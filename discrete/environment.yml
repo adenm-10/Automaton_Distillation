@@ -1,0 +1,17 @@
+name: autd
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.7.2
+  - pip==23.2
+  - conda-forge:spot==2.11.1
+
+  - pip:
+    - -r requirements.txt
+
+    # Final manual step, run:
+    #    pip install stable-baselines3
+    #    pip install --no-deps stable-baselines3==1.5.0 gym==0.15.7 numpy==1.17.5
+    # stable-baselines3 conflicts with the version of gym and numpy installed in requirements, but seems to work.
+    # Not sure how to do this automatically...

@@ -1,0 +1,24 @@
+# Pytorch - depends on CUDA version.
+# See: PyTorch website for exact version to install
+--extra-index-url https://download.pytorch.org/whl/cu113
+torch==1.12.1+cu113
+torchvision==0.13.1+cu113
+torchaudio==0.12.1
+
+gym==0.15.7
+flloat==0.3.0
+pythomata==0.3.2
+networkx==2.6.3
+more-itertools==9.1.0
+numpy==1.17.5
+tensorboard==2.11.2
+tqdm==4.65.0
+patchelf==0.17.2.1
+
+# For safety gym:
+mujoco_py==2.1.2.14
+xmltodict==0.13.0
+
+# For mujoco:
+Cython==0.29.23
+
