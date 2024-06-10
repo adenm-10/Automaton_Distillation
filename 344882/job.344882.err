@@ -1,0 +1,24 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Traceback (most recent call last):
+  File "./discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 30, in <module>
+    run_training(config)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/main.py", line 42, in run_training
+    train_agent(config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/training.py", line 690, in train_agent
+    next_aut_states = reset_done_aut_states(aut_states_after_current, dones, automaton)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/training.py", line 355, in reset_done_aut_states
+    return torch.where(dones, a, b)
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!
+
+real	0m7.638s
+user	0m3.879s
+sys	0m4.009s

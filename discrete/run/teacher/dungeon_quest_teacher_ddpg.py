@@ -9,13 +9,13 @@ from discrete.lib.agent.DDPG_Agent import DDPG_Agent
 
 from discrete.lib.agent.AC_Agent import AC_Agent
 
-device = torch.device("cpu")
+#device = torch.device("cpu")
 if torch.cuda.is_available():
     device = torch.device('cuda')
     print("cuda detected")
-    assert False
+    #assert False
 
-max_training_steps=int(75000)
+max_training_steps=int(500000)
 
 config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, "dungeon_quest_rew_per_step_env_config_7_cont",
                            device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,

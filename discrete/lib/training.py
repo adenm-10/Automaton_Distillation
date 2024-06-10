@@ -351,8 +351,10 @@ def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.
     # print(dones)
     # print(a)
     b = torch.tensor(aut_states_after_previous.cpu().numpy(), dtype=torch.int64, device="cpu")
+    
+    #precious reverted to the old code
 
-    return torch.where(dones, a, b)
+    return torch.where(dones, automaton.default_state, aut_states_after_previous)
 
 
 class TraceHelper:

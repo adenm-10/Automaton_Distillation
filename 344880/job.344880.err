@@ -1,0 +1,16 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+Traceback (most recent call last):
+  File "./discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 16, in <module>
+    assert False
+AssertionError
+
+real	1m0.347s
+user	0m2.401s
+sys	0m4.176s

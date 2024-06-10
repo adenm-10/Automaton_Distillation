@@ -46,7 +46,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
         automaton=automaton,
         reward_machine=None,
         epsilon=0.1,
-        agent_train_batch_size=100, # was 32
+        agent_train_batch_size=128, # was 32 # changing to 128 from 100
         target_agent_update_every_steps=1000,
         max_training_steps=max_training_steps,
         checkpoint_every_steps=int(1e4),

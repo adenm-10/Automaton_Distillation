@@ -1,0 +1,294 @@
+/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic
+	[4mGPU0	GPU1	NIC0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	SYS	0,2,4	0		N/A
+GPU1	SYS	 X 	SYS	1,3,5	1		N/A
+NIC0	SYS	SYS	 X 				
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+
+
+
+
+============================================
+Discrete Steps until Terminal State: 150
+Continuous Steps until Terminal State: 150
+Dungeon Quest LTLF: F(sword) & (!sword U key)
+============================================
+
+
+/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic
+cuda detected
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b5c4be60978>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b5c4be609b0>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b5c4be609e8>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x2b5c4be60a20>]
+
+
+============================================
+DDPG AGENT TRAINING
+Steps Before Total Run Termination: 500000
+============================================
+
+
+Starting training at: 2024-06-09 21:10:44
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x2b5c4be60320>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(8, 2)
+Automaton Num States: 8
+Action Space: Box(1,)
+input shape: (8, 2)
+Agent Name: DDPG Agent
+Loading from checkpoint
+input shape: (8, 2)
+Actor Learning Rate: 0.0001
+Critic Learning Rate: 0.001
+Updating Graphs at Step: 70000
+Updating Graphs at Step: 71000
+Updating Graphs at Step: 72000
+Updating Graphs at Step: 73000
+Updating Graphs at Step: 74000
+Updating Graphs at Step: 75000
+Updating Graphs at Step: 76000
+Updating Graphs at Step: 77000
+Updating Graphs at Step: 78000
+Updating Graphs at Step: 79000
+Updating Graphs at Step: 80000
+Updating Graphs at Step: 81000
+Updating Graphs at Step: 82000
+Updating Graphs at Step: 83000
+Updating Graphs at Step: 84000
+Updating Graphs at Step: 85000
+Updating Graphs at Step: 86000
+Updating Graphs at Step: 87000
+Updating Graphs at Step: 88000
+Updating Graphs at Step: 89000
+Updating Graphs at Step: 90000
+Updating Graphs at Step: 91000
+Updating Graphs at Step: 92000
+Updating Graphs at Step: 93000
+Updating Graphs at Step: 94000
+Updating Graphs at Step: 95000
+Updating Graphs at Step: 96000
+Updating Graphs at Step: 97000
+Updating Graphs at Step: 98000
+Updating Graphs at Step: 99000
+Updating Graphs at Step: 100000
+Updating Graphs at Step: 101000
+Updating Graphs at Step: 102000
+Updating Graphs at Step: 103000
+Updating Graphs at Step: 104000
+Updating Graphs at Step: 105000
+Updating Graphs at Step: 106000
+Updating Graphs at Step: 107000
+Updating Graphs at Step: 108000
+Updating Graphs at Step: 109000
+Updating Graphs at Step: 110000
+Updating Graphs at Step: 111000
+Updating Graphs at Step: 112000
+Updating Graphs at Step: 113000
+Updating Graphs at Step: 114000
+Updating Graphs at Step: 115000
+Updating Graphs at Step: 116000
+Updating Graphs at Step: 117000
+Updating Graphs at Step: 118000
+Updating Graphs at Step: 119000
+Updating Graphs at Step: 120000
+Updating Graphs at Step: 121000
+Updating Graphs at Step: 122000
+Updating Graphs at Step: 123000
+Updating Graphs at Step: 124000
+Updating Graphs at Step: 125000
+Updating Graphs at Step: 126000
+Updating Graphs at Step: 127000
+Updating Graphs at Step: 128000
+Updating Graphs at Step: 129000
+Updating Graphs at Step: 130000
+Updating Graphs at Step: 131000
+Updating Graphs at Step: 132000
+Updating Graphs at Step: 133000
+Updating Graphs at Step: 134000
+Updating Graphs at Step: 135000
+Updating Graphs at Step: 136000
+Updating Graphs at Step: 137000
+Updating Graphs at Step: 138000
+Updating Graphs at Step: 139000
+Updating Graphs at Step: 140000
+Updating Graphs at Step: 141000
+Updating Graphs at Step: 142000
+Updating Graphs at Step: 143000
+Updating Graphs at Step: 144000
+Updating Graphs at Step: 145000
+Updating Graphs at Step: 146000
+Updating Graphs at Step: 147000
+Updating Graphs at Step: 148000
+Updating Graphs at Step: 149000
+Updating Graphs at Step: 150000
+Updating Graphs at Step: 151000
+Updating Graphs at Step: 152000
+Updating Graphs at Step: 153000
+Updating Graphs at Step: 154000
+Updating Graphs at Step: 155000
+Updating Graphs at Step: 156000
+Updating Graphs at Step: 157000
+Updating Graphs at Step: 158000
+Updating Graphs at Step: 159000
+Updating Graphs at Step: 160000
+Updating Graphs at Step: 161000
+Updating Graphs at Step: 162000
+Updating Graphs at Step: 163000
+Updating Graphs at Step: 164000
+Updating Graphs at Step: 165000
+Updating Graphs at Step: 166000
+Updating Graphs at Step: 167000
+Updating Graphs at Step: 168000
+Updating Graphs at Step: 169000
+Updating Graphs at Step: 170000
+Updating Graphs at Step: 171000
+Updating Graphs at Step: 172000
+Updating Graphs at Step: 173000
+Updating Graphs at Step: 174000
+Updating Graphs at Step: 175000
+Updating Graphs at Step: 176000
+Updating Graphs at Step: 177000
+Updating Graphs at Step: 178000
+Updating Graphs at Step: 179000
+Updating Graphs at Step: 180000
+Updating Graphs at Step: 181000
+Updating Graphs at Step: 182000
+Updating Graphs at Step: 183000
+Updating Graphs at Step: 184000
+Updating Graphs at Step: 185000
+Updating Graphs at Step: 186000
+Updating Graphs at Step: 187000
+Updating Graphs at Step: 188000
+Updating Graphs at Step: 189000
+Updating Graphs at Step: 190000
+Updating Graphs at Step: 191000
+Updating Graphs at Step: 192000
+Updating Graphs at Step: 193000
+Updating Graphs at Step: 194000
+Updating Graphs at Step: 195000
+Updating Graphs at Step: 196000
+Updating Graphs at Step: 197000
+Updating Graphs at Step: 198000
+Updating Graphs at Step: 199000
+Updating Graphs at Step: 200000
+Updating Graphs at Step: 201000
+Updating Graphs at Step: 202000
+Updating Graphs at Step: 203000
+Updating Graphs at Step: 204000
+Updating Graphs at Step: 205000
+Updating Graphs at Step: 206000
+Updating Graphs at Step: 207000
+Updating Graphs at Step: 208000
+Updating Graphs at Step: 209000
+Updating Graphs at Step: 210000
+Updating Graphs at Step: 211000
+Updating Graphs at Step: 212000
+Updating Graphs at Step: 213000
+Updating Graphs at Step: 214000
+Updating Graphs at Step: 215000
+Updating Graphs at Step: 216000
+Updating Graphs at Step: 217000
+Updating Graphs at Step: 218000
+Updating Graphs at Step: 219000
+Updating Graphs at Step: 220000
+Updating Graphs at Step: 221000
+Updating Graphs at Step: 222000
+Updating Graphs at Step: 223000
+Updating Graphs at Step: 224000
+Updating Graphs at Step: 225000
+Updating Graphs at Step: 226000
+Updating Graphs at Step: 227000
+Updating Graphs at Step: 228000
+Updating Graphs at Step: 229000
+Updating Graphs at Step: 230000
+Updating Graphs at Step: 231000
+Updating Graphs at Step: 232000
+Updating Graphs at Step: 233000
+Updating Graphs at Step: 234000
+Updating Graphs at Step: 235000
+Updating Graphs at Step: 236000
+Updating Graphs at Step: 237000
+Updating Graphs at Step: 238000
+Updating Graphs at Step: 239000
+Updating Graphs at Step: 240000
+Updating Graphs at Step: 241000
+Updating Graphs at Step: 242000
+Updating Graphs at Step: 243000
+Updating Graphs at Step: 244000
+Updating Graphs at Step: 245000
+Updating Graphs at Step: 246000
+Updating Graphs at Step: 247000
+Updating Graphs at Step: 248000
+Updating Graphs at Step: 249000
+Updating Graphs at Step: 250000
+Updating Graphs at Step: 251000
+Updating Graphs at Step: 252000
+Updating Graphs at Step: 253000
+Updating Graphs at Step: 254000
+Updating Graphs at Step: 255000
+Updating Graphs at Step: 256000
+Updating Graphs at Step: 257000
+Updating Graphs at Step: 258000
+Updating Graphs at Step: 259000
+Updating Graphs at Step: 260000
+Updating Graphs at Step: 261000
+Updating Graphs at Step: 262000
+Updating Graphs at Step: 263000
+Updating Graphs at Step: 264000
+Updating Graphs at Step: 265000
+Updating Graphs at Step: 266000
+Updating Graphs at Step: 267000
+Updating Graphs at Step: 268000
+Updating Graphs at Step: 269000
+Updating Graphs at Step: 270000
+Updating Graphs at Step: 271000
+Updating Graphs at Step: 272000
+Updating Graphs at Step: 273000
+Updating Graphs at Step: 274000
+Updating Graphs at Step: 275000
+Updating Graphs at Step: 276000
+Updating Graphs at Step: 277000
+Updating Graphs at Step: 278000
+Updating Graphs at Step: 279000
+Updating Graphs at Step: 280000
+Updating Graphs at Step: 281000
+Updating Graphs at Step: 282000
+Updating Graphs at Step: 283000
+Updating Graphs at Step: 284000
+Updating Graphs at Step: 285000
+Updating Graphs at Step: 286000
+Updating Graphs at Step: 287000
+Updating Graphs at Step: 288000
+Updating Graphs at Step: 289000
+Updating Graphs at Step: 290000
+Updating Graphs at Step: 291000
+Updating Graphs at Step: 292000
+Updating Graphs at Step: 293000
+Updating Graphs at Step: 294000
+Updating Graphs at Step: 295000
+Updating Graphs at Step: 296000
+Updating Graphs at Step: 297000
+Updating Graphs at Step: 298000
+Updating Graphs at Step: 299000
+Updating Graphs at Step: 300000
+Updating Graphs at Step: 301000
+Updating Graphs at Step: 302000
+Updating Graphs at Step: 303000
+Updating Graphs at Step: 304000
+Updating Graphs at Step: 305000
+Updating Graphs at Step: 306000
+Updating Graphs at Step: 307000
+Updating Graphs at Step: 308000
+Updating Graphs at Step: 309000

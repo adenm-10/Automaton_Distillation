@@ -1,0 +1,28 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Traceback (most recent call last):
+  File "./discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 30, in <module>
+    run_training(config)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/main.py", line 42, in run_training
+    train_agent(config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/training.py", line 705, in train_agent
+    global_step=i)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/rollout_buffer.py", line 534, in add_vec_experiences
+    last_aut_state=aut_states_after_current[i])
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/rollout_buffer.py", line 268, in add_episode
+    (self.priorities, max_priority)
+  File "/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/discrete/lib/rollout_buffer.py", line 174, in write_to_and_move_head
+    src_tensor = src_tensor.clone().detach().float().to(self.device)
+AttributeError: 'numpy.float64' object has no attribute 'clone'
+
+real	0m20.883s
+user	0m4.368s
+sys	0m5.472s

@@ -155,7 +155,7 @@ class CriticNetwork(nn.Module):
         torch.nn.init.uniform_(self.q.bias.data, -f3, f3)
         
         # self.optimizer = optim.Adam(self.parameters(), lr=beta)
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda:0')
         
         self.to(self.device)
         
@@ -242,7 +242,7 @@ class ActorNetwork(nn.Module):
         
         self.optimizer = torch.optim.Adam(self.parameters(), lr =alpha)
         # self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.device = torch.device('cpu')
+        self.device = torch.device('cuda:0')
         self.to(self.device)
         
     def forward(self, state):
@@ -305,6 +305,7 @@ class DDPG_Agent(AC_Agent):
         # self.target_actor = ActorNetwork(alpha=0.000025, input_dims = np.prod(input_shape), n_actions=num_actions, name = 'TargetActor')
         # self.noise = OUActionNoise(mu=np.zeros(num_actions))
         self.noise = OUActionNoise(mu=np.zeros(1))
+        self.device = torch.device('cuda:0')
 
 
         
@@ -326,7 +327,8 @@ class DDPG_Agent(AC_Agent):
     def create_agent(cls, input_shape: Tuple, num_automaton_states: int, num_actions: int) -> "AC_Agent":
         return cls(input_shape, num_actions)
     
-    def choose_action(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> np.ndarray:
+    def choose_action(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> torch.tensor:
+        
         self.actor.eval()
         # print(f"Continuous Observation / DDPG Input: {observation}")
         # assert False
@@ -335,7 +337,7 @@ class DDPG_Agent(AC_Agent):
         # assert False
 
         # noise = torch.tensor(self.noise(),dtype=torch.float).to(self.actor.device)
-        noise = torch.tensor(np.random.normal(scale=0.3, size=1))
+        noise = torch.tensor(np.random.normal(scale=0.3, size=1)).to(self.actor.device)
         mu_prime = mu + noise
         # print(f"Mu: {mu}, \nNoise: {noise}")
         # print(f"Forward Action: {mu_prime}")
@@ -388,7 +390,6 @@ class DDPG_Agent(AC_Agent):
         # assert False
         # return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions)).to(
         #     self.adv_branch.weight.device)
-        return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions)).to(
-            "cpu")
+        return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions)).to(self.device)
     
         
