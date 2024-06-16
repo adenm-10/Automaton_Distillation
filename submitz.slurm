@@ -20,7 +20,7 @@
 #Select File to run
 #export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
 export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/
-export file="./discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
+export file="../discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
 export args=""
 
 #Select how logs get stored
@@ -80,6 +80,7 @@ echo "ulimit -l" >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
 ## Directory Cleanup ##
+mv ./test_output/test_output* $SLURM_JOB_ID/
 mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
 mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
 mv learning_curves $SLURM_JOB_ID/

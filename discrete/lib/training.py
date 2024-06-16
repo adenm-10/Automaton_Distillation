@@ -568,10 +568,10 @@ def train_agent(config: Configuration,
 
         print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
 
-        actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
+        actor_optimizer = torch.optim.Adam(agent.parameters(), lr = actor_lr)
         #Also try 0.000025 for lr
     
-        critic_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.001)
+        critic_optimizer = torch.optim.Adam(agent.parameters(), lr = critic_lr)
         #Also try 0.00025 for lr
     else:
         optimizer = torch.optim.Adam(agent.parameters())
@@ -622,12 +622,12 @@ def train_agent(config: Configuration,
         # (1) Choose action based off current state
         if isinstance(agent, AC_Agent):
             actions = agent.choose_action(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
-                                             current_aut_states) # DDPG doesnt use current aut states in action selection
+                                             current_aut_states).to(config.device) # DDPG doesnt use current aut states in action selection
         else:
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
             # print(f"\nQ Values: {q_values}")
-            actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
+            actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon).to(config.device)
 
         # (2) Return observation after making action in environment
         # print(f"Actions: \n{actions}\n")
@@ -680,7 +680,6 @@ def train_agent(config: Configuration,
             print("Aut States affecting Rewards")
             rewards += automaton.target_reward_shaping(current_aut_states, aut_states_after_current)
 
-        
         trace_helper.finalize_step(dones)
 
         intr_rewards = batch_intrins_rew_calculator.calc_intr_rewards_batch(batch_intrins_reward_state,
@@ -756,59 +755,58 @@ def train_agent(config: Configuration,
             reward_mav = moving_average(rewards_list)
             steps_mav = moving_average(steps_to_terminal_total)
 
-            '''
-            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-            plt.xlabel('Iterations')
-            plt.ylabel('Loss')
-            plt.legend()
-            
-            # os.mkdir(path_to_out)
-
-            # plt.ylim([0,2])
-
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Losses.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Losses.png')
-
-            plt.clf()
-
-            # print(f"reward iters, list")
-            # print(rewards_iterations)
-            # print(rewards_list)
-            plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-            plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-            plt.xlabel('Iterations')
-            plt.ylabel('Rewards')
-            plt.legend()
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
-
-            plt.clf()
-
-            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-            plt.xlabel('Episodes')
-            plt.ylabel('Steps to Terminal State')
-            plt.legend()
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps.png')
-            '''
-
             try:
                 print(f"Moving Average Reward: {reward_mav[-1]}")
                 print(f"Moving Average Steps / Ep: {steps_mav[-1]}\n")
             except:
                 print("Not enough data yet\n")	
+
+    
+    plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
+    plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
+    plt.xlabel('Iterations')
+    plt.ylabel('Loss')
+    plt.legend()
+    
+    # os.mkdir(path_to_out)
+
+    # plt.ylim([0,2])
+
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Losses.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+
+    plt.clf()
+
+    # print(f"reward iters, list")
+    # print(rewards_iterations)
+    # print(rewards_list)
+    plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
+    plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
+    plt.xlabel('Iterations')
+    plt.ylabel('Rewards')
+    plt.legend()
+    
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Rewards.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
+
+    plt.clf()
+
+    steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
+
+    plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
+    plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
+    plt.xlabel('Episodes')
+    plt.ylabel('Steps to Terminal State')
+    plt.legend()
+    
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Steps.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Steps.png')
 
     return agent
 
