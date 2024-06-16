@@ -565,8 +565,8 @@ def train_agent(config: Configuration,
         #DIEGO WAS HERE
         # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.001)
         # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
-        actor_lr = 0.0001
-        critic_lr = 0.001
+        actor_lr = config.actor_lr
+        critic_lr = config.critic_lr
 
         print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
 

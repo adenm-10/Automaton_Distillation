@@ -70,7 +70,13 @@ rm -rf ./checkpoints/*
 
 ###mpirun -np $SLURM_NTASKS python $file
 echo
-time python -u $file $args
+
+alr=0.0001
+clr=0.001
+gamma=0.99
+
+# Should match the environment used when used as a student
+time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma"
 echo
 # sleep 3
 
