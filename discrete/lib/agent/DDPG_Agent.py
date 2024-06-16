@@ -393,11 +393,11 @@ class DDPG_Agent(AC_Agent):
     def calc_v_values_batch(self, observation: torch.Tensor, automaton_state: torch.Tensor) -> torch.Tensor:
         return self.calc_q_values_batch(observation, automaton_state).amax(dim=-1)
 
-    def create_target_agent(self) -> "AC_TargetAgent":
+    def create_target_agent(self, tau=1) -> "AC_TargetAgent":
         # print(f"self.adv_branch.weight.device: {self.adv_branch.weight.device}")
         # assert False
         # return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions)).to(
         #     self.adv_branch.weight.device)
-        return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions)).to(self.device)
+        return AC_EasyTargetAgent(self, DDPG_Agent(self.input_shape, self.num_actions), tau=tau).to(self.device)
     
         

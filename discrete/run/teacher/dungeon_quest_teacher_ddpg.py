@@ -39,6 +39,8 @@ if __name__ == '__main__':
     parser.add_argument('--alr', type=float, default=0.0001, help='Actor Learning Rate')
     parser.add_argument('--clr', type=float, default=0.001, help='Critic Learning Rate')
     parser.add_argument('--gamma', type=float, default=0.99, help='Discount Factor (Gamma)')
+    parser.add_argument('--batch-size', type=int, default=128, help='buffer batch size')
+    parser.add_argument('--tau', type=float, default=1.0, help='target transfer tau')
     
     # Parse arguments from command line
     args = parser.parse_args()
@@ -47,10 +49,12 @@ if __name__ == '__main__':
     alr = args.alr
     clr = args.clr
     gamma = args.gamma
+    batch_size = args.batch_size
+    tau = args.tau
 
     config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, "dungeon_quest_rew_per_step_env_config_7_cont",
                            device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,
-                           ltlf=dungeon_quest_ltlf, max_training_steps=max_training_steps, gamma=gamma, alr=alr, clr=clr)
+                           ltlf=dungeon_quest_ltlf, max_training_steps=max_training_steps, gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau)
 
     print("\n\n============================================")
     print(f"DDPG AGENT TRAINING")

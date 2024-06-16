@@ -4,6 +4,7 @@ Created on Feb 6, 2024
 @author: diegobenalcazar
 '''
 import torch
+import copy
 
 from discrete.lib.agent.AC_Agent import AC_Agent, AC_TargetAgent
 from discrete.lib.agent.feature_extractor import FeatureExtractor
@@ -14,11 +15,13 @@ class AC_EasyTargetAgent(AC_TargetAgent):
     Target agent that delegates to a copy of the source agent, and uses the state_dict when updating itself
     """
 
-    def __init__(self, source: AC_Agent, initial_copy: AC_Agent):
+    def __init__(self, source: AC_Agent, initial_copy: AC_Agent, tau: float):
         super().__init__()
         self.source = source
         self.target = initial_copy
+        self.tau = tau
         self.update_weights()
+        assert False
 
     @classmethod
     def create_agent(cls, input_shape: FeatureExtractor, num_automaton_states: int, num_actions: int) -> "AC_Agent":
@@ -40,8 +43,11 @@ class AC_EasyTargetAgent(AC_TargetAgent):
         raise NotImplementedError("Shouldn't create targets of target agents")
 
     def update_weights(self):
-        # noinspection PyTypeChecker
-        # tau = 1
-        # print(self.source.state_dict())
-        # assert False
-        self.target.load_state_dict(self.source.state_dict())
+        source_copy = copy.deepcopy(self.source.state_dict())
+        target_copy = copy.deepcopy(self.target.state_dict())
+
+        for param_tensor in source_copy:
+            
+            source_copy[param_tensor] = self.tau * source_copy[param_tensor]  + (1 - self.tau) * target_copy[param_tensor]
+
+        self.target.load_state_dict(source_copy)

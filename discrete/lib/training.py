@@ -555,7 +555,7 @@ def train_agent(config: Configuration,
     buff_helper = VecRolloutBufferHelper(config.num_parallel_envs, rollout_buffer, logger,
                                          no_done_on_out_of_time=config.no_done_on_out_of_time)
 
-    target_agent = agent.create_target_agent()
+    target_agent = agent.create_target_agent(tau=config.tau)
 
     current_states = torch.as_tensor(env.reset(), device=config.device)
     current_aut_states = torch.tensor([automaton.default_state] * config.num_parallel_envs,

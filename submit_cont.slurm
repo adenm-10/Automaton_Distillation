@@ -71,12 +71,14 @@ rm -rf ./checkpoints/*
 ###mpirun -np $SLURM_NTASKS python $file
 echo
 
-alr=0.000075
-clr=0.00075
+alr=0.0001
+clr=0.001
 gamma=0.99
+batch_size=128
+tau=1.0
 
 # Should match the environment used when used as a student
-time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma"
+time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 # sleep 3

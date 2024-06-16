@@ -55,3 +55,4 @@ class Configuration(NamedTuple):
     run_name: str
     actor_lr: float
     critic_lr: float
+    tau: float

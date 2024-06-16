@@ -30,7 +30,7 @@ dummy_ltlf = "True"
 
 def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device, agent_cls=DuelingQNetworkAgent,
                       no_done_on_out_of_time: bool = False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
-                      max_training_steps=int(1e6), online_distill: bool = False, gamma: float = 0.99, alr: float = 0.001, clr: float = 0.001):
+                      max_training_steps=int(1e6), online_distill: bool = False, gamma: float = 0.99, alr: float = 0.001, clr: float = 0.001, batch_size: int = 128, tau: float = 1.0):
     automaton, ap_extractor = construct_ap_extractor_automaton(aps, ltlf, device)
 
 
@@ -47,7 +47,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
         automaton=automaton,
         reward_machine=None,
         epsilon=0.1,
-        agent_train_batch_size=128, # was 32 # changing to 128 from 100
+        agent_train_batch_size=batch_size, # was 32 # changing to 128 from 100
         target_agent_update_every_steps=1000,
         max_training_steps=max_training_steps,
         checkpoint_every_steps=int(1e4),
@@ -60,7 +60,8 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
         device=device,
         run_name=run_name,
         actor_lr=alr,
-        critic_lr=clr
+        critic_lr=clr,
+        tau=tau
     )
 
 
