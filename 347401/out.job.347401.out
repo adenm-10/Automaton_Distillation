@@ -1,0 +1,281 @@
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+	[4mGPU0	GPU1	NIC0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	SYS	4,6,12,14,16	0		N/A
+GPU1	SYS	 X 	SYS	1,3,5,7,9,11	1		N/A
+NIC0	SYS	SYS	 X 				
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+
+
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 150
+Continuous Steps until Terminal State: 150
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+Dungeon Quest LTLF: F(sword) & (!sword U key)
+============================================
+
+
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+imported all dependencies, checking for cuda
+
+==============
+Cuda detected!
+==============
+
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6ba8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6be0>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6c18>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x2b524b1b6c50>]
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6ba8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6be0>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b524b1b6c18>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x2b524b1b6c50>]
+
+
+============================================
+DDPG AGENT TRAINING
+Steps Before Total Run Termination: 200000
+============================================
+
+
+Starting training at: 2024-06-16 17:52:37
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x2b524b1b6588>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(8, 2)
+Automaton Num States: 8
+Action Space: Box(1,)
+input shape: (8, 2)
+
+==============
+Cuda detected!
+==============
+
+Agent Name: DDPG Agent
+NOT Loading from checkpoint
+input shape: (8, 2)
+
+==============
+Cuda detected!
+==============
+
+Actor Learning Rate: 0.0001
+Critic Learning Rate: 0.001
+Completed Steps: 0
+Completed Steps: 1000
+Completed Steps: 2000
+Completed Steps: 3000
+Completed Steps: 4000
+Completed Steps: 5000
+Completed Steps: 6000
+Completed Steps: 7000
+Completed Steps: 8000
+Completed Steps: 9000
+Completed Steps: 10000
+Completed Steps: 11000
+Completed Steps: 12000
+Completed Steps: 13000
+Completed Steps: 14000
+Completed Steps: 15000
+Completed Steps: 16000
+Completed Steps: 17000
+Completed Steps: 18000
+Completed Steps: 19000
+Completed Steps: 20000
+Completed Steps: 21000
+Completed Steps: 22000
+Completed Steps: 23000
+Completed Steps: 24000
+Completed Steps: 25000
+Completed Steps: 26000
+Completed Steps: 27000
+Completed Steps: 28000
+Completed Steps: 29000
+Completed Steps: 30000
+Completed Steps: 31000
+Completed Steps: 32000
+Completed Steps: 33000
+Completed Steps: 34000
+Completed Steps: 35000
+Completed Steps: 36000
+Completed Steps: 37000
+Completed Steps: 38000
+Completed Steps: 39000
+Completed Steps: 40000
+Completed Steps: 41000
+Completed Steps: 42000
+Completed Steps: 43000
+Completed Steps: 44000
+Completed Steps: 45000
+Completed Steps: 46000
+Completed Steps: 47000
+Completed Steps: 48000
+Completed Steps: 49000
+Completed Steps: 50000
+Completed Steps: 51000
+Completed Steps: 52000
+Completed Steps: 53000
+Completed Steps: 54000
+Completed Steps: 55000
+Completed Steps: 56000
+Completed Steps: 57000
+Completed Steps: 58000
+Completed Steps: 59000
+Completed Steps: 60000
+Completed Steps: 61000
+Completed Steps: 62000
+Completed Steps: 63000
+Completed Steps: 64000
+Completed Steps: 65000
+Completed Steps: 66000
+Completed Steps: 67000
+Completed Steps: 68000
+Completed Steps: 69000
+Completed Steps: 70000
+Completed Steps: 71000
+Completed Steps: 72000
+Completed Steps: 73000
+Completed Steps: 74000
+Completed Steps: 75000
+Completed Steps: 76000
+Completed Steps: 77000
+Completed Steps: 78000
+Completed Steps: 79000
+Completed Steps: 80000
+Completed Steps: 81000
+Completed Steps: 82000
+Completed Steps: 83000
+Completed Steps: 84000
+Completed Steps: 85000
+Completed Steps: 86000
+Completed Steps: 87000
+Completed Steps: 88000
+Completed Steps: 89000
+Completed Steps: 90000
+Completed Steps: 91000
+Completed Steps: 92000
+Completed Steps: 93000
+Completed Steps: 94000
+Completed Steps: 95000
+Completed Steps: 96000
+Completed Steps: 97000
+Completed Steps: 98000
+Completed Steps: 99000
+Completed Steps: 100000
+Completed Steps: 101000
+Completed Steps: 102000
+Completed Steps: 103000
+Completed Steps: 104000
+Completed Steps: 105000
+Completed Steps: 106000
+Completed Steps: 107000
+Completed Steps: 108000
+Completed Steps: 109000
+Completed Steps: 110000
+Completed Steps: 111000
+Completed Steps: 112000
+Completed Steps: 113000
+Completed Steps: 114000
+Completed Steps: 115000
+Completed Steps: 116000
+Completed Steps: 117000
+Completed Steps: 118000
+Completed Steps: 119000
+Completed Steps: 120000
+Completed Steps: 121000
+Completed Steps: 122000
+Completed Steps: 123000
+Completed Steps: 124000
+Completed Steps: 125000
+Completed Steps: 126000
+Completed Steps: 127000
+Completed Steps: 128000
+Completed Steps: 129000
+Completed Steps: 130000
+Completed Steps: 131000
+Completed Steps: 132000
+Completed Steps: 133000
+Completed Steps: 134000
+Completed Steps: 135000
+Completed Steps: 136000
+Completed Steps: 137000
+Completed Steps: 138000
+Completed Steps: 139000
+Completed Steps: 140000
+Completed Steps: 141000
+Completed Steps: 142000
+Completed Steps: 143000
+Completed Steps: 144000
+Completed Steps: 145000
+Completed Steps: 146000
+Completed Steps: 147000
+Completed Steps: 148000
+Completed Steps: 149000
+Completed Steps: 150000
+Completed Steps: 151000
+Completed Steps: 152000
+Completed Steps: 153000
+Completed Steps: 154000
+Completed Steps: 155000
+Completed Steps: 156000
+Completed Steps: 157000
+Completed Steps: 158000
+Completed Steps: 159000
+Completed Steps: 160000
+Completed Steps: 161000
+Completed Steps: 162000
+Completed Steps: 163000
+Completed Steps: 164000
+Completed Steps: 165000
+Completed Steps: 166000
+Completed Steps: 167000
+Completed Steps: 168000
+Completed Steps: 169000
+Completed Steps: 170000
+Completed Steps: 171000
+Completed Steps: 172000
+Completed Steps: 173000
+Completed Steps: 174000
+Completed Steps: 175000
+Completed Steps: 176000
+Completed Steps: 177000
+Completed Steps: 178000
+Completed Steps: 179000
+Completed Steps: 180000
+Completed Steps: 181000
+Completed Steps: 182000
+Completed Steps: 183000
+Completed Steps: 184000
+Completed Steps: 185000
+Completed Steps: 186000
+Completed Steps: 187000
+Completed Steps: 188000
+Completed Steps: 189000
+Completed Steps: 190000
+Completed Steps: 191000
+Completed Steps: 192000
+Completed Steps: 193000
+Completed Steps: 194000
+Completed Steps: 195000
+Completed Steps: 196000
+Completed Steps: 197000
+Completed Steps: 198000
+Completed Steps: 199000
+
+Exited training loop, plotting results...
+
+saved, now moving on...
+Finished training at: 2024-06-16 18:45:08
+Total elapsed time: 3151.482483625412
+
