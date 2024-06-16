@@ -283,11 +283,18 @@ class DDPG_Agent(AC_Agent):
         self.input_shape = input_shape
         self.name = "DDPG Agent"
         print(f"input shape: {input_shape}")
+        self.num_actions = num_actions
+
+        self.device = "cpu"
+
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda:0')
+            print("\n==============\nCuda detected!\n==============\n")
+
         # print(f"\nnum_actions: \n{num_actions}\n")
 
         # assert False
         # self.feature_extractor = FeatureExtractor(input_shape=input_shape)
-        self.num_actions = num_actions
         # print("DDPG Agent num actions")
         # print(num_actions)
         # self.half_feat_extractor_output_size = self.feature_extractor.output_size // 2
@@ -301,11 +308,11 @@ class DDPG_Agent(AC_Agent):
         # self.target_actor = ActorNetwork(input_dims, n_actions=num_actions, name = 'TargetActor')        
         # self.noise = OUActionNoise(mu=np.zeros(num_actions))
         self.actor = ActorNetwork(alpha=0.00025, input_dims = np.prod(input_shape), n_actions=self.num_actions, name = 'Actor')
+        self.actor.to(self.device)
         # self.actor = ActorNetwork(alpha=0.000025, input_dims = np.prod(input_shape), n_actions=num_actions, name = 'Actor')
         # self.target_actor = ActorNetwork(alpha=0.000025, input_dims = np.prod(input_shape), n_actions=num_actions, name = 'TargetActor')
         # self.noise = OUActionNoise(mu=np.zeros(num_actions))
         self.noise = OUActionNoise(mu=np.zeros(1))
-        self.device = torch.device('cuda:0')
 
 
         
@@ -317,6 +324,7 @@ class DDPG_Agent(AC_Agent):
         # self.actor = ActorNetwork(alpha, input_dims, layer1_size, layer2_size, n_actions=n_actions, name='Actor')
         # self.target_actor = ActorNetwork(alpha, input_dims, layer1_size,layer2_size, n_actions=n_actions, name='TargetActor')        
         self.critic = CriticNetwork(beta=0.00025, input_dims = np.prod(input_shape), fc1_dims= 400,fc2_dims=300, n_actions=self.num_actions, name='Critic')
+        self.critic.to(self.device)
         # self.target_critic = CriticNetwork(beta, input_dims, layer1_size,layer2_size, n_actions=n_actions, name='TargetCritic')
         # self.noise = OUActionNoise(mu=np.zeros(n_actions))
         #
