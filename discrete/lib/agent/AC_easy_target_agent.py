@@ -21,7 +21,6 @@ class AC_EasyTargetAgent(AC_TargetAgent):
         self.target = initial_copy
         self.tau = tau
         self.update_weights()
-        assert False
 
     @classmethod
     def create_agent(cls, input_shape: FeatureExtractor, num_automaton_states: int, num_actions: int) -> "AC_Agent":
