@@ -11,6 +11,10 @@ from discrete.lib.agent.AC_Agent import AC_Agent
 device = torch.device("cpu")
 if torch.cuda.is_available():
     device = torch.device('cuda:0')
+    print("\n==============\nCuda detected!\n==============\n")
+else:
+    print("No CUDA detected, using CPU...\n")
+    # assert False
 
 max_training_steps=int(75000)
 
