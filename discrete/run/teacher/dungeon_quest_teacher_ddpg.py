@@ -17,16 +17,11 @@ print("imported all dependencies, checking for cuda")
 
 #device = torch.device("cpu")
 if torch.cuda.is_available():
-    device = torch.device('cuda')
-    print("\n==============")
-    print("Cuda detected!")
-    print("==============\n")
-    #assert False
+    device = torch.device('cuda:0')
+    print("\n==============\nCuda detected!\n==============\n")
 else:
     print("no cuda detected, exiting...")
     assert False
-
-#assert False
 
 max_training_steps=int(500000)
 

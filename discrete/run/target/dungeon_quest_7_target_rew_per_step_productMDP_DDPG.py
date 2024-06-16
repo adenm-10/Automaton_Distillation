@@ -8,7 +8,7 @@ from discrete.run.utils import student_config_v1
 
 device = torch.device("cpu")
 if torch.cuda.is_available():
-    device = torch.device('cuda')
+    device = torch.device('cuda:0')
 
 config = student_config_v1(
     env_config=dungeon_quest_rew_per_step_env_config_7_cont,
