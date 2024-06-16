@@ -1,3 +1,7 @@
+
+
+print("entered training run...")
+
 import torch
 
 from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
@@ -9,11 +13,20 @@ from discrete.lib.agent.DDPG_Agent import DDPG_Agent
 
 from discrete.lib.agent.AC_Agent import AC_Agent
 
+print("imported all dependencies, checking for cuda")
+
 #device = torch.device("cpu")
 if torch.cuda.is_available():
     device = torch.device('cuda')
-    print("cuda detected")
+    print("\n==============")
+    print("Cuda detected!")
+    print("==============\n")
     #assert False
+else:
+    print("no cuda detected, exiting...")
+    assert False
+
+#assert False
 
 max_training_steps=int(500000)
 

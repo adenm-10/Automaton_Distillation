@@ -1,0 +1,14 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+/home/amckinney/my-envs/autd/lib/python3.7/site-packages/torch/cuda/__init__.py:83: UserWarning: CUDA initialization: CUDA unknown error - this may be due to an incorrectly set up environment, e.g. changing env variable CUDA_VISIBLE_DEVICES after program start. Setting the available devices to be zero. (Triggered internally at  ../c10/cuda/CUDAFunctions.cpp:109.)
+  return torch._C._cuda_getDeviceCount() > 0
+Traceback (most recent call last):
+  File "discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 21, in <module>
+    device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,
+NameError: name 'device' is not defined

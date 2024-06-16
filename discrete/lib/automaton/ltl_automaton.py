@@ -37,8 +37,8 @@ def load_aut_from_cache(ltlf: str, ap_names: List[str], device: torch.device):
             if not sd:
                 return None
 
-            np.asarray(sd["adj_list"], dtype=np.int)
-            return LTLAutomaton(np.asarray(sd["adj_list"], dtype=np.int), sd["init_state"], device)
+            np.asarray(sd["adj_list"], dtype=np.int64)
+            return LTLAutomaton(np.asarray(sd["adj_list"], dtype=np.int64), sd["init_state"], device)
     except (JSONDecodeError, FileNotFoundError):
         return None
 
@@ -136,7 +136,7 @@ class LTLAutomaton(Automaton):
         print("Done with DFA conversion")
 
         # Convert from SymbolicDFA to an adjacency list with an integer alphabet
-        adj_matrix = -np.ones((len(dfa.states), 2 ** len(ap_names)), dtype=np.int)
+        adj_matrix = -np.ones((len(dfa.states), 2 ** len(ap_names)), dtype=np.int64)
         iter = 0
         for state in dfa.states:
             iter += 1

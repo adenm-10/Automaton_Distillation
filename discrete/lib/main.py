@@ -1,4 +1,7 @@
 import copy
+import sys
+
+print(sys.version)
 
 from torch.utils.tensorboard import SummaryWriter
 

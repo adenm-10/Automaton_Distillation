@@ -1,21 +1,23 @@
 #!/bin/bash
 
-##SBATCH -n 2 #try this (distributed - more than 1 computing node)
-##SBATCH --constraint=h100 # try this again - if this does not work eliminate it
+#SBATCH --nodes=4 #try this (distributed - more than 1 computing node)
+#SBATCH --constraint=v100 # try this again - if this does not work eliminate it
+##SBATCH --nodelist=evc1
 #SBATCH --time=72:00:00
-#SBATCH --cpus-per-gpu=4
-#SBATCH --gpus=3
+#SBATCH --cpus-per-gpu=2
+#SBATCH --gpus=4
 #SBATCH --job-name=Automaton
 #SBATCH --account=cenyioha
-#SBATCH --output=job.%J.out
-#SBATCH --error=job.%J.err
+#SBATCH --output=out.job.%J.out
+#SBATCH --error=err.job.%J.err
 
 ## --nodes=4
 ## --ntasks-per-node=10
 ## --mem-per-cpu=1990
 
 #Select File to run
-export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
+#export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
+export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/
 export file="./discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
 export args=""
 
@@ -26,8 +28,8 @@ export benchmark_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
 
 ##Load Modules
 module purge
-module load anaconda
-module load cuda/cuda-11.4
+module load anaconda/anaconda3
+module load cuda/cuda-11.3
 
 ## Enter Working Directory ##
 cd $SLURM_SUBMIT_DIR
@@ -42,6 +44,8 @@ mkdir "tmp"
 mkdir "tmp/policy"
 mkdir "learning_curves"
 
+#echo "Made needed log directories"
+
 ## Module debugging ##
 module list >> $debug_logs
 nvidia-smi topo -m
@@ -51,21 +55,30 @@ date >> $benchmark_logs
 echo "ulimit -l: " >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
+#echo "Activating conda env"
+
+conda deactivate
+
 ## Run job ##
+conda activate autd 
 source activate autd
+
+rm -rf ./automaton_q/*
+rm -rf ./logs/*
+rm -rf ./checkpoints/*
+
 ###mpirun -np $SLURM_NTASKS python $file
-##python $file $args
 echo
 time python -u $file $args
 echo
-sleep 3
+# sleep 3
 
 date >> $benchmark_logs
 echo "ulimit -l" >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
 ## Directory Cleanup ##
-mv job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
-mv job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
+mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
+mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
 mv learning_curves $SLURM_JOB_ID/
 mv tmp $SLURM_JOB_ID/

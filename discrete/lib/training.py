@@ -748,6 +748,7 @@ def train_agent(config: Configuration,
             reward_mav = moving_average(rewards_list)
             steps_mav = moving_average(steps_to_terminal_total)
 
+            '''
             plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
             plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
             plt.xlabel('Iterations')
@@ -793,6 +794,13 @@ def train_agent(config: Configuration,
                 plt.savefig(f'{path_to_out}/Student_Steps.png')
             else:
                 plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+            '''
+
+            try:
+                print(f"Moving Average Reward: {reward_mav[-1]}")
+                print(f"Moving Average Steps / Ep: {steps_mav[-1]}\n")
+            except:
+                print("Not enough data yet\n")	
 
     return agent
 
