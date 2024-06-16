@@ -20,7 +20,7 @@
 #Select File to run
 #export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
 export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/
-export file="../discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
+export file="./discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
 export args=""
 
 #Select how logs get stored
@@ -61,8 +61,7 @@ ulimit -l >> $benchmark_logs
 
 conda deactivate
 
-## Run job ##
-conda activate autd 
+## Run job ## 
 source activate autd
 
 rm -rf ./automaton_q/*

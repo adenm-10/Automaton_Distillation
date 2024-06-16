@@ -40,28 +40,11 @@ See 'conda init --help' for more information and options.
 IMPORTANT: You may need to close and restart your shell after running 'conda init'.
 
 
-
-CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
-To initialize your shell, run
-
-    $ conda init <SHELL_NAME>
-
-Currently supported shells are:
-  - bash
-  - fish
-  - tcsh
-  - xonsh
-  - zsh
-  - powershell
-
-See 'conda init --help' for more information and options.
-
-IMPORTANT: You may need to close and restart your shell after running 'conda init'.
-
-
 /home/amckinney/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
   warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+XIO:  fatal IO error 2 (No such file or directory) on X server "172.17.0.242:10.0"
+      after 898 requests (898 known processed) with 2 events remaining.
 
-real	5m58.803s
-user	5m49.000s
-sys	0m16.472s
+real	1m18.672s
+user	0m46.267s
+sys	0m8.565s

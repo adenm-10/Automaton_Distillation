@@ -599,6 +599,10 @@ def train_agent(config: Configuration,
     steps_to_terminal = [0]*config.num_parallel_envs
     steps_to_terminal_total = []
     
+    loss_mav = []
+    reward_mav = []
+    steps_mav = []
+
     rewards_iterations = []
 
     now = datetime.now().strftime("%m-%d_%H-%M-%S")
@@ -622,12 +626,12 @@ def train_agent(config: Configuration,
         # (1) Choose action based off current state
         if isinstance(agent, AC_Agent):
             actions = agent.choose_action(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
-                                             current_aut_states).to(config.device) # DDPG doesnt use current aut states in action selection
+                                             current_aut_states) # DDPG doesnt use current aut states in action selection
         else:
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
             # print(f"\nQ Values: {q_values}")
-            actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon).to(config.device)
+            actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
 
         # (2) Return observation after making action in environment
         # print(f"Actions: \n{actions}\n")
@@ -761,13 +765,20 @@ def train_agent(config: Configuration,
             except:
                 print("Not enough data yet\n")	
 
+    print("\nExited training loop, plotting results...\n")
     
+    loss_mav = moving_average(losses)
+    reward_mav = moving_average(rewards_list)
+    steps_mav = moving_average(steps_to_terminal_total)
+
     plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
     plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
     plt.xlabel('Iterations')
     plt.ylabel('Loss')
     plt.legend()
     
+    print("plotted, now saving...")
+
     # os.mkdir(path_to_out)
 
     # plt.ylim([0,2])
@@ -778,6 +789,8 @@ def train_agent(config: Configuration,
         plt.savefig(f'{path_to_out}/Teacher_Losses.png')
 
     plt.clf()
+
+    print("saved, now moving on...")
 
     # print(f"reward iters, list")
     # print(rewards_iterations)
