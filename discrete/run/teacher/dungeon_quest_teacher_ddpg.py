@@ -16,7 +16,7 @@ from discrete.lib.agent.AC_Agent import AC_Agent
 
 print("imported all dependencies, checking for cuda")
 
-#device = torch.device("cpu")
+device = torch.device("cpu")
 if torch.cuda.is_available():
     device = torch.device('cuda:0')
     print("\n==============\nCuda detected!\n==============\n")

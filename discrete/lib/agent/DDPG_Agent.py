@@ -122,7 +122,7 @@ class OUActionNoise(object):
 
 class CriticNetwork(nn.Module):
     def __init__(self, beta, input_dims, fc1_dims, fc2_dims, n_actions, name, 
-                chkpt_dir='tmp/ddpg'):
+                chkpt_dir='tmp/ddpg', device='cpu'):
 
         super(CriticNetwork, self).__init__()
         # print(f"input dims critic: {input_dims}")
@@ -155,7 +155,7 @@ class CriticNetwork(nn.Module):
         torch.nn.init.uniform_(self.q.bias.data, -f3, f3)
         
         # self.optimizer = optim.Adam(self.parameters(), lr=beta)
-        self.device = torch.device('cuda:0')
+        self.device = device
         
         self.to(self.device)
         
@@ -206,7 +206,7 @@ class CriticNetwork(nn.Module):
         
 class ActorNetwork(nn.Module):
     def __init__(self, alpha, input_dims, n_actions, name, fc1_dims = 400, fc2_dims = 300, 
-                chkpt_dir='tmp/ddpg'):
+                chkpt_dir='tmp/ddpg', device='cpu'):
         super(ActorNetwork, self).__init__()
 
         # print(f"actor input dims: {input_dims}")
@@ -240,9 +240,9 @@ class ActorNetwork(nn.Module):
         torch.nn.init.uniform_(self.mu.weight.data, -f3, f3)
         torch.nn.init.uniform_(self.mu.bias.data, -f3, f3)
         
-        self.optimizer = torch.optim.Adam(self.parameters(), lr =alpha)
+        # self.optimizer = torch.optim.Adam(self.parameters(), lr =alpha)
         # self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.device = torch.device('cuda:0')
+        self.device = device
         self.to(self.device)
         
     def forward(self, state):
@@ -307,7 +307,7 @@ class DDPG_Agent(AC_Agent):
         # self.actor = ActorNetwork(input_dims, n_actions=num_actions, name = 'Actor')
         # self.target_actor = ActorNetwork(input_dims, n_actions=num_actions, name = 'TargetActor')        
         # self.noise = OUActionNoise(mu=np.zeros(num_actions))
-        self.actor = ActorNetwork(alpha=0.00025, input_dims = np.prod(input_shape), n_actions=self.num_actions, name = 'Actor')
+        self.actor = ActorNetwork(alpha=0.00025, input_dims = np.prod(input_shape), n_actions=self.num_actions, name = 'Actor', device=self.device)
         self.actor.to(self.device)
         # self.actor = ActorNetwork(alpha=0.000025, input_dims = np.prod(input_shape), n_actions=num_actions, name = 'Actor')
         # self.target_actor = ActorNetwork(alpha=0.000025, input_dims = np.prod(input_shape), n_actions=num_actions, name = 'TargetActor')
@@ -323,7 +323,7 @@ class DDPG_Agent(AC_Agent):
         #
         # self.actor = ActorNetwork(alpha, input_dims, layer1_size, layer2_size, n_actions=n_actions, name='Actor')
         # self.target_actor = ActorNetwork(alpha, input_dims, layer1_size,layer2_size, n_actions=n_actions, name='TargetActor')        
-        self.critic = CriticNetwork(beta=0.00025, input_dims = np.prod(input_shape), fc1_dims= 400,fc2_dims=300, n_actions=self.num_actions, name='Critic')
+        self.critic = CriticNetwork(beta=0.00025, input_dims = np.prod(input_shape), fc1_dims= 400,fc2_dims=300, n_actions=self.num_actions, name='Critic', device=self.device)
         self.critic.to(self.device)
         # self.target_critic = CriticNetwork(beta, input_dims, layer1_size,layer2_size, n_actions=n_actions, name='TargetCritic')
         # self.noise = OUActionNoise(mu=np.zeros(n_actions))
