@@ -26,6 +26,8 @@ from discrete.lib.rollout_buffer import VecRolloutBufferHelper, RolloutBuffer, C
 from discrete.lib.updater import Updater
 from discrete.lib.agent.DDPG_Agent import DDPG_Agent
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
