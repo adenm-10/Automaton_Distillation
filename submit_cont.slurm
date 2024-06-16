@@ -71,8 +71,8 @@ rm -rf ./checkpoints/*
 ###mpirun -np $SLURM_NTASKS python $file
 echo
 
-alr=0.0001
-clr=0.001
+alr=0.000075
+clr=0.00075
 gamma=0.99
 
 # Should match the environment used when used as a student
