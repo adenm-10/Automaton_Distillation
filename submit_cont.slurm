@@ -77,6 +77,7 @@ gamma=0.99
 
 # Should match the environment used when used as a student
 time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma"
+mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 # sleep 3
 
@@ -85,7 +86,6 @@ echo "ulimit -l" >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
 ## Directory Cleanup ##
-mv ./test_output/test_output* $SLURM_JOB_ID/
 mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
 mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
 mv learning_curves $SLURM_JOB_ID/

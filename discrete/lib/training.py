@@ -746,8 +746,9 @@ def train_agent(config: Configuration,
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
         if i % 1000 == 0:
-            print(f"Updating Graphs at Step: {i}")
+            print(f"Completed Steps: {i}")
 
+            """
             end_time = time.time()
             print(f"Elapsed time: {end_time - start_time} s")
             start_time = end_time
@@ -766,6 +767,7 @@ def train_agent(config: Configuration,
                 print(f"Moving Average Steps / Ep: {steps_mav[-1]}\n")
             except:
                 print("Not enough data yet\n")	
+            """
 
     print("\nExited training loop, plotting results...\n")
     
@@ -778,8 +780,6 @@ def train_agent(config: Configuration,
     plt.xlabel('Iterations')
     plt.ylabel('Loss')
     plt.legend()
-    
-    print("plotted, now saving...")
 
     # os.mkdir(path_to_out)
 
