@@ -75,7 +75,7 @@ alr=0.0001
 clr=0.001
 gamma=0.99
 batch_size=128
-tau=0.8
+tau=0.2
 
 # Should match the environment used when used as a student
 time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
