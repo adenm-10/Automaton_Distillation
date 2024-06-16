@@ -1,0 +1,150 @@
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+	[4mGPU0	NIC0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	4	0		N/A
+NIC0	SYS	 X 				
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+
+
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 150
+Continuous Steps until Terminal State: 150
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+Dungeon Quest LTLF: F(sword) & (!sword U key)
+============================================
+
+
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+imported all dependencies, checking for cuda
+
+==============
+Cuda detected!
+==============
+
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b641f940780>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b641f9407b8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b641f9407f0>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x2b641f940828>]
+
+
+============================================
+DDPG AGENT TRAINING
+Steps Before Total Run Termination: 15000
+============================================
+
+
+Starting training at: 2024-06-16 12:27:47
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x2b641f940128>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(8, 2)
+Automaton Num States: 8
+Action Space: Box(1,)
+input shape: (8, 2)
+
+==============
+Cuda detected!
+==============
+
+Agent Name: DDPG Agent
+NOT Loading from checkpoint
+input shape: (8, 2)
+
+==============
+Cuda detected!
+==============
+
+Actor Learning Rate: 0.0001
+Critic Learning Rate: 0.001
+Updating Graphs at Step: 0
+Elapsed time: 0.48592138290405273 s
+Moving Average Reward: 0.22862061858177185
+Not enough data yet
+
+Updating Graphs at Step: 1000
+Elapsed time: 17.905317068099976 s
+Moving Average Reward: 0.1337316908314824
+Moving Average Steps / Ep: 139.0754716981132
+
+Updating Graphs at Step: 2000
+Elapsed time: 20.192137479782104 s
+Moving Average Reward: 0.7868059926107526
+Moving Average Steps / Ep: 142.68
+
+Updating Graphs at Step: 3000
+Elapsed time: 22.851721048355103 s
+Moving Average Reward: 0.016840504314750433
+Moving Average Steps / Ep: 148.33
+
+Updating Graphs at Step: 4000
+Elapsed time: 22.651638507843018 s
+Moving Average Reward: -0.03809112347662449
+Moving Average Steps / Ep: 150.0
+
+Updating Graphs at Step: 5000
+Elapsed time: 22.872565746307373 s
+Moving Average Reward: 0.0548356846999377
+Moving Average Steps / Ep: 148.53
+
+Updating Graphs at Step: 6000
+Elapsed time: 23.46083402633667 s
+Moving Average Reward: 0.214935310035944
+Moving Average Steps / Ep: 145.58
+
+Updating Graphs at Step: 7000
+Elapsed time: 23.507046461105347 s
+Moving Average Reward: 0.3360797831043601
+Moving Average Steps / Ep: 147.35
+
+Updating Graphs at Step: 8000
+Elapsed time: 24.008957862854004 s
+Moving Average Reward: 1.4757363637536765
+Moving Average Steps / Ep: 145.65
+
+Updating Graphs at Step: 9000
+Elapsed time: 23.886548042297363 s
+Moving Average Reward: -0.09006288025528192
+Moving Average Steps / Ep: 146.93
+
+Updating Graphs at Step: 10000
+Elapsed time: 22.12722086906433 s
+Moving Average Reward: 0.1281608914397657
+Moving Average Steps / Ep: 145.32
+
+Updating Graphs at Step: 11000
+Elapsed time: 23.22983694076538 s
+Moving Average Reward: 0.2277559399511665
+Moving Average Steps / Ep: 138.24
+
+Updating Graphs at Step: 12000
+Elapsed time: 25.04528260231018 s
+Moving Average Reward: 0.3073489544168115
+Moving Average Steps / Ep: 116.32
+
+Updating Graphs at Step: 13000
+Elapsed time: 23.90282678604126 s
+Moving Average Reward: 1.52354410443455
+Moving Average Steps / Ep: 116.84
+
+Updating Graphs at Step: 14000
+Elapsed time: 24.145959854125977 s
+Moving Average Reward: 0.5311069196276367
+Moving Average Steps / Ep: 114.2
+
+Finished training at: 2024-06-16 12:33:30
+Total elapsed time: 343.0141079425812
+

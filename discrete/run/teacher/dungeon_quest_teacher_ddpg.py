@@ -3,6 +3,7 @@
 print("entered training run...")
 
 import torch
+import time
 
 from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
 from discrete.lib.main import run_training
@@ -20,10 +21,10 @@ if torch.cuda.is_available():
     device = torch.device('cuda:0')
     print("\n==============\nCuda detected!\n==============\n")
 else:
-    print("no cuda detected, exiting...")
-    assert False
+    print("No CUDA detected, using CPU...\n")
+    # assert False
 
-max_training_steps=int(500000)
+max_training_steps=int(15000)
 
 config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, "dungeon_quest_rew_per_step_env_config_7_cont",
                            device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,
@@ -35,4 +36,6 @@ if __name__ == '__main__':
     print(f"DDPG AGENT TRAINING")
     print(f"Steps Before Total Run Termination: {max_training_steps}")
     print("============================================\n\n")
+    start_time = time.time()
     run_training(config)
+    print(f"Total elapsed time: {time.time() - start_time}")

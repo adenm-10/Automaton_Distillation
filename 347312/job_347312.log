@@ -1,5 +1,8 @@
-JobID: 347304
+JobID: 347312
 Current working directory is /lustre/fs1/home/amckinney/Local_Neuro_Symbolic
-Sun Jun 16 11:47:59 EDT 2024
+Sun Jun 16 12:46:41 EDT 2024
 ulimit -l: 
+unlimited
+Sun Jun 16 12:51:26 EDT 2024
+ulimit -l
 unlimited

@@ -1,10 +1,12 @@
 #!/bin/bash
 
-#SBATCH --nodes=4 #try this (distributed - more than 1 computing node)
+#SBATCH --nodes=2 #try this (distributed - more than 1 computing node)
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
 ##SBATCH --nodelist=evc1
+##SBATCH --ntasks=8
+##SBATCH --cpus-per-task=4
 #SBATCH --time=72:00:00
-#SBATCH --cpus-per-gpu=2
+#SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=4
 #SBATCH --job-name=Automaton
 #SBATCH --account=cenyioha

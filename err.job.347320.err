@@ -1,0 +1,62 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/cuda-11.3"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/cuda-11.3"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+mkdir: cannot create directory ‘tmp’: File exists
+mkdir: cannot create directory ‘tmp/policy’: File exists
+mkdir: cannot create directory ‘learning_curves’: File exists
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3
+
+ 
+
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda deactivate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+slurmstepd: error: *** JOB 347320 ON evc1 CANCELLED AT 2024-06-16T13:04:04 ***
