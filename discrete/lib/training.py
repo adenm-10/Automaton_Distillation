@@ -1,4 +1,5 @@
 import copy
+import time
 from typing import Tuple, Dict, List
 from datetime import datetime
 import os
@@ -612,6 +613,9 @@ def train_agent(config: Configuration,
     path_to_out = os.path.join(hard_path)
     os.mkdir(path_to_out)
 
+    start_time = time.time()
+    end_time = 0
+
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\n\n\nStep {i}\n\n\n")
     
@@ -738,6 +742,10 @@ def train_agent(config: Configuration,
 
         if i % 1000 == 0:
             print(f"Updating Graphs at Step: {i}")
+
+            end_time = time.time()
+            print(f"Elapsed time: {end_time - start_time} s")
+            start_time = end_time
 
             # print(training_iterations)
             # print(losses)
