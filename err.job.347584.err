@@ -1,0 +1,57 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/cuda-11.3"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/cuda-11.3"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3
+
+ 
+
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda deactivate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Exception in thread Thread-1:
+Traceback (most recent call last):
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/threading.py", line 917, in _bootstrap_inner
+    self.run()
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/tensorboard/summary/writer/event_file_writer.py", line 233, in run
+    self._record_writer.write(data)
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/tensorboard/summary/writer/record_writer.py", line 40, in write
+    self._writer.write(header + header_crc + data + footer_crc)
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 766, in write
+    self.fs.append(self.filename, file_content, self.binary_mode)
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 160, in append
+    self._write(filename, file_content, "ab" if binary_mode else "a")
+  File "/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/tensorboard/compat/tensorflow_stub/io/gfile.py", line 164, in _write
+    with io.open(filename, mode, encoding=encoding) as f:
+FileNotFoundError: [Errno 2] No such file or directory: b'logs/dungeon_quest_teacher_rew_per_step_7_productMDP/events.out.tfevents.1718628154.evc1.214940.0'
+

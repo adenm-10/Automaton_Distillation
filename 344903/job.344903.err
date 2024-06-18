@@ -1,0 +1,14 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+/home/pnwaorgu/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+
+real	139m13.202s
+user	136m53.324s
+sys	5m29.306s

@@ -1,0 +1,51 @@
+/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic
+	[4mGPU0	GPU1	NIC0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	SYS	0,2,32,34	0		N/A
+GPU1	SYS	 X 	SYS	1,33	1		N/A
+NIC0	SYS	SYS	 X 				
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+
+
+
+
+============================================
+Discrete Steps until Terminal State: 150
+Continuous Steps until Terminal State: 150
+Dungeon Quest LTLF: F(sword) & (!sword U key)
+============================================
+
+
+/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic
+cuda detected
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b8aa66489b0>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b8aa66489e8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x2b8aa6648a20>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x2b8aa6648a58>]
+
+
+============================================
+DDPG AGENT TRAINING
+Steps Before Total Run Termination: 75000
+============================================
+
+
+Starting training at: 2024-06-11 21:49:52
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x2b8aa6648358>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(8, 2)
+Automaton Num States: 8
+Action Space: Box(1,)
+input shape: (8, 2)
+Agent Name: DDPG Agent
+

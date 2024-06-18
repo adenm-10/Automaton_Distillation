@@ -555,7 +555,11 @@ def train_agent(config: Configuration,
     buff_helper = VecRolloutBufferHelper(config.num_parallel_envs, rollout_buffer, logger,
                                          no_done_on_out_of_time=config.no_done_on_out_of_time)
 
-    target_agent = agent.create_target_agent(tau=config.tau)
+    if isinstance(agent, AC_Agent):
+    
+      target_agent = agent.create_target_agent(tau=config.tau)
+      
+    target_agent = agent.create_target_agent()
 
     current_states = torch.as_tensor(env.reset(), device=config.device)
     current_aut_states = torch.tensor([automaton.default_state] * config.num_parallel_envs,
@@ -779,7 +783,7 @@ def train_agent(config: Configuration,
     plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
     plt.xlabel('Iterations')
     plt.ylabel('Loss')
-    plt.legend()
+    plt.legend(loc="upper right")
 
     # os.mkdir(path_to_out)
 
@@ -801,7 +805,7 @@ def train_agent(config: Configuration,
     plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
     plt.xlabel('Iterations')
     plt.ylabel('Rewards')
-    plt.legend()
+    plt.legend(loc="upper right")
     
     if isinstance(agent, AC_Agent):
         plt.savefig(f'{path_to_out}/Student_Rewards.png')
@@ -816,7 +820,7 @@ def train_agent(config: Configuration,
     plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
     plt.xlabel('Episodes')
     plt.ylabel('Steps to Terminal State')
-    plt.legend()
+    plt.legend(loc="upper right")
     
     if isinstance(agent, AC_Agent):
         plt.savefig(f'{path_to_out}/Student_Steps.png')

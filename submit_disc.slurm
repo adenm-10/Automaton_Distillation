@@ -18,8 +18,8 @@
 ## --mem-per-cpu=1990
 
 #Select File to run
-#export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
-export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/
+export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/pnwaorgu/Local_Neuro_Symbolic/
+#export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/
 export file="./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py"
 export args=""
 

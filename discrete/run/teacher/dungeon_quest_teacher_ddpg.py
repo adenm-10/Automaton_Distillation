@@ -25,7 +25,7 @@ else:
     print("No CUDA detected, using CPU...\n")
     # assert False
 
-max_training_steps=int(200000)
+max_training_steps=int(2000000)
 
 config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, "dungeon_quest_rew_per_step_env_config_7_cont",
                            device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,
