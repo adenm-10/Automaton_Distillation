@@ -289,7 +289,7 @@ class DDPG_Agent(AC_Agent):
 
         if torch.cuda.is_available():
             self.device = torch.device('cuda:0')
-            print("\n==============\nCuda detected!\n==============\n")
+            # print("\n==============\nCuda detected!\n==============\n")
 
         # print(f"\nnum_actions: \n{num_actions}\n")
 
