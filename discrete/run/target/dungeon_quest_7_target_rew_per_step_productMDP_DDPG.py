@@ -12,7 +12,7 @@ if torch.cuda.is_available():
 else:
     print("No CUDA detected, using CPU...\n")
 
-max_training_steps = int(2e6)
+max_training_steps = int(2e5)
 
 config = student_config_v1(
     env_config=dungeon_quest_rew_per_step_env_config_7_cont,

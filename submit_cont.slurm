@@ -68,14 +68,19 @@ rm -rf ./automaton_q/*
 rm -rf ./logs/*
 rm -rf ./checkpoints/*
 
+alr=0.0001
+clr=0.001
+gamma=0.99
+batch_size=64
+tau=0.01
+
 ###mpirun -np $SLURM_NTASKS python $file
 echo
 
 # Should match the environment used when used as a student
 # time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
-python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py
-python -u ./discrete/run/reward_machine/dungeon_quest_machine_rew_per_step.py
-python -u ./discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_DDPG.py # Dynamic Distillation
+
+time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 # sleep 3

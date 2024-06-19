@@ -24,12 +24,12 @@ dungeon_quest_config_7 = MineWorldConfig(
                 reward=+1
             ),
             fixed_placements=[],
-            random_placements=1
+            random_placements=0
         ),
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="chest", consumable=False, grid_letter="C", inventory_modifier=Counter(key=-1, sword=+1),
-                inventory_requirements=Counter(key=1), reward=+1
+                inventory_requirements=Counter(key=1), reward=+100, terminal=True
             ),
             fixed_placements=[],
             random_placements=1
@@ -40,7 +40,7 @@ dungeon_quest_config_7 = MineWorldConfig(
                 inventory_requirements=Counter(sword=1, shield=1), reward=+100, terminal=True
             ),
             fixed_placements=[],
-            random_placements=1
+            random_placements=0
         )
     ],
     inventory=[
@@ -68,12 +68,12 @@ dungeon_quest_config_7_cont = MineWorldConfig(
                 reward=+1
             ),
             fixed_placements=[],
-            random_placements=1
+            random_placements=0
         ),
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="chest", consumable=False, grid_letter="C", inventory_modifier=Counter(key=-1, sword=+1),
-                inventory_requirements=Counter(key=1), reward=+1
+                inventory_requirements=Counter(key=1), reward=+100, terminal=True
             ),
             fixed_placements=[],
             random_placements=1
@@ -84,7 +84,7 @@ dungeon_quest_config_7_cont = MineWorldConfig(
                 inventory_requirements=Counter(sword=1, shield=1), reward=+100, terminal=True
             ),
             fixed_placements=[],
-            random_placements=1
+            random_placements=0
         )
     ],
     inventory=[
@@ -122,25 +122,25 @@ dungeon_quest_exp_env_config_7 = EnvConfig(
 
 # APS AND LTLF BOTH CHANGED
 # ORIGINAL
-dungeon_quest_aps = [
-    AP(name="key", func=MineInventoryAP(inventory_item="key", quantity=1)),
-    AP(name="sword", func=MineInventoryAP(inventory_item="sword", quantity=1)),
-    AP(name="shield", func=MineInventoryAP(inventory_item="shield", quantity=1)),
-    AP(name="dragon", func=MineInfoAutAP(ap_name="dragon"))
-]
-
-# dungeon_quest_ltlf = "F(dragon) & (!sword U key) & (!dragon U sword) & (!dragon U shield)"
-
 # dungeon_quest_aps = [
 #     AP(name="key", func=MineInventoryAP(inventory_item="key", quantity=1)),
 #     AP(name="sword", func=MineInventoryAP(inventory_item="sword", quantity=1)),
-#     # AP(name="shield", func=MineInventoryAP(inventory_item="shield", quantity=1)),
-#     # AP(name="dragon", func=MineInfoAutAP(ap_name="dragon"))
+#     AP(name="shield", func=MineInventoryAP(inventory_item="shield", quantity=1)),
+#     AP(name="dragon", func=MineInfoAutAP(ap_name="dragon"))
 # ]
 
-dungeon_quest_ltlf = "F(dragon) & (!sword U key) & (!dragon U sword) & (!dragon U shield)"
+# dungeon_quest_ltlf = "F(dragon) & (!sword U key) & (!dragon U sword) & (!dragon U shield)"
+
+dungeon_quest_aps = [
+    AP(name="key", func=MineInventoryAP(inventory_item="key", quantity=1)),
+    AP(name="sword", func=MineInventoryAP(inventory_item="sword", quantity=1)),
+    # AP(name="shield", func=MineInventoryAP(inventory_item="shield", quantity=1)),
+    # AP(name="dragon", func=MineInfoAutAP(ap_name="dragon"))
+]
+
+# dungeon_quest_ltlf = "F(dragon) & (!sword U key) & (!dragon U sword) & (!dragon U shield)"
 # dungeon_quest_ltlf = "F(key)"
-# dungeon_quest_ltlf = "F(sword) & (!sword U key)"
+dungeon_quest_ltlf = "F(sword) & (!sword U key)"
 
 print(f"Dungeon Quest LTLF: {dungeon_quest_ltlf}")
 print("============================================\n\n")
