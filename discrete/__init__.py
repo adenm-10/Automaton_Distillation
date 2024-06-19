@@ -1,7 +1,7 @@
 import gym
 
-continuous_as_steps_to_term_state = 150
-discrete_as_steps_to_term_state = 150
+continuous_as_steps_to_term_state = 1000
+discrete_as_steps_to_term_state = 1000
 
 gym.register("MineWorldEnv-v0",
              entry_point="discrete.lib.env.mineworldenv:MineWorldEnv",
