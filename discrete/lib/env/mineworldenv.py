@@ -356,7 +356,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         #     print(f"Inventory Name: {inv_config.name}")
                         #     print(f"Inventory State: {self.inventory[inv_config.name]}")
 
-                        # print(f"Full Reward!: {this_tile.reward}, Special Tile: {this_tile.action_name}, Special Tile Location: {special_tile}, Raw Distance: {distance_to_tile}")
+                        # print(f"Full Reward!: {this_tile.reward}, Special Tile: {this_tile.action_name}, Special Tile Location: {special_tile}, Raw Distance: {distance_to_tile}\n")
                         # print("Full Reward!\n")
 
                         new_inv = this_tile.apply_inventory(self.inventory)
@@ -382,10 +382,10 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                     if distance_to_tile > 1:
                         tile_reward = this_tile.reward
                         distance_reward = 2.5 * normal_distribution(distance_to_tile, 1, 1)
-                        # print(f"This Tile: {special_tile}")
+                        # print(f"This Tile: {special_tile}, {this_tile.action_name}")
                         # print(f"Raw Distance: {distance_to_tile}")
                         # print(f"Tile Reward: {tile_reward}")
-                        # print(f"Distance Reward: {distance_reward}")
+                        # print(f"Distance Reward: {distance_reward}\n")
                         # Gradually work up to special tile reward as the agent moves closer to a distance of 1
                         reward +=  tile_reward * distance_reward 
                         # print()
