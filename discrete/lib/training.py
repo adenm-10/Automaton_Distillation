@@ -580,8 +580,8 @@ def train_agent(config: Configuration,
         critic_optimizer = torch.optim.Adam(agent.parameters(), lr = critic_lr)
         #Also try 0.00025 for lr
     else:
-        optimizer = torch.optim.Adam(agent.parameters())
-        # optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
+        # optimizer = torch.optim.Adam(agent.parameters())
+        optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
     
     trace_helper = TraceHelper(config.num_parallel_envs)
     batch_intrins_rew_calculator = IntrinsicRewardCalculatorBatchWrapper(config.intrinsic_reward_calculator,
