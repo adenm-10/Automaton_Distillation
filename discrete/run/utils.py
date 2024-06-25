@@ -76,8 +76,8 @@ def student_config_v1(env_config: EnvConfig, teacher_run_name: str, student_run_
     with open(f"automaton_q/{teacher_run_name}.json", "r") as f:
         teacher_aut_info = json.load(f)
 
-    print(teacher_aut_info)
-    assert False
+    # print(teacher_aut_info)
+    # assert False
     
     if reward_machine:
         reward_machine = RewardMachine.from_json(teacher_config, device),

@@ -99,10 +99,10 @@ class AnnealTargetAutomaton(AbstractTargetAutomatonWrapper, ABC):
 
         self.recalc_cache()
 
-        print(f"q_total: {self.source_q_total}")
-        print(self.source_q_total / self.source_q_count)
-        print(self.source_q_count)
-        print(self._cached_source_q_values)
+        # print(f"q_total: {self.source_q_total}")
+        # print(self.source_q_total / self.source_q_count)
+        # print(self.source_q_count)
+        # print(self._cached_source_q_values)
 
     # Q_teacher
     def target_q_values(self, aut_states: torch.Tensor, aps: torch.Tensor, iter_num: int) -> torch.Tensor:

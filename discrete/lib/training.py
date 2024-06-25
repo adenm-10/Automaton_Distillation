@@ -223,7 +223,7 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     # print(f"Automaton: {automaton}\n\n")
 
     if isinstance(automaton, TargetAutomaton):
-        print("Automaton Distillation to Affecting Target Q Value\n\n\n")
+        # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
         # Q_teacher
         target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
 
@@ -611,18 +611,6 @@ def train_agent(config: Configuration,
 
     rewards_iterations = []
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = f"./test_output/test_output_{now}"
-
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
-    else:
-        hard_path = hard_path + "_disc/"
-
-    path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
-
     start_time = time.time()
     end_time = 0
 
@@ -687,7 +675,7 @@ def train_agent(config: Configuration,
         
         # Reward shaping
         if isinstance(automaton, TargetAutomaton):
-            print("Aut States affecting Rewards")
+            # print("Aut States affecting Rewards")
             rewards += automaton.target_reward_shaping(current_aut_states, aut_states_after_current)
 
         trace_helper.finalize_step(dones)
@@ -749,35 +737,32 @@ def train_agent(config: Configuration,
         target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
-        if i % 1000 == 0:
-            print(f"Completed Steps: {i}")
-
-            """
-            end_time = time.time()
-            print(f"Elapsed time: {end_time - start_time} s")
-            start_time = end_time
-
-            # print(training_iterations)
-            # print(losses)
-            # print(rewards_list)
-
-            # moving average calculation
-            loss_mav = moving_average(losses)
+        if i % 1000 == 0 and i != 0:
             reward_mav = moving_average(rewards_list)
             steps_mav = moving_average(steps_to_terminal_total)
-
-            try:
-                print(f"Moving Average Reward: {reward_mav[-1]}")
-                print(f"Moving Average Steps / Ep: {steps_mav[-1]}\n")
-            except:
-                print("Not enough data yet\n")	
-            """
-
-    print("\nExited training loop, plotting results...\n")
+            print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
     
     loss_mav = moving_average(losses)
     reward_mav = moving_average(rewards_list)
     steps_mav = moving_average(steps_to_terminal_total)
+
+    reward_mav = moving_average(rewards_list)
+    steps_mav = moving_average(steps_to_terminal_total)
+    print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
+
+    print("\nExited training loop, plotting results...\n")
+
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
+    dirname = os.path.dirname(__file__)
+    hard_path = f"./test_output/test_output_{now}"
+
+    if isinstance(agent, AC_Agent):
+        hard_path = hard_path + "_cont/"
+    else:
+        hard_path = hard_path + "_disc/"
+
+    path_to_out = os.path.join(hard_path)
+    os.mkdir(path_to_out)
 
     plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
     plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')

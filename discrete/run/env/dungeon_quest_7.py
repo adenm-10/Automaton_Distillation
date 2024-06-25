@@ -57,22 +57,21 @@ dungeon_quest_config_7_cont = MineWorldConfig(
     placements=[
         TilePlacement(
             tile=MineWorldTileType(
-                action_name="key", consumable=True, grid_letter="K", inventory_modifier=Counter(key=+1), reward=+1
+                action_name="key",    consumable=True, grid_letter="K", inventory_modifier=Counter(key=+1),    reward=+1
             ),
             fixed_placements=[],
             random_placements=1
         ),
         TilePlacement(
             tile=MineWorldTileType(
-                action_name="shield", consumable=True, grid_letter="S", inventory_modifier=Counter(shield=+1),
-                reward=+1
+                action_name="shield", consumable=True, grid_letter="S", inventory_modifier=Counter(shield=+1), reward=+1
             ),
             fixed_placements=[],
             random_placements=1
         ),
         TilePlacement(
             tile=MineWorldTileType(
-                action_name="chest", consumable=False, grid_letter="C", inventory_modifier=Counter(key=-1, sword=+1),
+                action_name="chest",  consumable=False, grid_letter="C", inventory_modifier=Counter(key=-1, sword=+1),
                 inventory_requirements=Counter(key=1), reward=+1
             ),
             fixed_placements=[],

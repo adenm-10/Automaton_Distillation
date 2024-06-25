@@ -1,3 +1,5 @@
+#Static Student
+
 import torch
 
 from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent

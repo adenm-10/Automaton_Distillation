@@ -52,9 +52,14 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     tau = args.tau
 
-    config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, "dungeon_quest_rew_per_step_env_config_7_cont",
-                           device, aps=dungeon_quest_aps, agent_cls=DDPG_Agent,
-                           ltlf=dungeon_quest_ltlf, max_training_steps=max_training_steps, gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau)
+    config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, 
+                               "dungeon_quest_rew_per_step_env_config_7_cont",
+                               device, 
+                               aps=dungeon_quest_aps, 
+                               agent_cls=DDPG_Agent,
+                               ltlf=dungeon_quest_ltlf, 
+                               max_training_steps=max_training_steps, 
+                               gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau)
 
     print("\n\n============================================")
     print(f"Training Teacher / Independent DDPG Agent")
