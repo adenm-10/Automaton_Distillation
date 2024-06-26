@@ -166,28 +166,10 @@ def normal_distribution(x, mu=0, sigma=1):
 @functools.lru_cache(16384)
 def obs_rewrite(shape, obs):
     position, tile_locs, inventories = obs
-
-    # print(f"position: {position}")
-    # print(f"tile locs: {tile_locs}")
-    # print(f"inventories: {inventories}")
-
-    # position = (int(position[0]), int(position[1]))
     # Convert to float?
-
-    # print(f"OBS REWRITE DEBUG")
-    # print(f"tuple expansion: {((position,), *tile_locs)}")
-    # print(f"tuple: {tuple(n_hot_grid(shape, layer) for layer in ((position,), *tile_locs))}")
-
     position_tile_layers = tuple(n_hot_grid(shape, layer) for layer in ((position,), *tile_locs))
     inventory_layers = tuple(np.full(shape, layer, dtype=np.int8) for layer in inventories)
-    
-    # print(f"position tile layers; {position_tile_layers}")
-    # print(f"inventory layers: {inventory_layers}")
-    
-    return_val = np.stack((*position_tile_layers, *inventory_layers), axis=0) 
-    # print(f"return val: {return_val}")
-    # assert False
-    return return_val
+    return np.stack((*position_tile_layers, *inventory_layers), axis=0)
 
 @functools.lru_cache(16384)
 def obs_rewrite_cont(obs):

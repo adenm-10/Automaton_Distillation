@@ -50,16 +50,6 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
 
     importance = torch.pow(importance, 1 - config.epsilon)  # So that high-priority states aren't _too_ overrepresented
     
-    # print("indexes")
-    # print(indices)
-    # print(indices.shape)
-    
-    states = rollout_sample.states
-    # print("rollout states")
-    # print(states)
-    # print(states.shape)
-    
-    
     # Estimate best action in new states using main Q network
     q_max = agent.calc_q_values_batch(rollout_sample.next_states, rollout_sample.next_aut_states)
     arg_q_max = torch.argmax(q_max, dim=1)
@@ -75,25 +65,12 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
     # Calculate targets (bellman equation)
     target_q = rollout_sample.rewards + (config.gamma * double_q * (~rollout_sample.dones).float())
     target_q = target_q.detach()
-    
-    # print("aps")
-    # print(rollout_sample.aps)
-    
-    
-    # print("target q")
-    # print(target_q)
-    # print(target_q.shape)
 
     if isinstance(automaton, TargetAutomaton):
         # Q_teacher
         target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-
         # Beta
         target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-        
-        # print("target automaton q")
-        # print(target_automaton_q)
-        # print(target_automaton_q.shape)
         
         target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
 
@@ -108,19 +85,7 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
     action_q_values = q_values[range(config.agent_train_batch_size), (rollout_sample.actions).long()]
 
     # Sample q values that we get wrong more often
-    # print()
-    # print(q_values.shape)
-    # print(config.agent_train_batch_size)
-    # print(range(config.agent_train_batch_size))
-    # print((rollout_sample.actions).long().shape)
-    # print(action_q_values.shape)
-    # print(target_q.shape)
-    # print()
     error = action_q_values - target_q
-
-    # print("error")
-    # print(error)
-    # print(error.shape)
     rollout_buffer.set_priorities(indices=indices, errors=error.detach())
 
     # Actually train the neural network
@@ -312,14 +277,12 @@ def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Ag
 
     optim.step()
 
-
 def take_eps_greedy_action_from_q_values(q_values: torch.Tensor, epsilon: float) -> np.ndarray:
     num_actions = q_values.shape[1]
     greedy_actions = torch.argmax(q_values, dim=1)
     modified_actions = torch.where(torch.rand_like(greedy_actions, dtype=torch.float32) > epsilon, greedy_actions,
                                    torch.randint_like(greedy_actions, num_actions))
     return modified_actions.detach().cpu().numpy()
-
 
 def vec_env_distinct_episodes(states: torch.Tensor, infos: List[Dict]) -> Tuple[torch.Tensor, torch.Tensor]:
     """
@@ -555,11 +518,10 @@ def train_agent(config: Configuration,
     buff_helper = VecRolloutBufferHelper(config.num_parallel_envs, rollout_buffer, logger,
                                          no_done_on_out_of_time=config.no_done_on_out_of_time)
 
-    if isinstance(agent, AC_Agent):
-    
-      target_agent = agent.create_target_agent(tau=config.tau)
-      
     target_agent = agent.create_target_agent()
+
+    if isinstance(agent, AC_Agent):
+      target_agent = agent.create_target_agent(tau=config.tau)
 
     current_states = torch.as_tensor(env.reset(), device=config.device)
     current_aut_states = torch.tensor([automaton.default_state] * config.num_parallel_envs,
@@ -580,9 +542,9 @@ def train_agent(config: Configuration,
         critic_optimizer = torch.optim.Adam(agent.parameters(), lr = critic_lr)
         #Also try 0.00025 for lr
     else:
-        # optimizer = torch.optim.Adam(agent.parameters())
-        optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
-    
+        optimizer = torch.optim.Adam(agent.parameters())
+        # optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
+
     trace_helper = TraceHelper(config.num_parallel_envs)
     batch_intrins_rew_calculator = IntrinsicRewardCalculatorBatchWrapper(config.intrinsic_reward_calculator,
                                                                          device=config.device)
@@ -614,6 +576,20 @@ def train_agent(config: Configuration,
     start_time = time.time()
     end_time = 0
 
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
+    dirname = os.path.dirname(__file__)
+    hard_path = f"./test_output/test_output_{now}"
+
+    # print(f"\nExited training loop, plotting results to: {hard_path}\n")
+
+    if isinstance(agent, AC_Agent):
+        hard_path = hard_path + "_cont/"
+    else:
+        hard_path = hard_path + "_disc/"
+
+    path_to_out = os.path.join(hard_path)
+    os.mkdir(path_to_out)
+
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\n\n\nStep {i}\n\n\n")
     
@@ -624,12 +600,7 @@ def train_agent(config: Configuration,
         else:
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
-            # print(f"\nQ Values: {q_values}")
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
-
-        # (2) Return observation after making action in environment
-        # print(f"Actions: \n{actions}\n")
-        # assert False
 
         obs, rewards, dones, infos = env.step(actions)
 
@@ -649,9 +620,9 @@ def train_agent(config: Configuration,
         obs = torch.as_tensor(obs, device=config.device)
         rewards = torch.as_tensor(rewards, device=config.device)
         rewards_list.append(float(rewards.float().mean()))
-        logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
         dones = torch.as_tensor(dones, device=config.device)
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
+        logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
 
         # print(f"Infos Continuous: {infos}") 
         # print(f"\nInfos Discrete: {infos_discrete}")
@@ -661,7 +632,11 @@ def train_agent(config: Configuration,
         # print(f"States after current: {states_after_current}")
         # print(f"next states: {next_states}")
 
-        aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos_discrete)
+        aps_after_current = []
+        if isinstance(agent, AC_Agent):
+            aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos_discrete)
+        else:
+            aps_after_current = student_ap_extractor.extract_aps_batch(states_after_current, infos)
 
         # If dfa_updater changes the automaton, we need to recalculate the current automaton state
         # Since aps_after_current shouldn't be included in this calculation, trace_helper is "two-phase"
@@ -675,7 +650,6 @@ def train_agent(config: Configuration,
         
         # Reward shaping
         if isinstance(automaton, TargetAutomaton):
-            # print("Aut States affecting Rewards")
             rewards += automaton.target_reward_shaping(current_aut_states, aut_states_after_current)
 
         trace_helper.finalize_step(dones)
@@ -734,83 +708,64 @@ def train_agent(config: Configuration,
                 losses.append(loss)
                 training_iterations.append(i)
             
-        target_agent_updater.update_every(config.target_agent_update_every_steps)
+            target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
         if i % 1000 == 0 and i != 0:
+        
+            loss_mav = moving_average(losses)
             reward_mav = moving_average(rewards_list)
             steps_mav = moving_average(steps_to_terminal_total)
+
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
-    
-    loss_mav = moving_average(losses)
-    reward_mav = moving_average(rewards_list)
-    steps_mav = moving_average(steps_to_terminal_total)
 
-    reward_mav = moving_average(rewards_list)
-    steps_mav = moving_average(steps_to_terminal_total)
-    print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
+            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
+            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
+            plt.xlabel('Iterations')
+            plt.ylabel('Loss')
+            plt.legend(loc="upper right")
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = f"./test_output/test_output_{now}"
+            # os.mkdir(path_to_out)
 
-    print(f"\nExited training loop, plotting results to: {hard_path}\n")
+            # plt.ylim([0,2])
 
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
-    else:
-        hard_path = hard_path + "_disc/"
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Losses.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Losses.png')
 
-    path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
+            plt.clf()
 
-    plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-    plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-    plt.xlabel('Iterations')
-    plt.ylabel('Loss')
-    plt.legend(loc="upper right")
+            # print("saved, now moving on...")
 
-    # os.mkdir(path_to_out)
+            # print(f"reward iters, list")
+            # print(rewards_iterations)
+            # print(rewards_list)
+            plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
+            plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
+            plt.xlabel('Iterations')
+            plt.ylabel('Rewards')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Rewards.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
 
-    # plt.ylim([0,2])
+            plt.clf()
 
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Losses.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
 
-    plt.clf()
-
-    print("saved, now moving on...")
-
-    # print(f"reward iters, list")
-    # print(rewards_iterations)
-    # print(rewards_list)
-    plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-    plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-    plt.xlabel('Iterations')
-    plt.ylabel('Rewards')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Rewards.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
-
-    plt.clf()
-
-    steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-    plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-    plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-    plt.xlabel('Episodes')
-    plt.ylabel('Steps to Terminal State')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Steps.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
+            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
+            plt.xlabel('Episodes')
+            plt.ylabel('Steps to Terminal State')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Steps.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Steps.png')
 
     return agent
 
