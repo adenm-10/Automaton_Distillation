@@ -636,7 +636,7 @@ def train_agent(config: Configuration,
         if isinstance(agent, AC_Agent):
             aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos_discrete)
         else:
-            aps_after_current = student_ap_extractor.extract_aps_batch(states_after_current, infos)
+            aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos)
 
         # If dfa_updater changes the automaton, we need to recalculate the current automaton state
         # Since aps_after_current shouldn't be included in this calculation, trace_helper is "two-phase"
