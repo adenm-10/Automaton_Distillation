@@ -16,7 +16,7 @@ else:
     print("No CUDA detected, using CPU...\n")
     # assert False
 
-max_training_steps=int(6e5)
+max_training_steps=int(1e6)
 
 # config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7, "dungeon_quest_teacher_rew_per_step_7_productMDP",
 #                            device, agent_cls=OneHotAutomatonAfterFeatureExtractorAgent, aps=dungeon_quest_aps,
