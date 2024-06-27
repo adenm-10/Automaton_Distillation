@@ -588,7 +588,6 @@ def train_agent(config: Configuration,
         hard_path = hard_path + "_disc/"
 
     path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
 
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\n\n\nStep {i}\n\n\n")
@@ -719,53 +718,55 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
 
-            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-            plt.xlabel('Iterations')
-            plt.ylabel('Loss')
-            plt.legend(loc="upper right")
+    os.mkdir(path_to_out)
 
-            # os.mkdir(path_to_out)
+    plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
+    plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
+    plt.xlabel('Iterations')
+    plt.ylabel('Loss')
+    plt.legend(loc="upper right")
 
-            # plt.ylim([0,2])
+    # os.mkdir(path_to_out)
 
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Losses.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+    # plt.ylim([0,2])
 
-            plt.clf()
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Losses.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Losses.png')
 
-            # print("saved, now moving on...")
+    plt.clf()
 
-            # print(f"reward iters, list")
-            # print(rewards_iterations)
-            # print(rewards_list)
-            plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-            plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-            plt.xlabel('Iterations')
-            plt.ylabel('Rewards')
-            plt.legend(loc="upper right")
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
+    # print("saved, now moving on...")
 
-            plt.clf()
+    # print(f"reward iters, list")
+    # print(rewards_iterations)
+    # print(rewards_list)
+    plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
+    plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
+    plt.xlabel('Iterations')
+    plt.ylabel('Rewards')
+    plt.legend(loc="upper right")
+    
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Rewards.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
 
-            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
+    plt.clf()
 
-            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-            plt.xlabel('Episodes')
-            plt.ylabel('Steps to Terminal State')
-            plt.legend(loc="upper right")
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+    steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
+
+    plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
+    plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
+    plt.xlabel('Episodes')
+    plt.ylabel('Steps to Terminal State')
+    plt.legend(loc="upper right")
+    
+    if isinstance(agent, AC_Agent):
+        plt.savefig(f'{path_to_out}/Student_Steps.png')
+    else:
+        plt.savefig(f'{path_to_out}/Teacher_Steps.png')
 
     return agent
 
