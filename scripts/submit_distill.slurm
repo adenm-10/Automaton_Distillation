@@ -80,6 +80,7 @@ echo
 
 # Should match the environment used when used as a student
 python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py
+mv ./test_output/test_output* $SLURM_JOB_ID/
 python -u ./discrete/run/reward_machine/dungeon_quest_machine_rew_per_step.py
 python -u ./discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_DDPG.py # Dynamic Distillation
 mv ./test_output/test_output* $SLURM_JOB_ID/

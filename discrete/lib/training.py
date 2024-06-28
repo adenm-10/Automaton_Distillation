@@ -576,19 +576,6 @@ def train_agent(config: Configuration,
     start_time = time.time()
     end_time = 0
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = f"./test_output/test_output_{now}"
-
-    # print(f"\nExited training loop, plotting results to: {hard_path}\n")
-
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
-    else:
-        hard_path = hard_path + "_disc/"
-
-    path_to_out = os.path.join(hard_path)
-
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\n\n\nStep {i}\n\n\n")
     
@@ -718,6 +705,18 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
 
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
+    dirname = os.path.dirname(__file__)
+    hard_path = f"./test_output/test_output_{now}"
+
+    # print(f"\nExited training loop, plotting results to: {hard_path}\n")
+
+    if isinstance(agent, AC_Agent):
+        hard_path = hard_path + "_cont/"
+    else:
+        hard_path = hard_path + "_disc/"
+
+    path_to_out = os.path.join(hard_path)
     os.mkdir(path_to_out)
 
     plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
