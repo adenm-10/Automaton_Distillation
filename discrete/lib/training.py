@@ -705,6 +705,10 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
 
+    loss_mav = moving_average(losses)
+    reward_mav = moving_average(rewards_list)
+    steps_mav = moving_average(steps_to_terminal_total)
+
     now = datetime.now().strftime("%m-%d_%H-%M-%S")
     dirname = os.path.dirname(__file__)
     hard_path = f"./test_output/test_output_{now}"
