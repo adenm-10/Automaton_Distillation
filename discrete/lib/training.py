@@ -577,7 +577,7 @@ def train_agent(config: Configuration,
     end_time = 0
 
     for i in range(start_iter_num, config.max_training_steps):
-        # print(f"\n\n\nStep {i}\n\n\n")
+        # print(f"\nStep {i}")
     
         # (1) Choose action based off current state
         if isinstance(agent, AC_Agent):
@@ -607,16 +607,22 @@ def train_agent(config: Configuration,
         rewards = torch.as_tensor(rewards, device=config.device)
         rewards_list.append(float(rewards.float().mean()))
         dones = torch.as_tensor(dones, device=config.device)
+
+        # obs = next_states
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
         logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
 
-        # print(f"Infos Continuous: {infos}") 
+        # print(f"Observations: \n{obs[0]}")
+        # print(f"Infos Continuous: \n{infos[0]}") 
         # print(f"\nInfos Discrete: {infos_discrete}")
-        # print(f"Rewards: {rewards}")
+        # print(f"Rewards: {rewards[0]}")
         # print(f"Rewards List: {rewards_list}")
         # print(f"Dones: {dones}")
         # print(f"States after current: {states_after_current}")
-        # print(f"next states: {next_states}")
+        # print(f"next states: \n{next_states[0]}")
+        # print(f"Action: {((actions[0] + 1) / 2) * 6.28}")
+
+        # assert False
 
         aps_after_current = []
         if isinstance(agent, AC_Agent):

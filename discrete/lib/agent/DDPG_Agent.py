@@ -15,91 +15,7 @@ import os
 
 from discrete.lib.agent.AC_Agent import AC_Agent, AC_TargetAgent
 from discrete.lib.agent.AC_easy_target_agent import AC_EasyTargetAgent
-# from discrete.lib.agent.feature_extractor import FeatureExtractor
-
-
-class Residual(nn.Module):
-    def __init__(self, inner):
-        super().__init__()
-        self.inner = inner
-
-    def forward(self, input):
-        output = self.inner(input)
-        return input + output
-
-class FeatureExtractor(nn.Module):
-    """
-    A basic feature extractor designed to work on stacked atari frames
-    Heavily based on architecture from DeepSynth and AlphaGo
-    """
-
-    def __init__(self, input_shape):
-        super().__init__()
-
-        num_blocks = 3
-        num_intermediate_filters = 32
-        # kernel_size = (3, 3)
-        kernel_size = (3, 3)
-        padding_amount = 1
-
-        num_channels, *input_shape_single = input_shape
-
-        # print(f"Continuous FE input shape: {[1, *input_shape]}")
-        # print(f"num_channels: {num_channels}")
-        # print(f"input shape single: {input_shape_single}")
-
-        grid_size = 1
-        for dim in input_shape_single:
-            grid_size *= dim
-
-        # Basically the architecture from AlphaGo
-        def generate_common():
-            init_conv = nn.Sequential(
-                nn.Conv2d(num_channels, num_intermediate_filters, kernel_size=kernel_size, padding=padding_amount),
-                nn.BatchNorm2d(num_intermediate_filters),
-                nn.LeakyReLU()
-            )
-
-            blocks = [nn.Sequential(
-                Residual(
-                    nn.Sequential(
-                        nn.Conv2d(in_channels=num_intermediate_filters,
-                                  out_channels=num_intermediate_filters,
-                                  kernel_size=kernel_size,
-                                  padding=padding_amount),
-                        nn.BatchNorm2d(num_intermediate_filters),
-                        nn.LeakyReLU(),
-                        nn.Conv2d(in_channels=num_intermediate_filters,
-                                  out_channels=num_intermediate_filters,
-                                  kernel_size=kernel_size,
-                                  padding=padding_amount),
-                        nn.BatchNorm2d(num_intermediate_filters))
-                ),
-                nn.LeakyReLU()
-            ) for _ in range(num_blocks)]
-
-            return nn.Sequential(
-                init_conv, *blocks
-            )
-
-        self.net = generate_common()
-        self.flattener = nn.Flatten()
-
-        # test_zeros = torch.zeros((1, *input_shape))
-        test_zeros = torch.zeros((1, *input_shape, padding_amount))
-        # print(f"test zeros: {test_zeros}")
-        # print(f"test zeros shape: {test_zeros.shape}")
-        # assert False
-        self.output_size = int(self.net(test_zeros).numel())
-
-    def forward(self, input):
-        all_features = self.net(input)
-        return self.flattener(all_features)
-
-    def clone(self):
-        other_featext = FeatureExtractor(self.input_shape).to(self.config.device)
-        other_featext.load_state_dict(self.state_dict())
-        return other_featext
+from discrete.lib.agent.feature_extractor import FeatureExtractor
 
 class OUActionNoise(object):
     # def __init__(self, mu, sigma=0.5, theta=1, dt=1e-1, x0=None):
@@ -250,8 +166,6 @@ class ActorNetwork(nn.Module):
         # print(f"actor state input shape: {state.shape}")
         
         x = self.flattener(state)
-        # print(f"actor state input: {x}")
-        # assert False
         # print(f"after flatten shape: {x.shape}")
         x = self.fc1(x)
         x = self.bn1(x)
@@ -261,8 +175,7 @@ class ActorNetwork(nn.Module):
         x = torch.nn.functional.relu(x)
         x = torch.tanh(self.mu(x))
         x = x.squeeze()
-        # print(f"actor op: {x}")
-        # assert False
+
         return x
     
     def save_checkpoint(self):
@@ -337,6 +250,9 @@ class DDPG_Agent(AC_Agent):
     
     def choose_action(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> torch.tensor:
         
+        # print(f"observation: {observation}")
+        # assert False
+
         self.actor.eval()
         # print(f"Continuous Observation / DDPG Input: {observation}")
         # assert False
@@ -345,7 +261,7 @@ class DDPG_Agent(AC_Agent):
         # assert False
 
         # noise = torch.tensor(self.noise(),dtype=torch.float).to(self.actor.device)
-        noise = torch.tensor(np.random.normal(scale=0.3, size=1)).to(self.actor.device)
+        noise = torch.tensor(np.random.normal(loc=0, scale=0.1, size=1)).to(self.actor.device)
         mu_prime = mu + noise
         # print(f"Mu: {mu}, \nNoise: {noise}")
         # print(f"Forward Action: {mu_prime}")

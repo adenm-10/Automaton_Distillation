@@ -38,7 +38,7 @@ elif sequence_level == 3:
     key_r, key_p, key_t = 1, 1, False
     shield_r, shield_p, shield_t = 1, 1, False
     sword_r, sword_p, sword_t = 1, 1, False
-    dragon_r, dragon_p, dragon_t = 10, 1, True
+    dragon_r, dragon_p, dragon_t = 5, 1, True
   
 
 dungeon_quest_config_7 = MineWorldConfig(

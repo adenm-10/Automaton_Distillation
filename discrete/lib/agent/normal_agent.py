@@ -27,11 +27,9 @@ class DuelingQNetworkAgent(Agent):
         return cls(input_shape, num_actions)
 
     def forward(self, obs):
-        # print(f"Dueling Q Network Forward obs: {obs}")
         # print(f"Shape: {obs.shape}")
         # assert False
         features = self.feature_extractor(obs)
-        # print("Dueling Q Network features")
         # print(features.shape)
         # print("half extractor")
         # print(self.half_feat_extractor_output_size)
@@ -47,8 +45,17 @@ class DuelingQNetworkAgent(Agent):
         mean_adv = adv.mean(dim=1)
 
         q_vals = val + (adv - mean_adv.unsqueeze(1))  # Unsqueeze necessary so that it broadcasts correctly
-        # print("q_vals")
-        # print(f"Q_Vals: {q_vals}")
+
+        print(f"Dueling Q Network Forward obs: {obs[0].size()}")
+        print(f"Dueling Q Network features: \n{features[0].size()}")
+        print(f"Val Stream: \n{val_stream[0].size()}")
+        print(f"Adv Stream: \n{adv_stream[0].size()}")
+        print(f"Val: \n{val[0]}")
+        print(f"adv: \n{adv[0]}")
+        print(f"Q_Vals: {q_vals[0]}")
+        assert False
+
+
         return q_vals
 
     def calc_q_values_batch(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> torch.Tensor:
