@@ -703,7 +703,7 @@ def train_agent(config: Configuration,
             target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
-        if i % 1000 == 0 and i != 0:
+        if i % 10000 == 0 and i != 0:
         
             loss_mav = moving_average(losses)
             reward_mav = moving_average(rewards_list)

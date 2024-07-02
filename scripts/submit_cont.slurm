@@ -72,16 +72,18 @@ rm -rf ./checkpoints/*
 alr=0.0001
 clr=0.001
 gamma=0.99
-batch_size=64
-tau=0.01
+batch_size=32
+tau=1.0
 
 ###mpirun -np $SLURM_NTASKS python $file
 echo
 
 # Should match the environment used when used as a student
 # time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
-
-time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
+for dragon_r in 1 5 10 20 50 100
+do
+    python discrete/run/teacher/dungeon_quest_teacher_ddpg.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --batch_size="$batch_size" --dragon-reward="$dragon_r"
+done
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 # sleep 3
