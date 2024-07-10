@@ -1,11 +1,10 @@
 #!/bin/bash
 
+echo "checkpoint"
+
 #SBATCH --nodes=1 #try this (distributed - more than 1 computing node)
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-##SBATCH --nodelist=evc1
-##SBATCH --ntasks=8
-##SBATCH --cpus-per-task=4
-#SBATCH --time=20:00:00
+#SBATCH --time=72:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
@@ -13,16 +12,12 @@
 #SBATCH --output=out.job.%J.out
 #SBATCH --error=err.job.%J.err
 
-## --nodes=4
-## --ntasks-per-node=10
-## --mem-per-cpu=1990
+echo "checkpoint"
 
 username=$(whoami)
 
 #Select File to run
 export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/${username}/Local_Neuro_Symbolic/
-export file="./discrete/run/teacher/dungeon_quest_teacher_ddpg.py"
-export args=""
 
 #Select how logs get stored
 mkdir $SLURM_JOB_ID
@@ -32,7 +27,7 @@ export benchmark_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
 ##Load Modules
 module purge
 module load anaconda/anaconda3
-module load cuda/cuda-11.3
+module load cuda/cuda-11.4
 
 ## Enter Working Directory ##
 cd $SLURM_SUBMIT_DIR
