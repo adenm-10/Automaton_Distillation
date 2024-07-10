@@ -576,6 +576,18 @@ def train_agent(config: Configuration,
     start_time = time.time()
     end_time = 0
 
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
+    dirname = os.path.dirname(__file__)
+    hard_path = f"./test_output/test_output_{now}"
+
+    if isinstance(agent, AC_Agent):
+        hard_path = hard_path + "_cont/"
+    else:
+        hard_path = hard_path + "_disc/"
+
+    path_to_out = os.path.join(hard_path)
+    os.mkdir(path_to_out)
+
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
     
@@ -711,71 +723,57 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
 
-    loss_mav = moving_average(losses)
-    reward_mav = moving_average(rewards_list)
-    steps_mav = moving_average(steps_to_terminal_total)
+            loss_mav = moving_average(losses)
+            reward_mav = moving_average(rewards_list)
+            steps_mav = moving_average(steps_to_terminal_total)
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = f"./test_output/test_output_{now}"
+            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
+            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
+            plt.xlabel('Iterations')
+            plt.ylabel('Loss')
+            plt.legend(loc="upper right")
 
-    # print(f"\nExited training loop, plotting results to: {hard_path}\n")
+            # os.mkdir(path_to_out)
 
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
-    else:
-        hard_path = hard_path + "_disc/"
+            # plt.ylim([0,2])
 
-    path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Losses.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Losses.png')
 
-    plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-    plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-    plt.xlabel('Iterations')
-    plt.ylabel('Loss')
-    plt.legend(loc="upper right")
+            plt.clf()
 
-    # os.mkdir(path_to_out)
+            # print("saved, now moving on...")
 
-    # plt.ylim([0,2])
+            # print(f"reward iters, list")
+            # print(rewards_iterations)
+            # print(rewards_list)
+            plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
+            plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
+            plt.xlabel('Iterations')
+            plt.ylabel('Rewards')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Rewards.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
 
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Losses.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+            plt.clf()
 
-    plt.clf()
+            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
 
-    # print("saved, now moving on...")
-
-    # print(f"reward iters, list")
-    # print(rewards_iterations)
-    # print(rewards_list)
-    plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-    plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-    plt.xlabel('Iterations')
-    plt.ylabel('Rewards')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Rewards.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
-
-    plt.clf()
-
-    steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-    plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-    plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-    plt.xlabel('Episodes')
-    plt.ylabel('Steps to Terminal State')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Steps.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
+            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
+            plt.xlabel('Episodes')
+            plt.ylabel('Steps to Terminal State')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Steps.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Steps.png')
 
     return agent
 
