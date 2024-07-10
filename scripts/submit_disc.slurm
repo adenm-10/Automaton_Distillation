@@ -6,8 +6,8 @@
 ##SBATCH --ntasks=8
 ##SBATCH --cpus-per-task=4
 #SBATCH --time=20:00:00
-#SBATCH --cpus-per-gpu=4
-#SBATCH --gpus=2
+#SBATCH --cpus-per-gpu=8
+#SBATCH --gpus=1
 #SBATCH --job-name=Automaton
 #SBATCH --account=cenyioha
 #SBATCH --output=out.job.%J.out

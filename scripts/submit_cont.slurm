@@ -6,8 +6,8 @@
 ##SBATCH --ntasks=8
 ##SBATCH --cpus-per-task=4
 #SBATCH --time=20:00:00
-#SBATCH --cpus-per-gpu=4
-#SBATCH --gpus=2
+#SBATCH --cpus-per-gpu=8
+#SBATCH --gpus=1
 #SBATCH --job-name=Automaton
 #SBATCH --account=cenyioha
 #SBATCH --output=out.job.%J.out
@@ -72,18 +72,15 @@ rm -rf ./checkpoints/*
 alr=0.0001
 clr=0.001
 gamma=0.99
-batch_size=32
-tau=1.0
+tau=0.001
+dragon_r=10
 
 ###mpirun -np $SLURM_NTASKS python $file
 echo
 
 # Should match the environment used when used as a student
 # time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
-for dragon_r in 1 5 10 20 50 100
-do
-    python discrete/run/teacher/dungeon_quest_teacher_ddpg.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --batch_size="$batch_size" --dragon-reward="$dragon_r"
-done
+python discrete/run/teacher/dungeon_quest_teacher_ddpg.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --dragon-reward="$dragon_r"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 # sleep 3
