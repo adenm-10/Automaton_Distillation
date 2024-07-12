@@ -7,7 +7,7 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-sequence_level = 3 # 0-3
+sequence_level = 2 # 0-3
 
 key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
 sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False
@@ -71,7 +71,7 @@ dungeon_quest_config_7 = MineWorldConfig(
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="dragon", consumable=True, grid_letter="D", inventory_modifier=Counter(),
-                inventory_requirements=Counter(sword=sword_p, shield=shield_p), reward=+dragon_r, terminal=dragon_t
+                inventory_requirements=Counter(sword=sword_p, shield=shield_p), reward=+100, terminal=dragon_t
             ),
             fixed_placements=[],
             random_placements=dragon_p
