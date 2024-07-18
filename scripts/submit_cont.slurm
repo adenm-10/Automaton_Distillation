@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "checkpoint"
-
 #SBATCH --nodes=1 #try this (distributed - more than 1 computing node)
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
 #SBATCH --time=72:00:00

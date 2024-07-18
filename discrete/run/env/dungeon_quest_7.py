@@ -7,7 +7,7 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-sequence_level = 2 # 0-3
+sequence_level = 1 # 0-3
 
 key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
 sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False

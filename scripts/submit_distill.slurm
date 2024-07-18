@@ -5,7 +5,7 @@
 ##SBATCH --nodelist=evc1
 ##SBATCH --ntasks=8
 ##SBATCH --cpus-per-task=4
-#SBATCH --time=20:00:00
+#SBATCH --time=48:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
