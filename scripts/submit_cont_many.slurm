@@ -77,25 +77,17 @@ do
 
                 dir_name="./dragon-r_${dragon_r}_bound-persist_${bounding_persist}_bounding-dist_${bounding_dist}_seq-level_${seq_levdl}"
                 mkdir "$dir_name"
-                sbatch ./scripts/submit_cont_single.slurm $dir_name
+                sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID
 
             done
         done
     done
 done
 
-mv -f ./dragon_r* $SLURM_JOB_ID/
-
 unset dragon_r
 unset bounding_persist
 unset bounding_dist
 unset seq_level
-
-# Should match the environment used when used as a student
-# time python -u $file --alr="$alr" --clr="$clr" --gamma="$gamma" --batch-size="$batch_size" --tau="$tau"
-
-echo
-# sleep 3
 
 date >> $benchmark_logs
 echo "ulimit -l" >> $benchmark_logs
