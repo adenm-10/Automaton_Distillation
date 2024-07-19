@@ -3,9 +3,6 @@ import gym
 continuous_as_steps_to_term_state = 1000
 discrete_as_steps_to_term_state = 1000
 
-try:
-    
-
 print("\n\n============================================")
 print(f"Discrete Steps until Terminal State: {discrete_as_steps_to_term_state}")
 print(f"Continuous Steps until Terminal State: {continuous_as_steps_to_term_state}")
