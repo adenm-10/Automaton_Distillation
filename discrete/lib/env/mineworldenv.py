@@ -22,6 +22,9 @@ except:
     bounding_persist = False
     bounding_dist = 7
 
+print(f"Bounding Persist: {type(bounding_persist)}, {bounding_persist}")
+print(f"Counding Distance: {type(bounding_dist)}, {bounding_dist}")
+
 
 class MineWorldTileType:
     """A single special tile in the mine world"""
@@ -374,7 +377,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                     if distance_to_tile > 1:
                         tile_reward = this_tile.reward
-                        distance_reward = 2.5 * normal_distribution(distance_to_tile, 1, 1)
+                        # distance_reward = 2.5 * normal_distribution(distance_to_tile, 1, 1)
+                        distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
                         # print(f"This Tile: {special_tile}, {this_tile.action_name}")
                         # print(f"Raw Distance: {distance_to_tile}")
                         # print(f"Tile Reward: {tile_reward}")

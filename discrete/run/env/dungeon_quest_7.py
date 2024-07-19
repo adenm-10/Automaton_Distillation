@@ -18,7 +18,10 @@ try:
     sequence_level = int(os.environ["seq_level"])
 except:
     terminal_reward = 10
+    sequence_level = 1
 
+print(f"Terminal Reward: {type(terminal_reward)}, {terminal_reward}")
+print(f"Sequence Level: {type(sequence_level)}, {sequence_level}")
 
 key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
 sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False
