@@ -1,4 +1,5 @@
 from collections import Counter
+import os
 
 from discrete.lib.automaton.mine_aps import MineLocationAP, MineInventoryAP, MineInfoAutAP
 from discrete.lib.automaton.mine_env_ap_extractor import AP
@@ -8,6 +9,16 @@ from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
 sequence_level = 1 # 0-3
+
+terminal_reward = 10
+sequence_level = 1
+
+try:
+    terminal_reward = int(os.environ["dragon_r"])
+    sequence_level = int(os.environ["seq_level"])
+except:
+    terminal_reward = 10
+
 
 key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
 sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False
@@ -38,7 +49,8 @@ elif sequence_level == 3:
     key_r, key_p, key_t = 1, 1, False
     shield_r, shield_p, shield_t = 1, 1, False
     sword_r, sword_p, sword_t = 1, 1, False
-    dragon_r, dragon_p, dragon_t = 10, 1, True
+    dragon_r_cont, dragon_p_cont, dragon_t_cont = 10, 1, True
+    dragon_r_disc, dragon_p_disc, dragon_t_disc = 100, 1, True
   
 
 dungeon_quest_config_7 = MineWorldConfig(

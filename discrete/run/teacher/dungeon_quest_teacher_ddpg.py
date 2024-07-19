@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--gamma', type=float, default=0.99, help='Discount Factor (Gamma)')
     parser.add_argument('--batch-size', type=int, default=32, help='Buffer Batch Size')
     parser.add_argument('--tau', type=float, default=1.0, help='Target Transfer Tau')
-    parser.add_argument('--dragon-reward', type=int, default=100, help='Buffer Batch Size')
+    parser.add_argument('--total-steps', type=int, default=int(2e6), help='Buffer Batch Size')
     
     # Parse arguments from command line
     args = parser.parse_args()
@@ -52,7 +52,8 @@ if __name__ == '__main__':
     gamma = args.gamma
     batch_size = args.batch_size
     tau = args.tau
-    dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
+    max_training_steps = int(args.total_steps)
+    # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
     config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, 
                                "dungeon_quest_rew_per_step_env_config_7_cont",

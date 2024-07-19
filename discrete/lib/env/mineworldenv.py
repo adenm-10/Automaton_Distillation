@@ -2,6 +2,7 @@ import functools
 from collections import Counter
 from random import Random
 from typing import Tuple, TypeVar, Union, List, Dict, Collection
+import os
 
 import numpy as np
 from gym import spaces
@@ -10,6 +11,16 @@ from math import sin, cos, sqrt, pi, exp
 from discrete.lib.env.gridenv import GridEnv
 from discrete.lib.env.saveloadenv import SaveLoadEnv
 from discrete.lib.env.util import element_add
+
+bounding_persist = False
+bounding_dist = 7
+
+try:
+    bounding_persist = os.environ["bounding_persist"] == 'True'
+    bounding_dist = int(os.environ["bounding_dist"])
+except:
+    bounding_persist = False
+    bounding_dist = 7
 
 
 class MineWorldTileType:
