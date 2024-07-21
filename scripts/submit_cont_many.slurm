@@ -62,22 +62,18 @@ rm -rf ./checkpoints/*
 ###mpirun -np $SLURM_NTASKS python $file
 
 # baseline
-for dragon_r_i in 5 # 10 50 100
+for dragon_r_i in 5 #10 50 100
 do
-    for bounding_persist_i in "True" # "False"
+    for bounding_persist_i in "True"
     do
-        for bounding_dist_i in 2 #3 4 5
+        for bounding_dist_i in 2 #4 6
         do
             for seq_level_i in 1 #2 3
             do  
-                export dragon_r=($dragon_r_i)
-                export bounding_persist=($bounding_persist_i)
-                export bounding_dist=($bounding_dist_i)
-                export seq_level=($seq_level_i)
 
                 dir_name="./dragon-r_${dragon_r}_bound-persist_${bounding_persist}_bounding-dist_${bounding_dist}_seq-level_${seq_levdl}"
                 mkdir "$dir_name"
-                sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID
+                sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r $bounding_persist $bounding_dist $seq_level
 
             done
         done

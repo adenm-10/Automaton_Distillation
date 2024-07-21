@@ -18,12 +18,13 @@ bounding_dist = 7
 try:
     bounding_persist = os.environ["bounding_persist"] == 'True'
     bounding_dist = int(os.environ["bounding_dist"])
-except:
+except Exception as e:
+    print(f"Exception:\n\t{e}")
     bounding_persist = False
     bounding_dist = 7
 
 print(f"Bounding Persist: {type(bounding_persist)}, {bounding_persist}")
-print(f"Counding Distance: {type(bounding_dist)}, {bounding_dist}")
+print(f"Bounding Distance: {type(bounding_dist)}, {bounding_dist}")
 
 
 class MineWorldTileType:

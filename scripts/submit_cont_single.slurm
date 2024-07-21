@@ -13,6 +13,11 @@
 dir_name=$1
 orig_job_id=$2
 
+export dragon_r=$3
+export bounding_persist=$4
+export bounding_dist=$5
+export seq_level=$6
+
 out_file=out.job.${SLURM_JOB_ID}.out
 err_file=err.job.${SLURM_JOB_ID}.err
 
