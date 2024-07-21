@@ -16,8 +16,8 @@ bounding_persist = False
 bounding_dist = 7
 
 try:
-    bounding_persist = os.environ["bounding_persist"] == 'True'
-    bounding_dist = int(os.environ["bounding_dist"])
+    bounding_persist = os.environ.get("bounding_persist") == 'True'
+    bounding_dist = int(os.environ.get("bounding_dist"))
 except Exception as e:
     print(f"Exception:\n\t{e}")
     bounding_persist = False

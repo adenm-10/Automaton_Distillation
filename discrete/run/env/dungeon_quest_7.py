@@ -14,8 +14,8 @@ terminal_reward = 10
 sequence_level = 1
 
 try:
-    terminal_reward = int(os.environ["dragon_r"])
-    sequence_level = int(os.environ["seq_level"])
+    terminal_reward = int(os.environ.get("dragon_r"))
+    sequence_level = int(os.environ.get("seq_level"))
 except:
     terminal_reward = 10
     sequence_level = 1
