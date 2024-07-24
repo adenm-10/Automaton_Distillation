@@ -201,12 +201,15 @@ def obs_rewrite_cont(obs):
     tile_locs = [element for sublist in temp_tiles for element in sublist]
     # tile_locs = [temp_tiles]
     inventories = [inv_num for inv_num in inventories]
+    inventories_one_hot = [0, 0] * len(inventories)
+    for i in range(len(inventories)):
+        inventories_one_hot[2 * i + inventories[i]] = 1
 
     # print(f"position: {position}")
     # print(f"tile locs: {tile_locs}")
-    # print(f"inventories: {inventories}")
+    # print(f"inventories: {inventories_one_hot}")
 
-    return_val = np.concatenate((position, tile_locs, inventories), axis=0) 
+    return_val = np.concatenate((position, tile_locs, inventories_one_hot), axis=0) 
     # print(f"return val: {return_val}")
     # assert False
     return return_val
@@ -225,7 +228,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         # self.action_space = spaces.Discrete(6) # Input can only be 0, 1, 2, 3, 4, 5
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(self.num_actions,), dtype=np.float32)
         self.observation_space = spaces.Box(0, 1,
-                                            shape=(2 + len(config.placements) * 2 + len(config.inventory), ),
+                                            shape=(2 + len(config.placements) * 2 + len(config.inventory) * 2, ),
                                             dtype=np.float32)
         self.config = config
         
