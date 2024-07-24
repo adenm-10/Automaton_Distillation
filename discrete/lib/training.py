@@ -578,8 +578,11 @@ def train_agent(config: Configuration,
 
     now = datetime.now().strftime("%m-%d_%H-%M-%S")
     dirname = os.path.dirname(__file__)
-    # hard_path = f"./test_output/test_output_{now}"
-    hard_path = f"./test_output/test_output_d-r_{os.getenv('dragon_r')}_b-d_{os.getenv('bounding_dist')}_s-l_{os.getenv('seq_level')}"
+    hard_path = ""
+    if os.getenv('dragon_r') != '':
+        hard_path = f"./test_output/test_output_d-r_{os.getenv('dragon_r')}_b-d_{os.getenv('bounding_dist')}_s-l_{os.getenv('seq_level')}"
+    else:
+        hard_path = f"./test_output/test_output_{now}"
 
     if isinstance(agent, AC_Agent):
         hard_path = hard_path + "_cont/"

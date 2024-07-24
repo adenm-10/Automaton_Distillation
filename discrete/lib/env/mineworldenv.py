@@ -246,6 +246,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         self.special_tiles: Dict[Tuple[int, int], MineWorldTileType] = dict()
         self.inventory = Counter()
 
+        self.persist_dict = {}
+
     def step(self, action: float):
 
         x = np.asarray([action], dtype=self.action_space.dtype)
@@ -370,6 +372,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                         self.inventory = new_inv
                         action_names.add(this_tile.action_name)
+                        self.persist_dict[self.special_tiles[special_tile]] = bounding_dist
 
                         if this_tile.consumable:
                             del self.special_tiles[special_tile]
@@ -382,8 +385,15 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                     if distance_to_tile > 1:
                         tile_reward = this_tile.reward
-                        # distance_reward = 2.5 * normal_distribution(distance_to_tile, 1, 1)
-                        distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
+                        distance_reward = bounding_dist * normal_distribution(distance_to_tile, 1, 1)
+
+                        for key in self.persist_dict.keys():
+                            distance_reward += bounding_dist * normal_distribution(self.persist_dict[key], 1, 1)
+                            if self.persist_dict[key] > 0:
+                                self.persist_dict[key] -= 1
+
+
+                        # distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
                         # print(f"This Tile: {special_tile}, {this_tile.action_name}")
                         # print(f"Raw Distance: {distance_to_tile}")
                         # print(f"Tile Reward: {tile_reward}")

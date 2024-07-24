@@ -26,9 +26,9 @@ alr=0.0001
 clr=0.001
 gamma=0.99
 tau=0.001
-total_steps=1000000
+total_steps=400000
 
 python discrete/run/teacher/dungeon_quest_teacher_ddpg.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps"
-
 mv test_output/test_output* $out_file $err_file $dir_name/
 mv $dir_name $orig_job_id/
+
