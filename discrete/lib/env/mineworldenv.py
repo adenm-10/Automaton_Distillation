@@ -388,8 +388,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         distance_reward = bounding_dist * normal_distribution(distance_to_tile, 1, 1)
 
                         for key in self.persist_dict.keys():
-                            distance_reward += bounding_dist * normal_distribution(self.persist_dict[key], 1, 1)
-                            if self.persist_dict[key] > 0:
+                            distance_reward += bounding_dist * normal_distribution(bounding_dist - self.persist_dict[key], 1, 1)
+                            if self.persist_dict[key] > -1:
                                 self.persist_dict[key] -= 1
 
 
