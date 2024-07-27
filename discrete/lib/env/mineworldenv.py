@@ -172,10 +172,11 @@ def const_plane(shape, val):
     result = np.full(shape, val)
     return result
 
-def normal_distribution(x, mu=0, sigma=1):
-    coefficient = 1 / sqrt(2 * pi * sigma**2)
-    exponent = -((x - mu)**2) / (2 * sigma**2)
-    return coefficient * exp(exponent)
+# mu = b, sigma = a, x = distance from or time steps after
+def mod_normal_distribution(x, mu=1, height=1, width=1):
+    mod_sigma = (width - mu) / (2 * np.sqrt(2 * np.log(2)))
+    exponent = -0.5 * ((x - mu) / (mod_sigma))**2
+    return height * exp(exponent)
 
 
 @functools.lru_cache(16384)
@@ -372,7 +373,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                         self.inventory = new_inv
                         action_names.add(this_tile.action_name)
-                        self.persist_dict[self.special_tiles[special_tile]] = bounding_dist
+                        self.persist_dict[self.special_tiles[special_tile]] = [1, this_tile.reward]
 
                         if this_tile.consumable:
                             del self.special_tiles[special_tile]
@@ -385,12 +386,13 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                     if distance_to_tile > 1:
                         tile_reward = this_tile.reward
-                        distance_reward = bounding_dist * normal_distribution(distance_to_tile, 1, 1)
+                        distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
+                        persist_reward  = 0
 
                         for key in self.persist_dict.keys():
-                            distance_reward += bounding_dist * normal_distribution(bounding_dist - self.persist_dict[key], 1, 1)
-                            if self.persist_dict[key] > -1:
-                                self.persist_dict[key] -= 1
+                            persist_reward += mod_normal_distribution(self.persist_dict[key][0], mu=1, height=self.persist_dict[key][1], width=bounding_dist)
+                            if self.persist_dict[key][0] < bounding_dist + 1:
+                                self.persist_dict[key][0] += 1
 
 
                         # distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
@@ -399,7 +401,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         # print(f"Tile Reward: {tile_reward}")
                         # print(f"Distance Reward: {distance_reward}\n")
                         # Gradually work up to special tile reward as the agent moves closer to a distance of 1
-                        reward +=  tile_reward * distance_reward 
+                        reward +=  distance_reward + persist_reward
                         # print()
 
                         # print(f"Total Reward: {reward}\n")

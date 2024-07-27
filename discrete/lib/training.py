@@ -590,7 +590,10 @@ def train_agent(config: Configuration,
         hard_path = hard_path + "_disc/"
 
     path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
+    try:
+        os.mkdir(path_to_out)
+    except:
+        print("Output Directory Already Exists")
 
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
