@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-#SBATCH --time=72:00:00
+#SBATCH --time=10:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
@@ -17,6 +17,7 @@ export dragon_r=$3
 export bounding_persist=$4
 export bounding_dist=$5
 export seq_level=$6
+export tau=$7
 
 out_file=out.job.${SLURM_JOB_ID}.out
 err_file=err.job.${SLURM_JOB_ID}.err
@@ -25,7 +26,7 @@ err_file=err.job.${SLURM_JOB_ID}.err
 alr=0.0001
 clr=0.001
 gamma=0.99
-tau=0.001
+# tau=0.001
 total_steps=400000
 
 python discrete/run/teacher/dungeon_quest_teacher_ddpg.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps"

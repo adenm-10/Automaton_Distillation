@@ -295,6 +295,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         if new_place[0] >= 0 and new_place[0] < self.config.tile_shape[0] and new_place[1] >= 0 and new_place[1] < self.config.tile_shape[1]:
             can_move = True
+        else:
+            reward -= 0.1
 
         # print(f"New Tile Position: {new_tile}, True Position: {new_place}")
         # print(f"Can Move: {can_move}")

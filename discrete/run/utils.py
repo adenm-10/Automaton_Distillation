@@ -36,7 +36,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
 
     return Configuration(
         env_config=env_config,
-        num_parallel_envs=8,
+        num_parallel_envs=10,
         rollout_buffer_config=RolloutBufferConfig(
             rollout_buffer_cls=CircularRolloutBuffer,
             capacity=150000,
@@ -133,7 +133,7 @@ def teacher_config_productMDP(env_config: EnvConfig, run_name: str, device: torc
 
     return Configuration(
         env_config=env_config,
-        num_parallel_envs=8,
+        num_parallel_envs=10,
         rollout_buffer_config=RolloutBufferConfig(
             rollout_buffer_cls=CircularRolloutBuffer,
             capacity=150000,
