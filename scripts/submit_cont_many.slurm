@@ -71,10 +71,11 @@ do
             for seq_level_i in 2
             do  
                 for tau_i in 1 0.1 0.01 0.001 0.0001 0.0001
+                do
                     dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_tau_${tau_i}"
                     mkdir "$dir_name"
                     sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r_i $bounding_persist_i $bounding_dist_i $seq_level_i $tau_i
-
+                done
             done
         done
     done
