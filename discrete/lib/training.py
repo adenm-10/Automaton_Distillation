@@ -31,6 +31,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
+curr_crit_loss = None 
+curr_act_loss = None
+
+top_loss = [(0, 0, 0, 0, 0, 0, 0)] * 10
+
 def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: TargetAgent,
           rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
     """
@@ -207,10 +212,16 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
         # print(f"Target_Q: {target_q}")
 
         automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
+
+    # print(f"States: {states}")
+    # print(f"Actions: {actions}")
+
     
     agent.critic.train()
     critic_optim.zero_grad()
     critic_loss = F.mse_loss(target_q, critic_value)
+    # print(f"Critic Loss: {critic_loss}")
+    curr_crit_loss = critic_loss
     critic_loss.backward()
     critic_optim.step()
     
@@ -220,8 +231,14 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     agent.actor.train()
     actor_loss = -agent.critic.forward(states,mu)
     actor_loss = torch.mean(actor_loss)
+    # print(f"Actor Loss: {actor_loss}\n\n")
+    curr_act_loss = actor_loss
     actor_loss.backward()
     actor_optim.step()
+
+    # for i in range(len(top_loss)):
+    #     if critic_loss.item() + actor_loss.item() > top_loss[i][0]:
+    #         top_loss[i] = (curr_crit_loss.item() + curr_act_loss.item(), curr_crit_loss, curr_act_loss, states, actions, next_states, rewards)
 
     # What are the q-values that the current agent predicts for the actions it took
     # q_values = agent.calc_q_values_batch(rollout_sample.states, rollout_sample.aut_states)
@@ -564,6 +581,8 @@ def train_agent(config: Configuration,
     training_iterations = []
     losses = []
     rewards_list = []
+    rewards_per_ep = [0]*config.num_parallel_envs
+    rewards_per_ep_list = []
     steps_to_terminal = [0]*config.num_parallel_envs
     steps_to_terminal_total = []
     
@@ -576,24 +595,24 @@ def train_agent(config: Configuration,
     start_time = time.time()
     end_time = 0
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = ""
-    if os.getenv('dragon_r') != '':
-        hard_path = f"./test_output/test_output_d-r_{os.getenv('dragon_r')}_b-d_{os.getenv('bounding_dist')}_s-l_{os.getenv('seq_level')}"
+    path_to_out = ""
+    if os.getenv('PLOT_OP_PATH'):
+        path_to_out = os.getenv('PLOT_OP_PATH')
     else:
+        now = datetime.now().strftime("%m-%d_%H-%M-%S")
+        dirname = os.path.dirname(__file__)
         hard_path = f"./test_output/test_output_{now}"
 
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
-    else:
-        hard_path = hard_path + "_disc/"
+        if isinstance(agent, AC_Agent):
+            hard_path = hard_path + "_cont/"
+        else:
+            hard_path = hard_path + "_disc/"
 
-    path_to_out = os.path.join(hard_path)
-    try:
-        os.mkdir(path_to_out)
-    except:
-        print("Output Directory Already Exists")
+        path_to_out = os.path.join(hard_path)
+        try:
+            os.mkdir(path_to_out)
+        except:
+            print("Output Directory Already Exists")
 
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
@@ -607,14 +626,19 @@ def train_agent(config: Configuration,
                                              current_aut_states)
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
 
+
         obs, rewards, dones, infos = env.step(actions)
 
         # Graphing operations
         steps_to_terminal = [x+1 for x in steps_to_terminal]
+        rewards_per_ep =    [x+r for x, r in zip(rewards_per_ep, rewards)]
         for index, done in enumerate(dones):
             if done:
                 steps_to_terminal_total.append(steps_to_terminal[index])
                 steps_to_terminal[index] = 0
+
+                rewards_per_ep_list.append(rewards_per_ep[index])
+                rewards_per_ep[index] = 0
 
         infos_discrete = copy.deepcopy(infos)
         for info in infos_discrete:
@@ -726,12 +750,25 @@ def train_agent(config: Configuration,
         
             loss_mav = moving_average(losses)
             reward_mav = moving_average(rewards_list)
+            reward_ep_mav = moving_average(rewards_per_ep_list)
             steps_mav = moving_average(steps_to_terminal_total)
 
-            print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_mav[-1]:.3f}")
+            print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
+
+    # print("Top Losses")
+    # for i in range(len(top_loss)):
+    #     print(f"Cumulative Loss: \n{top_loss[i][0]}\n")
+    #     print(f"Critic Loss: \n{top_loss[i][1]}\n")
+    #     print(f"Actor Loss: \n{top_loss[i][2]}\n")
+    #     print(f"States: \n{top_loss[i][3]}\n")
+    #     print(f"Actions: \n{top_loss[i][4]}\n")
+    #     print(f"Nest States: \n{top_loss[i][5]}\n")
+    #     print(f"Rewards: \n{top_loss[i][6]}\n")
+    #     print(f"=============================================================================")
 
     loss_mav = moving_average(losses)
     reward_mav = moving_average(rewards_list)
+    reward_ep_mav = moving_average(rewards_per_ep_list)
     steps_mav = moving_average(steps_to_terminal_total)
 
     plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
@@ -756,10 +793,10 @@ def train_agent(config: Configuration,
     # print(f"reward iters, list")
     # print(rewards_iterations)
     # print(rewards_list)
-    plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-    plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-    plt.xlabel('Iterations')
-    plt.ylabel('Rewards')
+    plt.plot([i for i in range(len(rewards_per_ep_list))], rewards_per_ep_list, color='blue', label='Raw Rewards')
+    plt.plot([i for i in range(len(rewards_per_ep_list))], reward_ep_mav,   color='red',  label='Moving Average Rewards')
+    plt.xlabel('Episodes')
+    plt.ylabel('Rewards per Episode')
     plt.legend(loc="upper right")
     
     if isinstance(agent, AC_Agent):

@@ -68,9 +68,9 @@ do
     do
         for bounding_dist_i in 3 #6
         do
-            for seq_level_i in 2
+            for seq_level_i in 2 3
             do  
-                for tau_i in 1 0.1 0.01 0.001 0.0001 0.0001
+                for tau_i in 0.0005 0.0001 0.00005
                 do
                     dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_tau_${tau_i}"
                     mkdir "$dir_name"
