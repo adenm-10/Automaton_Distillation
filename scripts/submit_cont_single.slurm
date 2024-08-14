@@ -26,18 +26,11 @@ out_file=out.job.${SLURM_JOB_ID}.out
 err_file=err.job.${SLURM_JOB_ID}.err
 
 # Hyperparameters
-alr=0.0001
-clr=0.001
-gamma=0.99
-# tau=0.001
-total_steps=2000000
-
-# Hyperparameters
 alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=50000
+total_steps=1000000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
