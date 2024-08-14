@@ -104,7 +104,7 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
 
     return float(loss)
     
-def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
+def DDPG_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
           rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
     """
     Perform AC gradient descent on a batch of samples from the rollout buffer (from deepsynth)
@@ -264,6 +264,120 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     logger.add_scalar("training / critic loss", float(critic_loss), global_step=iter_num)
 
     # optim.step()
+
+    return float(critic_loss)
+
+def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
+          rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
+    """
+    Perform AC gradient descent on a batch of samples from the rollout buffer (from deepsynth)
+    """
+
+    cur_timestep = iter_num
+    
+    # print("AC learn")
+
+    target_agent.target.actor.eval()
+    target_agent.target.critic.eval()
+    agent.critic.eval()
+    
+    rollout_sample, indices, importance = rollout_buffer.sample(config.agent_train_batch_size,
+                                                                automaton.num_states,
+                                                                priority_scale=config.rollout_buffer_config.priority_scale,
+                                                                reward_machine=reward_machine)
+    
+    # importance = torch.pow(importance, 1 - config.epsilon)  # So that high-priority states aren't to overrepresented
+
+    states = rollout_sample.states
+    next_states = rollout_sample.next_states
+    rewards = rollout_sample.rewards
+    actions = rollout_sample.actions
+    dones = rollout_sample.dones
+
+    with torch.no_grad():
+        target_actions = target_agent.target.actor.forward(next_states)
+        
+        # Q'
+        target_critic_1_value, target_critic_2_value = target_agent.target.critic.forward(next_states, target_actions)
+        
+        # y = r + gamma * min(q1, q2)
+        target_q = []
+        for j in range(config.agent_train_batch_size):
+            target_q.append(rewards[j] + config.gamma * min(target_critic_1_value[j], target_critic_2_value[j]) * dones[j])
+            # target_q.append(rewards[j] + config.gamma*target_critic_value[j])
+        target_q = torch.tensor(target_q).to(config.device)
+        target_q = target_q.view(config.agent_train_batch_size, 1)
+        target_q = target_q.squeeze()
+
+        if isinstance(automaton, TargetAutomaton):
+            # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
+            # Q_teacher
+            target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+
+            # print(f"Aut States: {rollout_sample.aut_states}")
+            # print(f"APS': {rollout_sample.aps}")
+            # print(f"target q automaton: {target_automaton_q}")
+
+            # Beta
+            target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+            
+            # print('target_automaton_q')
+            # print(target_automaton_q.shape)
+            
+            target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
+
+            # print(f"Target_Q: {target_q}")
+
+            automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
+ 
+    # Q
+    critic_1_value, critic_2_value = agent.critic.forward(states, actions)
+
+    agent.critic.train()
+    critic_loss = F.mse_loss(target_q, critic_1_value) + F.mse_loss(target_q, critic_2_value)
+
+    critic_optim.zero_grad()
+    critic_loss.backward()
+    critic_optim.step()
+
+    agent.critic.eval()
+
+    # Delayed Target Update
+    # if t mod d:
+    #   Update Actor weights
+    #   Update Both Critic Target Weights
+    #   Update Actor Target Weights
+
+    actor_loss = 0
+
+    if (cur_timestep + 1) % agent.d == 0:
+
+        mu = agent.actor.forward(states)
+
+        # Only want Q1 prediction
+        actor_loss, _ = agent.critic.forward(states, mu)
+        actor_loss = torch.mean(-actor_loss)
+
+        agent.actor.train()
+        actor_optim.zero_grad()
+        actor_loss.backward()
+        actor_optim.step()
+        agent.actor.eval()
+
+        target_agent.update_weights()
+    
+    # Sample q values that we get wrong more often
+    # print(f"\n\ntarget q: {target_q}\n\n")
+    # print(f"\n\critic_value: {critic_value}\n\n")
+    # assert False
+
+    error = critic_1_value - target_q
+    rollout_buffer.set_priorities(indices=indices, errors=error.detach())
+
+    # print(f"Critic loss: {float(critic_loss)}")
+    # print(f"Actor  loss: {float(actor_loss)}")
+
+    logger.add_scalar("training / actor loss", float(actor_loss), global_step=iter_num)
 
     return float(critic_loss)
 
@@ -545,22 +659,16 @@ def train_agent(config: Configuration,
                                       device=config.device, dtype=torch.long)
     
     if isinstance(agent, AC_Agent):
-        #DIEGO WAS HERE
-        # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.001)
-        # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
         actor_lr = config.actor_lr
         critic_lr = config.critic_lr
 
         print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
 
-        actor_optimizer = torch.optim.Adam(agent.parameters(), lr = actor_lr)
-        #Also try 0.000025 for lr
-    
-        critic_optimizer = torch.optim.Adam(agent.parameters(), lr = critic_lr)
-        #Also try 0.00025 for lr
+        actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = actor_lr)
+        critic_optimizer = torch.optim.Adam(agent.critic.parameters(), lr = critic_lr)
+
     else:
         optimizer = torch.optim.Adam(agent.parameters())
-        # optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
 
     trace_helper = TraceHelper(config.num_parallel_envs)
     batch_intrins_rew_calculator = IntrinsicRewardCalculatorBatchWrapper(config.intrinsic_reward_calculator,
@@ -731,8 +839,13 @@ def train_agent(config: Configuration,
             # print("entered training block")
             # Train off-policy
             if isinstance(agent, AC_Agent):
-                loss = AC_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
-                  automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                if agent.name == "DDPG Agent":
+                    loss = DDPG_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                else:
+                    loss = TD3_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                
                 # print(f"DDPG Critic Loss: {loss}")
                 losses.append(loss)
                 training_iterations.append(i)
@@ -743,7 +856,8 @@ def train_agent(config: Configuration,
                 losses.append(loss)
                 training_iterations.append(i)
             
-            target_agent_updater.update_every(config.target_agent_update_every_steps)
+            if agent.name != "TD3 Agent":
+                target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
         if i % 1000 == 0 and i != 0:
