@@ -700,6 +700,30 @@ def train_agent(config: Configuration,
 
     rewards_iterations = []
 
+    start_time = time.time()
+    end_time = 0
+
+    path_to_out = ""
+    if config.path_to_out:
+        path_to_out = config.path_to_out
+    else:
+        now = datetime.now().strftime("%m-%d_%H-%M-%S")
+        dirname = os.path.dirname(__file__)
+        hard_path = f"./test_output/test_output_{now}"
+
+        if isinstance(agent, AC_Agent):
+            hard_path = hard_path + "_cont/"
+        else:
+            hard_path = hard_path + "_disc/"
+
+        path_to_out = os.path.join(hard_path)
+        
+        try:
+            os.mkdir(path_to_out)
+        except:
+            print("Output Directory Already Exists")
+    # print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
+
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
     
@@ -847,6 +871,61 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
+        if i == 200000:
+            loss_mav = moving_average(losses)
+            reward_mav = moving_average(rewards_list)
+            reward_ep_mav = moving_average(rewards_per_ep_list)
+            steps_mav = moving_average(steps_to_terminal_total)
+
+            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
+            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
+            plt.xlabel('Iterations')
+            plt.ylabel('Loss')
+            plt.legend(loc="upper right")
+
+            # os.mkdir(path_to_out)
+
+            # plt.ylim([0,2])
+
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Losses_200k.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Losses_200k.png')
+
+            plt.clf()
+
+            # print("saved, now moving on...")
+
+            # print(f"reward iters, list")
+            # print(rewards_iterations)
+            # print(rewards_list)
+            plt.plot([i for i in range(len(rewards_per_ep_list))], rewards_per_ep_list, color='blue', label='Raw Rewards')
+            plt.plot([i for i in range(len(rewards_per_ep_list))], reward_ep_mav,   color='red',  label='Moving Average Rewards')
+            plt.xlabel('Episodes')
+            plt.ylabel('Rewards per Episode')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Rewards_200k.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Rewards_200k.png')
+
+            plt.clf()
+
+            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
+
+            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
+            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
+            plt.xlabel('Episodes')
+            plt.ylabel('Steps to Terminal State')
+            plt.legend(loc="upper right")
+            
+            if isinstance(agent, AC_Agent):
+                plt.savefig(f'{path_to_out}/Student_Steps_200k.png')
+            else:
+                plt.savefig(f'{path_to_out}/Teacher_Steps_200k.png')
+
+
     # print("Top Losses")
     # for i in range(len(top_loss)):
     #     print(f"Cumulative Loss: \n{top_loss[i][0]}\n")
@@ -857,30 +936,6 @@ def train_agent(config: Configuration,
     #     print(f"Nest States: \n{top_loss[i][5]}\n")
     #     print(f"Rewards: \n{top_loss[i][6]}\n")
     #     print(f"=============================================================================")
-
-    start_time = time.time()
-    end_time = 0
-
-    path_to_out = ""
-    if config.path_to_out:
-        path_to_out = config.path_to_out
-    else:
-        now = datetime.now().strftime("%m-%d_%H-%M-%S")
-        dirname = os.path.dirname(__file__)
-        hard_path = f"./test_output/test_output_{now}"
-
-        if isinstance(agent, AC_Agent):
-            hard_path = hard_path + "_cont/"
-        else:
-            hard_path = hard_path + "_disc/"
-
-        path_to_out = os.path.join(hard_path)
-        
-        try:
-            os.mkdir(path_to_out)
-        except:
-            print("Output Directory Already Exists")
-    print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
     loss_mav = moving_average(losses)
     reward_mav = moving_average(rewards_list)
@@ -898,9 +953,9 @@ def train_agent(config: Configuration,
     # plt.ylim([0,2])
 
     if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Losses.png')
+        plt.savefig(f'{path_to_out}/Student_Losses_Full.png')
     else:
-        plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+        plt.savefig(f'{path_to_out}/Teacher_Losses_Full.png')
 
     plt.clf()
 
@@ -916,9 +971,9 @@ def train_agent(config: Configuration,
     plt.legend(loc="upper right")
     
     if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Rewards.png')
+        plt.savefig(f'{path_to_out}/Student_Rewards_Full.png')
     else:
-        plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
+        plt.savefig(f'{path_to_out}/Teacher_Rewards_Full.png')
 
     plt.clf()
 
@@ -931,9 +986,9 @@ def train_agent(config: Configuration,
     plt.legend(loc="upper right")
     
     if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Steps.png')
+        plt.savefig(f'{path_to_out}/Student_Steps_Full.png')
     else:
-        plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+        plt.savefig(f'{path_to_out}/Teacher_Steps_Full.png')
 
     return agent
 

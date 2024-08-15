@@ -2,40 +2,37 @@
 
 #SBATCH --nodes=1 #try this (distributed - more than 1 computing node)
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-##SBATCH --nodelist=evc1
-##SBATCH --ntasks=8
-##SBATCH --cpus-per-task=4
-#SBATCH --time=48:00:00
+#SBATCH --time=10:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
 #SBATCH --account=cenyioha
 #SBATCH --output=out.job.%J.out
 #SBATCH --error=err.job.%J.err
-
-## --nodes=4
-## --ntasks-per-node=10
-## --mem-per-cpu=1990
+#SBATCH --mail-type=END
+#SBATCH --mail-user=aden.mckinney@ucf.edu
 
 username=$(whoami)
 
 #Select File to run
 export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/${username}/Local_Neuro_Symbolic/
-export file=""
-export args=""
 
 #Select how logs get stored
 mkdir $SLURM_JOB_ID
 export debug_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
 export benchmark_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
 
+out_file=out.job.${SLURM_JOB_ID}.out
+err_file=err.job.${SLURM_JOB_ID}.err
+
 ##Load Modules
 module purge
-module load anaconda/anaconda3
-module load cuda/cuda-11.3
+module load anaconda
+module load cuda
 
 ## Enter Working Directory ##
 cd $SLURM_SUBMIT_DIR
+
 ## Create Log File ##
 echo $SLURM_SUBMIT_DIR
 echo "JobID: $SLURM_JOB_ID" >> $debug_logs
@@ -47,8 +44,6 @@ mkdir "tmp"
 mkdir "tmp/policy"
 mkdir "learning_curves"
 
-#echo "Made needed log directories"
-
 ## Module debugging ##
 module list >> $debug_logs
 nvidia-smi topo -m
@@ -58,34 +53,39 @@ date >> $benchmark_logs
 echo "ulimit -l: " >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
-#echo "Activating conda env"
-
-conda deactivate
-
 ## Run job ## 
-source activate autd
+conda activate autd
 
 rm -rf ./automaton_q/*
 rm -rf ./logs/*
 rm -rf ./checkpoints/*
 
-###mpirun -np $SLURM_NTASKS python $file
-echo
+# Hyperparameters
+alr=0.0003
+clr=0.0003
+gamma=0.99
+tau=0.005
+total_steps=2000
+export POLICY_FREQ=2
+export NOISE_CLIP=0.5
+export NOISE_STDDEV=0.2
 
-# alr=0.0001
-# clr=0.001
-# gamma=0.99
-# batch_size=64
-# tau=0.01
+dir_name=$SLURM_JOB_ID
+mkdir "$dir_name"
 
-# Should match the environment used when used as a student
-python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py
+python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 python -u ./discrete/run/reward_machine/dungeon_quest_machine_rew_per_step.py
-python -u ./discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_DDPG.py # Dynamic Distillation
+python -u ./discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_DDPG.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps" --path-to-out="$dir_name"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
-# sleep 3
+
+mv $out_file $err_file $dir_name/
+
+unset dragon_r
+unset bounding_persist
+unset bounding_dist
+unset seq_level
 
 date >> $benchmark_logs
 echo "ulimit -l" >> $benchmark_logs

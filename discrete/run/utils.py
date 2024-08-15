@@ -4,7 +4,7 @@ from typing import List, Type
 import torch
 
 from discrete.lib.agent.normal_agent import DuelingQNetworkAgent
-from discrete.lib.agent.DDPG_Agent import DDPG_Agent
+from discrete.lib.agent.TD3_Agent import TD3_Agent
 from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
 from discrete.lib.automaton.ltl_automaton import LTLAutomaton
 from discrete.lib.automaton.mine_env_ap_extractor import AP, MineEnvApExtractor
@@ -30,7 +30,8 @@ dummy_ltlf = "True"
 
 def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device, agent_cls=DuelingQNetworkAgent,
                       no_done_on_out_of_time: bool = False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
-                      max_training_steps=int(1e6), online_distill: bool = False, gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.001, batch_size: int = 32, tau: float = 1.0, path_to_out: str = None):
+                      max_training_steps=int(1e6), online_distill: bool = False, 
+                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.001, batch_size: int = 32, tau: float = 1.0, path_to_out: str = None):
     automaton, ap_extractor = construct_ap_extractor_automaton(aps, ltlf, device)
 
 
@@ -69,10 +70,23 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
 def student_config_v1(env_config: EnvConfig, teacher_run_name: str, student_run_name: str,
                       device: torch.device, anneal_target_aut_class: Type[AnnealTargetAutomaton],
                       anneal_target_aut_kwargs, new_gamma: float = 0.99,
-                      agent_cls=DDPG_Agent, max_training_steps=int(1e6),
+                      agent_cls=TD3_Agent, max_training_steps=int(1e6),
                       no_done_on_out_of_time=False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
-                      reward_machine: bool = False):
-    teacher_config = teacher_config_v1(env_config, teacher_run_name, device, agent_cls, aps=aps, ltlf=ltlf)
+                      reward_machine: bool = False,
+                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.001, batch_size: int = 32, tau: float = 1.0, path_to_out: str = None):
+
+    teacher_config = None
+    if agent_cls == TD3_Agent:
+        teacher_config = teacher_config_v1(env_config, 
+                               teacher_run_name,
+                               device, 
+                               agent_cls,
+                               aps=aps,
+                               ltlf=ltlf,
+                               max_training_steps=max_training_steps, 
+                               gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, path_to_out=path_to_out)  
+    else:
+        teacher_config = teacher_config_v1(env_config, teacher_run_name, device, agent_cls, aps=aps, ltlf=ltlf)
     
     with open(f"automaton_q/{teacher_run_name}.json", "r") as f:
         teacher_aut_info = json.load(f)
