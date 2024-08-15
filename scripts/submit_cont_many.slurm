@@ -24,8 +24,8 @@ export benchmark_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
 
 ##Load Modules
 module purge
-module load anaconda/anaconda3
-module load cuda/cuda-11.4
+module load anaconda
+module load cuda
 
 ## Enter Working Directory ##
 cd $SLURM_SUBMIT_DIR
@@ -52,8 +52,7 @@ ulimit -l >> $benchmark_logs
 
 
 ## Run job ## 
-conda deactivate
-source activate autd
+conda activate autd
 
 rm -rf ./automaton_q/*
 rm -rf ./logs/*
