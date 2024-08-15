@@ -862,8 +862,8 @@ def train_agent(config: Configuration,
     end_time = 0
 
     path_to_out = ""
-    if os.getenv('PLOT_OP_PATH'):
-        path_to_out = os.getenv('PLOT_OP_PATH')
+    if path_to_out_global:
+        path_to_out = path_to_out_global
     else:
         now = datetime.now().strftime("%m-%d_%H-%M-%S")
         dirname = os.path.dirname(__file__)

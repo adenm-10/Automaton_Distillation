@@ -42,6 +42,8 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=32, help='Buffer Batch Size')
     parser.add_argument('--tau', type=float, default=1.0, help='Target Transfer Tau')
     parser.add_argument('--total-steps', type=int, default=int(2e6), help='Buffer Batch Size')
+    parser.add_argument('--path-to-out', type=str, default=None, help='Path to place plots')
+
     
     # Parse arguments from command line
     args = parser.parse_args()
@@ -53,6 +55,7 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     tau = args.tau
     max_training_steps = int(args.total_steps)
+    global path_to_out_global = args.path_to_out
     # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
     config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, 

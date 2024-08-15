@@ -20,7 +20,6 @@ export bounding_persist=$4
 export bounding_dist=$5
 export seq_level=$6
 export tau=$7
-export PATH_TO_OUT="${dir_name}"
 
 out_file=out.job.${SLURM_JOB_ID}.out
 err_file=err.job.${SLURM_JOB_ID}.err
@@ -35,7 +34,7 @@ export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
 
-python discrete/run/teacher/dungeon_quest_teacher_td3.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps"
+python discrete/run/teacher/dungeon_quest_teacher_td3.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps" --path-to-out="$dir_name"
 mv $out_file $err_file $dir_name/
 mv $dir_name $orig_job_id/
 
