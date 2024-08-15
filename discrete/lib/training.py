@@ -700,28 +700,6 @@ def train_agent(config: Configuration,
 
     rewards_iterations = []
 
-    start_time = time.time()
-    end_time = 0
-
-    path_to_out = ""
-    if os.getenv('PLOT_OP_PATH'):
-        path_to_out = os.getenv('PLOT_OP_PATH')
-    else:
-        now = datetime.now().strftime("%m-%d_%H-%M-%S")
-        dirname = os.path.dirname(__file__)
-        hard_path = f"./test_output/test_output_{now}"
-
-        if isinstance(agent, AC_Agent):
-            hard_path = hard_path + "_cont/"
-        else:
-            hard_path = hard_path + "_disc/"
-
-        path_to_out = os.path.join(hard_path)
-        try:
-            os.mkdir(path_to_out)
-        except:
-            print("Output Directory Already Exists")
-
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
     
@@ -879,6 +857,30 @@ def train_agent(config: Configuration,
     #     print(f"Nest States: \n{top_loss[i][5]}\n")
     #     print(f"Rewards: \n{top_loss[i][6]}\n")
     #     print(f"=============================================================================")
+
+    start_time = time.time()
+    end_time = 0
+
+    path_to_out = ""
+    if os.getenv('PLOT_OP_PATH'):
+        path_to_out = os.getenv('PLOT_OP_PATH')
+        print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
+    else:
+        now = datetime.now().strftime("%m-%d_%H-%M-%S")
+        dirname = os.path.dirname(__file__)
+        hard_path = f"./test_output/test_output_{now}"
+
+        if isinstance(agent, AC_Agent):
+            hard_path = hard_path + "_cont/"
+        else:
+            hard_path = hard_path + "_disc/"
+
+        path_to_out = os.path.join(hard_path)
+        
+        try:
+            os.mkdir(path_to_out)
+        except:
+            print("Output Directory Already Exists")
 
     loss_mav = moving_average(losses)
     reward_mav = moving_average(rewards_list)
