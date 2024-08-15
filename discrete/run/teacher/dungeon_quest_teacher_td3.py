@@ -55,8 +55,7 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     tau = args.tau
     max_training_steps = int(args.total_steps)
-    global path_to_out_global
-    path_to_out_global = args.path_to_out
+    path_to_out = args.path_to_out
     # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
     config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, 
@@ -66,7 +65,7 @@ if __name__ == '__main__':
                                agent_cls=TD3_Agent,
                                ltlf=dungeon_quest_ltlf, 
                                max_training_steps=max_training_steps, 
-                               gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau)
+                               gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, path_to_out=path_to_out)
 
     print("\n\n============================================")
     print(f"Training Teacher / Independent DDPG Agent")

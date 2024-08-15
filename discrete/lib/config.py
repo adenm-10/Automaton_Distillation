@@ -56,3 +56,4 @@ class Configuration(NamedTuple):
     actor_lr: float
     critic_lr: float
     tau: float
+    path_to_out: str
