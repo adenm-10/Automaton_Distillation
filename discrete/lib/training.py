@@ -864,7 +864,6 @@ def train_agent(config: Configuration,
     path_to_out = ""
     if os.getenv('PLOT_OP_PATH'):
         path_to_out = os.getenv('PLOT_OP_PATH')
-        print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
     else:
         now = datetime.now().strftime("%m-%d_%H-%M-%S")
         dirname = os.path.dirname(__file__)
@@ -881,6 +880,7 @@ def train_agent(config: Configuration,
             os.mkdir(path_to_out)
         except:
             print("Output Directory Already Exists")
+    print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
     loss_mav = moving_average(losses)
     reward_mav = moving_average(rewards_list)
