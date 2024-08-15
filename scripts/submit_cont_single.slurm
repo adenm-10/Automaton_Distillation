@@ -30,13 +30,13 @@ alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=2000000
+total_steps=2000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
 
 python discrete/run/teacher/dungeon_quest_teacher_td3.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps"
-mv test_output/test_output* $out_file $err_file $dir_name/
+mv $out_file $err_file $dir_name/
 mv $dir_name $orig_job_id/
 
 unset POLICY_FREQ
