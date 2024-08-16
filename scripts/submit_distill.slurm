@@ -65,10 +65,12 @@ alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=2000
+total_steps=1000000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
+
+export seq_level=2
 
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
