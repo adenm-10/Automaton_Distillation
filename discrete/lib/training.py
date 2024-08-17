@@ -694,6 +694,8 @@ def train_agent(config: Configuration,
     rewards_per_ep_list = []
     steps_to_terminal = [0]*config.num_parallel_envs
     steps_to_terminal_total = []
+
+    ep_counter = 0
     
     loss_mav = []
     reward_mav = []
@@ -750,6 +752,8 @@ def train_agent(config: Configuration,
 
                 rewards_per_ep_list.append(rewards_per_ep[index])
                 rewards_per_ep[index] = 0
+
+                ep_counter += 1
 
         infos_discrete = copy.deepcopy(infos)
         for info in infos_discrete:
@@ -872,13 +876,15 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
-        if len(rewards_per_ep_list) == 10000:
+        if ep_counter == 10000:
             filename = "rew_and_steps_lists.pkl"
 
             reward_ep_mav = moving_average(rewards_per_ep_list)
             steps_mav = moving_average(steps_to_terminal_total)
 
             # print("saved, now moving on...")
+
+            plt.clf()
 
             # print(f"reward iters, list")
             # print(rewards_iterations)
@@ -914,9 +920,11 @@ def train_agent(config: Configuration,
                 'steps_mav': steps_mav
             }
 
-            filepath = os.path.join(path_to_out, filename)
+            filepath = f"{path_to_out}/{filename}"
             with open(filepath, 'wb') as file:
                 pickle.dump(data_dict, file)
+
+            return agent
 
 
     # print("Top Losses")
@@ -935,15 +943,13 @@ def train_agent(config: Configuration,
     reward_ep_mav = moving_average(rewards_per_ep_list)
     steps_mav = moving_average(steps_to_terminal_total)
 
+    plt.clf()
+
     plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
     plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
     plt.xlabel('Iterations')
     plt.ylabel('Loss')
     plt.legend(loc="upper right")
-
-    # os.mkdir(path_to_out)
-
-    # plt.ylim([0,2])
 
     if isinstance(agent, AC_Agent):
         plt.savefig(f'{path_to_out}/Student_Losses_Full.png')
