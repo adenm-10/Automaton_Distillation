@@ -3,6 +3,7 @@ import time
 from typing import Tuple, Dict, List
 from datetime import datetime
 import os
+import pickle
 
 import numpy as np
 import torch
@@ -871,28 +872,11 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
-        if i == 200000:
-            loss_mav = moving_average(losses)
-            reward_mav = moving_average(rewards_list)
+        if len(rewards_per_ep_list) == 10000:
+            filename = "rew_and_steps_lists.pkl"
+
             reward_ep_mav = moving_average(rewards_per_ep_list)
             steps_mav = moving_average(steps_to_terminal_total)
-
-            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-            plt.xlabel('Iterations')
-            plt.ylabel('Loss')
-            plt.legend(loc="upper right")
-
-            # os.mkdir(path_to_out)
-
-            # plt.ylim([0,2])
-
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Losses_200k.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Losses_200k.png')
-
-            plt.clf()
 
             # print("saved, now moving on...")
 
@@ -906,9 +890,9 @@ def train_agent(config: Configuration,
             plt.legend(loc="upper right")
             
             if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards_200k.png')
+                plt.savefig(f'{path_to_out}/Student_Rewards_12k_eps.png')
             else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards_200k.png')
+                plt.savefig(f'{path_to_out}/Teacher_Rewards_12k_eps.png')
 
             plt.clf()
 
@@ -921,9 +905,18 @@ def train_agent(config: Configuration,
             plt.legend(loc="upper right")
             
             if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps_200k.png')
+                plt.savefig(f'{path_to_out}/Student_Steps_12k_eps.png')
             else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps_200k.png')
+                plt.savefig(f'{path_to_out}/Teacher_Steps_12k_eps.png')
+
+            data_dict = {
+                'reward_ep_mav': reward_ep_mav,
+                'steps_mav': steps_mav
+            }
+
+            filepath = os.path.join(path_to_out, filename)
+            with open(filepath, 'wb') as file:
+                pickle.dump(data_dict, file)
 
 
     # print("Top Losses")

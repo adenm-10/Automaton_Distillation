@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-#SBATCH --time=10:00:00
+#SBATCH --time=20:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
@@ -29,7 +29,7 @@ alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=2000
+total_steps=500000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
