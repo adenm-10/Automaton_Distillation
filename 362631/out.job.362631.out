@@ -1,0 +1,66 @@
+/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic
+	[4mGPU0	NIC0	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	0,2,4,6	0		N/A
+NIC0	SYS	 X 				
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic
+Exception:
+	int() argument must be a string, a bytes-like object or a number, not 'NoneType'
+Bounding Persist: <class 'bool'>, False
+Bounding Distance: <class 'int'>, 7
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x153f09f960b8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x153f09f960f0>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x153f09f96128>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x153f09f96160>]
+['key', 'sword', 'shield', 'dragon']
+tensor([[0, 7, 2, 5, 6, 1, 2, 4, 2, 2, 2, 2, 2, 2, 2, 3],
+        [1, 1, 4, 4, 1, 1, 4, 4, 2, 2, 3, 3, 2, 2, 3, 3],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+        [4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3],
+        [5, 5, 5, 5, 4, 4, 4, 4, 2, 2, 2, 2, 3, 3, 3, 3],
+        [6, 1, 2, 4, 6, 1, 2, 4, 2, 2, 2, 3, 2, 2, 2, 3],
+        [7, 7, 5, 5, 1, 1, 4, 4, 2, 2, 2, 2, 2, 2, 3, 3]])
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+Exception:
+	int() argument must be a string, a bytes-like object or a number, not 'NoneType'
+Bounding Persist: <class 'bool'>, False
+Bounding Distance: <class 'int'>, 7
+Terminal Reward: <class 'int'>, 10
+Sequence Level: <class 'int'>, 1
+Dungeon Quest LTLF: F(sword) & (!sword U key)
+============================================
+
+
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+
