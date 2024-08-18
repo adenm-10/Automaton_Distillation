@@ -876,7 +876,7 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
-        if ep_counter == 10000:
+        if if ep_counter+1 % 1000 == 0:
             filename = "rew_and_steps_lists.pkl"
 
             reward_ep_mav = moving_average(rewards_per_ep_list)
@@ -896,9 +896,9 @@ def train_agent(config: Configuration,
             plt.legend(loc="upper right")
             
             if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards_12k_eps.png')
+                plt.savefig(f'{path_to_out}/Student_Rewards_periodic_eps.png')
             else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards_12k_eps.png')
+                plt.savefig(f'{path_to_out}/Teacher_Rewards_periodic_eps.png')
 
             plt.clf()
 
@@ -911,9 +911,9 @@ def train_agent(config: Configuration,
             plt.legend(loc="upper right")
             
             if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps_12k_eps.png')
+                plt.savefig(f'{path_to_out}/Student_Steps_periodic_eps.png')
             else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps_12k_eps.png')
+                plt.savefig(f'{path_to_out}/Teacher_Steps_periodic_eps.png')
 
             data_dict = {
                 'reward_ep_mav': reward_ep_mav,
@@ -924,7 +924,8 @@ def train_agent(config: Configuration,
             with open(filepath, 'wb') as file:
                 pickle.dump(data_dict, file)
 
-            return agent
+            if ep_counter == 10000:
+                return agent
 
 
     # print("Top Losses")
