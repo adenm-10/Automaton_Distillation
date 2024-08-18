@@ -753,7 +753,7 @@ def train_agent(config: Configuration,
                 rewards_per_ep_list.append(rewards_per_ep[index])
                 rewards_per_ep[index] = 0
 
-                ep_counter += 1
+                ep_counter = ep_counter + 1
 
         infos_discrete = copy.deepcopy(infos)
         for info in infos_discrete:
@@ -876,15 +876,12 @@ def train_agent(config: Configuration,
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
-        if if ep_counter+1 % 1000 == 0:
-            filename = "rew_and_steps_lists.pkl"
+        if ep_counter  == 10000:
 
             reward_ep_mav = moving_average(rewards_per_ep_list)
             steps_mav = moving_average(steps_to_terminal_total)
 
             # print("saved, now moving on...")
-
-            plt.clf()
 
             # print(f"reward iters, list")
             # print(rewards_iterations)
@@ -915,16 +912,20 @@ def train_agent(config: Configuration,
             else:
                 plt.savefig(f'{path_to_out}/Teacher_Steps_periodic_eps.png')
 
-            data_dict = {
-                'reward_ep_mav': reward_ep_mav,
-                'steps_mav': steps_mav
-            }
+            plt.clf()
 
-            filepath = f"{path_to_out}/{filename}"
-            with open(filepath, 'wb') as file:
-                pickle.dump(data_dict, file)
 
-            if ep_counter == 10000:
+            if isinstance(agent, AC_Agent):
+                data_dict = {
+                    'reward_ep_mav': reward_ep_mav,
+                    'steps_mav': steps_mav
+                }
+
+                filename = "rew_and_steps_lists.pkl"
+                filepath = f"{path_to_out}/{filename}"
+                with open(filepath, 'wb') as file:
+                    pickle.dump(data_dict, file)
+
                 return agent
 
 
@@ -989,6 +990,15 @@ def train_agent(config: Configuration,
         plt.savefig(f'{path_to_out}/Student_Steps_Full.png')
     else:
         plt.savefig(f'{path_to_out}/Teacher_Steps_Full.png')
+
+    data_dict = {
+        'reward_ep_mav': reward_ep_mav,
+        'steps_mav': steps_mav
+    }
+
+    filepath = f"{path_to_out}/{filename}"
+    with open(filepath, 'wb') as file:
+        pickle.dump(data_dict, file)
 
     return agent
 
