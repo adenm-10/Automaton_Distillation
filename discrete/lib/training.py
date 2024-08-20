@@ -689,11 +689,14 @@ def train_agent(config: Configuration,
 
     training_iterations = []
     losses = []
-    rewards_list = []
-    rewards_per_ep = [0]*config.num_parallel_envs
-    rewards_per_ep_list = []
-    steps_to_terminal = [0]*config.num_parallel_envs
-    steps_to_terminal_total = []
+
+    rewards_per_step = []
+    rewards_per_ep_current = [0]*config.num_parallel_envs
+    rewards_per_episode = []
+
+    steps_to_term_per_step = []
+    steps_to_terminal_current = [0]*config.num_parallel_envs
+    steps_to_term_per_episode = []
 
     ep_counter = 0
     
@@ -743,15 +746,15 @@ def train_agent(config: Configuration,
         obs, rewards, dones, infos = env.step(actions)
 
         # Graphing operations
-        steps_to_terminal = [x+1 for x in steps_to_terminal]
-        rewards_per_ep =    [x+r for x, r in zip(rewards_per_ep, rewards)]
+        steps_to_terminal_current = [x+1 for x in steps_to_terminal_current]
+        rewards_per_ep_current =    [x+r for x, r in zip(rewards_per_ep_current, rewards)]
         for index, done in enumerate(dones):
             if done:
-                steps_to_terminal_total.append(steps_to_terminal[index])
-                steps_to_terminal[index] = 0
+                steps_to_term_per_episode.append(steps_to_terminal_current[index])
+                steps_to_terminal_current[index] = 0
 
-                rewards_per_ep_list.append(rewards_per_ep[index])
-                rewards_per_ep[index] = 0
+                rewards_per_episode.append(rewards_per_ep_current[index])
+                rewards_per_ep_current[index] = 0
 
                 ep_counter = ep_counter + 1
 
@@ -763,24 +766,17 @@ def train_agent(config: Configuration,
 
         obs = torch.as_tensor(obs, device=config.device)
         rewards = torch.as_tensor(rewards, device=config.device)
-        rewards_list.append(float(rewards.float().mean()))
         dones = torch.as_tensor(dones, device=config.device)
 
-        # obs = next_states
+        rewards_per_step.append(float(rewards.float().mean()))
+        if len(steps_to_term_per_episode) > 0:
+            steps_to_term_per_step.append(steps_to_term_per_episode[-1])
+        else:
+            steps_to_term_per_step.append(0)
+
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
         logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
 
-        # print(f"Observations: \n{obs[0]}")
-        # print(f"Infos Continuous: \n{infos[0]}") 
-        # print(f"\nInfos Discrete: {infos_discrete}")
-        # print(f"Rewards: {rewards[0]}")
-        # print(f"Rewards List: {rewards_list}")
-        # print(f"Dones: {dones}")
-        # print(f"States after current: {states_after_current}")
-        # print(f"next states: \n{next_states[0]}")
-        # print(f"Action: {((actions[0] + 1) / 2) * 6.28}")
-
-        # assert False
 
         aps_after_current = []
         if isinstance(agent, AC_Agent):
@@ -870,64 +866,11 @@ def train_agent(config: Configuration,
         if i % 1000 == 0 and i != 0:
         
             loss_mav = moving_average(losses)
-            reward_mav = moving_average(rewards_list)
-            reward_ep_mav = moving_average(rewards_per_ep_list)
-            steps_mav = moving_average(steps_to_terminal_total)
+            reward_mav = moving_average(rewards_per_step)
+            reward_ep_mav = moving_average(rewards_per_episode)
+            steps_mav = moving_average(steps_to_term_per_episode)
 
             print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
-
-        if ep_counter  == 10000:
-
-            reward_ep_mav = moving_average(rewards_per_ep_list)
-            steps_mav = moving_average(steps_to_terminal_total)
-
-            # print("saved, now moving on...")
-
-            # print(f"reward iters, list")
-            # print(rewards_iterations)
-            # print(rewards_list)
-            plt.plot([i for i in range(len(rewards_per_ep_list))], rewards_per_ep_list, color='blue', label='Raw Rewards')
-            plt.plot([i for i in range(len(rewards_per_ep_list))], reward_ep_mav,   color='red',  label='Moving Average Rewards')
-            plt.xlabel('Episodes')
-            plt.ylabel('Rewards per Episode')
-            plt.legend(loc="upper right")
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards_periodic_eps.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards_periodic_eps.png')
-
-            plt.clf()
-
-            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-            plt.xlabel('Episodes')
-            plt.ylabel('Steps to Terminal State')
-            plt.legend(loc="upper right")
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps_periodic_eps.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps_periodic_eps.png')
-
-            plt.clf()
-
-
-            if isinstance(agent, AC_Agent):
-                data_dict = {
-                    'reward_ep_mav': reward_ep_mav,
-                    'steps_mav': steps_mav
-                }
-
-                filename = "rew_and_steps_lists.pkl"
-                filepath = f"{path_to_out}/{filename}"
-                with open(filepath, 'wb') as file:
-                    pickle.dump(data_dict, file)
-
-                return agent
-
 
     # print("Top Losses")
     # for i in range(len(top_loss)):
@@ -940,65 +883,110 @@ def train_agent(config: Configuration,
     #     print(f"Rewards: \n{top_loss[i][6]}\n")
     #     print(f"=============================================================================")
 
-    loss_mav = moving_average(losses)
-    reward_mav = moving_average(rewards_list)
-    reward_ep_mav = moving_average(rewards_per_ep_list)
-    steps_mav = moving_average(steps_to_terminal_total)
+    plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step,
+                 path_to_out, agent,
+                 displayed_steps=None, displayed_episodes=None)
 
-    plt.clf()
+    plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step,
+                 path_to_out, agent,
+                 displayed_steps=100000, displayed_episodes=10000)
 
-    plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-    plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-    plt.xlabel('Iterations')
-    plt.ylabel('Loss')
-    plt.legend(loc="upper right")
+    export_results(rewards_per_episode, steps_to_term_per_episode,
+                   rewards_per_step, steps_to_term_per_step,
+                   path_to_out)
 
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Losses_Full.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Losses_Full.png')
+    return agent
 
-    plt.clf()
-
-    # print("saved, now moving on...")
-
-    # print(f"reward iters, list")
-    # print(rewards_iterations)
-    # print(rewards_list)
-    plt.plot([i for i in range(len(rewards_per_ep_list))], rewards_per_ep_list, color='blue', label='Raw Rewards')
-    plt.plot([i for i in range(len(rewards_per_ep_list))], reward_ep_mav,   color='red',  label='Moving Average Rewards')
-    plt.xlabel('Episodes')
-    plt.ylabel('Rewards per Episode')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Rewards_Full.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Rewards_Full.png')
-
-    plt.clf()
-
-    steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-    plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-    plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-    plt.xlabel('Episodes')
-    plt.ylabel('Steps to Terminal State')
-    plt.legend(loc="upper right")
-    
-    if isinstance(agent, AC_Agent):
-        plt.savefig(f'{path_to_out}/Student_Steps_Full.png')
-    else:
-        plt.savefig(f'{path_to_out}/Teacher_Steps_Full.png')
+def export_results(rewards_per_episode, steps_to_term_per_episode,
+                   rewards_per_step, steps_to_term_per_step,
+                   path_to_out):
 
     data_dict = {
-        'reward_ep_mav': reward_ep_mav,
-        'steps_mav': steps_mav
-    }
+        'rewards_per_episode': rewards_per_episode, 
+        'steps_to_term_per_episode': steps_to_term_per_episode,
+        'rewards_per_step': rewards_per_step, 
+        'steps_to_term_per_step': steps_to_term_per_step
+        }
 
-    filepath = f"{path_to_out}/{filename}"
+    filepath = f"{path_to_out}/rew_and_steps_lists.pkl"
     with open(filepath, 'wb') as file:
         pickle.dump(data_dict, file)
 
-    return agent
+    return
+    
+
+def plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step, 
+                 path_to_out, agent,
+                 displayed_steps=None, displayed_episodes=None):
+
+    def plot_details(iteration_list, raw_data, moving_average_data,  # Data specifics
+                     blue_label, red_label, x_label, y_label,        # Labels
+                     save_figure_name):                              # File save name
+
+        plt.plot(iteration_list, raw_data,            color='blue', label=blue_label)
+        plt.plot(iteration_list, moving_average_data, color='red',  label=red_label)
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.legend(loc="upper right")
+        
+        if isinstance(agent, AC_Agent):
+            plt.savefig(f'{path_to_out}/Student_{save_figure_name}.png')
+        else:
+            plt.savefig(f'{path_to_out}/Teacher_{save_figure_name}.png')
+
+        plt.clf()
+
+    reward_mav = moving_average(rewards_per_step)
+    reward_ep_mav = moving_average(rewards_per_episode)
+    steps_mav = moving_average(steps_to_term_per_step)
+    steps_ep_mav = moving_average(steps_to_term_per_episode)
+
+    ep_filename, step_filename = "Full", "Full"
+
+    if displayed_steps and displayed_steps < len(rewards_per_step) and displayed_steps < len(steps_to_term_per_step):
+        reward_mav =             reward_mav[0:displayed_steps]
+        steps_mav  =             steps_mav[0:displayed_steps]
+        rewards_per_step =       rewards_per_step[0:displayed_steps]
+        steps_to_term_per_step = steps_to_term_per_step[0:displayed_steps]
+
+        step_filename = f"{displayed_steps}_Steps"
+
+    if displayed_episodes and displayed_episodes < len(rewards_per_episode) and displayed_episodes < len(steps_to_term_per_episode):
+        reward_ep_mav =             reward_ep_mav[0:displayed_episodes]
+        steps_ep_mav  =             steps_ep_mav[0:displayed_episodes]
+        rewards_per_episode =       rewards_per_episode[0:displayed_episodes]
+        steps_to_term_per_episode = steps_to_term_per_episode[0:displayed_episodes]
+
+        ep_filename   = f"{displayed_episodes}_Episodes"
+
+    plt.clf()
+
+    episode_iterations = [i for i in range(len(reward_ep_mav))]
+    steps_iterations =   [i for i in range(len(reward_mav))]
+
+    # Rewards per Episode
+    plot_details(episode_iterations, rewards_per_episode, reward_ep_mav,
+                 'Raw Rewards', 'Moving Average Rewards', 'Episodes', 'Rewards per Episode',
+                 f"Reward_{ep_filename}")
+
+    # Rewards per Step
+    plot_details(steps_iterations, rewards_per_step, reward_mav,
+                 'Raw Rewards', 'Moving Average Rewards', 'Timesteps', 'Rewards per Step',
+                 f"Reward_{step_filename}")
+
+    # Steps to Reach Terminal State per Episode
+    plot_details(episode_iterations, steps_to_term_per_episode, steps_ep_mav,
+                 'Raw Steps', 'Moving Average Steps', 'Episodes', 'Steps To Terminal State per Episode',
+                 f"Steps_{ep_filename}")
+
+    # Steps to Reach Terminal State per Step
+    plot_details(steps_iterations, steps_to_term_per_step, steps_mav,
+                 'Raw Steps', 'Moving Average Steps', 'Timesteps', 'Steps To Terminal State per Step',
+                 f"Steps_{step_filename}")
+
+    return
+
 

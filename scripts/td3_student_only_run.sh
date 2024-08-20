@@ -7,14 +7,12 @@ export bounding_persist="True"
 export bounding_dist=3
 export seq_level=2
 
-356977/dragon-r_10_bound-persist_True_bounding-dist_3_seq-level_2
-
 # Hyperparameters
 alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=50000
+total_steps=5000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2

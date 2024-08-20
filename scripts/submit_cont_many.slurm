@@ -67,9 +67,9 @@ do
     do
         for bounding_dist_i in 3 #6
         do
-            for seq_level_i in 2
+            for index in 1 2 3 4
             do
-                dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_tau_${tau_i}"
+                dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_index_${index}"
                 mkdir "$dir_name"
                 sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r_i $bounding_persist_i $bounding_dist_i $seq_level_i $tau_i
             done
