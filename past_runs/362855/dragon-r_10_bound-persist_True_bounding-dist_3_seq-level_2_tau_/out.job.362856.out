@@ -1,0 +1,124 @@
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+Bounding Persist: <class 'bool'>, True
+Bounding Distance: <class 'int'>, 3
+Terminal Reward: <class 'int'>, 10
+Sequence Level: <class 'int'>, 2
+Dungeon Quest LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+imported all dependencies, checking for cuda
+
+==============
+Cuda detected!
+==============
+
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x149c7d4886d8>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x149c7d488710>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x149c7d488748>]
+
+
+============================================
+Training Teacher / Independent DDPG Agent
+Max Training Steps: 1000000
+LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+Starting training at: 2024-08-19 13:08:11
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x149c7d4885f8>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(16,)
+Automaton Num States: 5
+Action Space: Box(1,)
+Agent Name: TD3 Agent
+NOT Loading from checkpoint
+Actor Learning Rate: 0.0003
+Critic Learning Rate: 0.0003
+Completed Steps:     1000 || Avg Steps:  900 || Avg Rew: -173.314
+Completed Steps:     2000 || Avg Steps:  950 || Avg Rew: -178.950
+Completed Steps:     3000 || Avg Steps:  933 || Avg Rew: -178.083
+Completed Steps:     4000 || Avg Steps:  950 || Avg Rew: -181.435
+Completed Steps:     5000 || Avg Steps:  960 || Avg Rew: -184.190
+Completed Steps:     6000 || Avg Steps:  951 || Avg Rew: -181.906
+Completed Steps:     7000 || Avg Steps:  957 || Avg Rew: -183.828
+Completed Steps:     8000 || Avg Steps:  963 || Avg Rew: -184.867
+Completed Steps:     9000 || Avg Steps:  956 || Avg Rew: -183.125
+Completed Steps:    10000 || Avg Steps:  960 || Avg Rew: -184.151
+Completed Steps:    11000 || Avg Steps:  960 || Avg Rew: -184.283
+Completed Steps:    12000 || Avg Steps:  960 || Avg Rew: -185.147
+Completed Steps:    13000 || Avg Steps:  970 || Avg Rew: -187.077
+Completed Steps:    14000 || Avg Steps:  970 || Avg Rew: -187.427
+Completed Steps:    15000 || Avg Steps:  960 || Avg Rew: -185.189
+Completed Steps:    16000 || Avg Steps:  970 || Avg Rew: -187.769
+Completed Steps:    17000 || Avg Steps:  970 || Avg Rew: -187.774
+Completed Steps:    18000 || Avg Steps:  970 || Avg Rew: -188.184
+Completed Steps:    19000 || Avg Steps:  980 || Avg Rew: -190.816
+Completed Steps:    20000 || Avg Steps:  990 || Avg Rew: -193.052
+Completed Steps:    21000 || Avg Steps:  990 || Avg Rew: -193.081
+Completed Steps:    22000 || Avg Steps:  990 || Avg Rew: -193.176
+Completed Steps:    23000 || Avg Steps:  980 || Avg Rew: -190.837
+Completed Steps:    24000 || Avg Steps:  970 || Avg Rew: -188.524
+Completed Steps:    25000 || Avg Steps:  980 || Avg Rew: -190.543
+Completed Steps:    26000 || Avg Steps:  980 || Avg Rew: -190.744
+Completed Steps:    27000 || Avg Steps:  980 || Avg Rew: -190.696
+Completed Steps:    28000 || Avg Steps:  980 || Avg Rew: -189.261
+Completed Steps:    29000 || Avg Steps:  970 || Avg Rew: -186.867
+Completed Steps:    30000 || Avg Steps:  966 || Avg Rew: -184.992
+Completed Steps:    31000 || Avg Steps:  966 || Avg Rew: -185.006
+Completed Steps:    32000 || Avg Steps:  966 || Avg Rew: -184.982
+Completed Steps:    33000 || Avg Steps:  962 || Avg Rew: -182.794
+Completed Steps:    34000 || Avg Steps:  969 || Avg Rew: -176.589
+Completed Steps:    35000 || Avg Steps:  870 || Avg Rew: -131.846
+Completed Steps:    36000 || Avg Steps:  825 || Avg Rew: -114.591
+Completed Steps:    37000 || Avg Steps:  782 || Avg Rew: -83.629
+Completed Steps:    38000 || Avg Steps:  469 || Avg Rew: 34.770
+Completed Steps:    39000 || Avg Steps:  421 || Avg Rew: 46.639
+Completed Steps:    40000 || Avg Steps:  257 || Avg Rew: 69.813
+Completed Steps:    41000 || Avg Steps:  187 || Avg Rew: 61.743
+Completed Steps:    42000 || Avg Steps:  131 || Avg Rew: 63.214
+Completed Steps:    43000 || Avg Steps:  130 || Avg Rew: 67.864
+Completed Steps:    44000 || Avg Steps:  161 || Avg Rew: 62.086
+Completed Steps:    45000 || Avg Steps:  181 || Avg Rew: 48.014
+Completed Steps:    46000 || Avg Steps:  159 || Avg Rew: 55.562
+Completed Steps:    47000 || Avg Steps:  117 || Avg Rew: 59.260
+Completed Steps:    48000 || Avg Steps:  160 || Avg Rew: 55.372
+Completed Steps:    49000 || Avg Steps:  144 || Avg Rew: 60.163
+Completed Steps:    50000 || Avg Steps:   51 || Avg Rew: 58.337
+Completed Steps:    51000 || Avg Steps:   85 || Avg Rew: 55.772
+Completed Steps:    52000 || Avg Steps:   67 || Avg Rew: 61.380
+Completed Steps:    53000 || Avg Steps:   51 || Avg Rew: 56.723
+Completed Steps:    54000 || Avg Steps:   52 || Avg Rew: 54.382
+Completed Steps:    55000 || Avg Steps:   40 || Avg Rew: 53.619
+Completed Steps:    56000 || Avg Steps:   34 || Avg Rew: 53.100
+Completed Steps:    57000 || Avg Steps:   42 || Avg Rew: 49.390
+Completed Steps:    58000 || Avg Steps:   48 || Avg Rew: 53.273
+Completed Steps:    59000 || Avg Steps:   27 || Avg Rew: 49.135
+Completed Steps:    60000 || Avg Steps:   36 || Avg Rew: 50.873
+Completed Steps:    61000 || Avg Steps:   26 || Avg Rew: 54.525
+Completed Steps:    62000 || Avg Steps:   25 || Avg Rew: 50.544
+Completed Steps:    63000 || Avg Steps:   29 || Avg Rew: 49.092
+Completed Steps:    64000 || Avg Steps:   44 || Avg Rew: 50.338
+Completed Steps:    65000 || Avg Steps:   23 || Avg Rew: 46.874
+Completed Steps:    66000 || Avg Steps:   20 || Avg Rew: 51.291
+Completed Steps:    67000 || Avg Steps:   20 || Avg Rew: 47.491
+Completed Steps:    68000 || Avg Steps:   21 || Avg Rew: 48.022
+Completed Steps:    69000 || Avg Steps:   20 || Avg Rew: 50.700
+Completed Steps:    70000 || Avg Steps:   28 || Avg Rew: 50.297
+Completed Steps:    71000 || Avg Steps:   24 || Avg Rew: 48.965
+Completed Steps:    72000 || Avg Steps:   16 || Avg Rew: 47.103
+Completed Steps:    73000 || Avg Steps:   20 || Avg Rew: 47.009
+Completed Steps:    74000 || Avg Steps:   14 || Avg Rew: 46.674
+Completed Steps:    75000 || Avg Steps:   31 || Avg Rew: 48.460
+Completed Steps:    76000 || Avg Steps:   21 || Avg Rew: 50.239
+Completed Steps:    77000 || Avg Steps:   31 || Avg Rew: 49.223
+Finished training at: 2024-08-19 13:30:57
+Total elapsed time: 1366.0625166893005

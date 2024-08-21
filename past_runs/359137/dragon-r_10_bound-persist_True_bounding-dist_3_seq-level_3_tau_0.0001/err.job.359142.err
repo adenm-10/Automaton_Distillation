@@ -1,0 +1,27 @@
+/home/amckinney/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Traceback (most recent call last):
+  File "discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 74, in <module>
+    run_training(config)
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/main.py", line 45, in run_training
+    train_agent(config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/training.py", line 785, in train_agent
+    plt.savefig(f'{path_to_out}/Student_Losses.png')
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/pyplot.py", line 977, in savefig
+    res = fig.savefig(*args, **kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/figure.py", line 3058, in savefig
+    self.canvas.print_figure(fname, **kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 2325, in print_figure
+    **kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 1648, in wrapper
+    return func(*args, **kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/_api/deprecation.py", line 415, in wrapper
+    return func(*inner_args, **inner_kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/backends/backend_agg.py", line 543, in print_png
+    dpi=self.figure.dpi, metadata=metadata, pil_kwargs=pil_kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/matplotlib/image.py", line 1675, in imsave
+    image.save(fname, **pil_kwargs)
+  File "/home/amckinney/my-envs/autd/lib/python3.7/site-packages/PIL/Image.py", line 2429, in save
+    fp = builtins.open(filename, "w+b")
+FileNotFoundError: [Errno 2] No such file or directory: './test_output/test_output_07-31_14-09-41_cont//Student_Losses.png'
+mv: cannot stat ‘test_output/test_output*’: No such file or directory

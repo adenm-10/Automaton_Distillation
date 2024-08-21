@@ -1,0 +1,47 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+Lmod has detected the following error: The following module(s) are unknown:
+"cuda/cuda-11.3"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "cuda/cuda-11.3"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+mkdir: cannot create directory ‘tmp’: File exists
+mkdir: cannot create directory ‘tmp/policy’: File exists
+mkdir: cannot create directory ‘learning_curves’: File exists
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3
+
+ 
+
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda deactivate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+/home/amckinney/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+0it [00:00, ?it/s]1it [00:00,  2.37it/s]7it [00:00, 15.03it/s]12it [00:00, 14.70it/s]39it [00:01, 60.00it/s]68it [00:01, 105.99it/s]97it [00:01, 146.14it/s]126it [00:01, 179.95it/s]154it [00:01, 205.00it/s]183it [00:01, 226.24it/s]212it [00:01, 242.13it/s]241it [00:01, 254.84it/s]270it [00:01, 263.72it/s]299it [00:01, 268.91it/s]327it [00:02, 271.41it/s]356it [00:02, 274.44it/s]385it [00:02, 276.92it/s]414it [00:02, 279.31it/s]443it [00:02, 280.54it/s]472it [00:02, 281.74it/s]501it [00:02, 281.77it/s]530it [00:02, 281.77it/s]559it [00:02, 282.35it/s]588it [00:02, 282.04it/s]617it [00:03, 282.89it/s]646it [00:03, 282.90it/s]675it [00:03, 283.89it/s]704it [00:03, 282.60it/s]733it [00:03, 283.14it/s]762it [00:03, 283.02it/s]791it [00:03, 281.96it/s]820it [00:03, 283.68it/s]849it [00:03, 270.57it/s]879it [00:04, 277.58it/s]909it [00:04, 281.88it/s]939it [00:04, 285.94it/s]969it [00:04, 289.07it/s]999it [00:04, 291.39it/s]1029it [00:04, 292.65it/s]1059it [00:04, 293.67it/s]1089it [00:04, 293.56it/s]1119it [00:04, 289.97it/s]1149it [00:04, 288.38it/s]1178it [00:05, 287.59it/s]1207it [00:05, 287.29it/s]1236it [00:05, 285.77it/s]1265it [00:05, 284.91it/s]1294it [00:05, 284.93it/s]1323it [00:05, 285.18it/s]1352it [00:05, 285.60it/s]1381it [00:05, 284.59it/s]1410it [00:05, 283.24it/s]1439it [00:05, 283.80it/s]1468it [00:06, 284.24it/s]1497it [00:06, 283.87it/s]1526it [00:06, 284.00it/s]1555it [00:06, 284.48it/s]1584it [00:06, 284.13it/s]1613it [00:06, 283.06it/s]1642it [00:06, 283.31it/s]1671it [00:06, 282.86it/s]1700it [00:06, 283.06it/s]1729it [00:06, 283.11it/s]1758it [00:07, 283.12it/s]1787it [00:07, 282.73it/s]1816it [00:07, 283.53it/s]1845it [00:07, 283.74it/s]1874it [00:07, 283.24it/s]1903it [00:07, 282.22it/s]1932it [00:07, 283.37it/s]1961it [00:07, 284.40it/s]1990it [00:07, 284.63it/s]2019it [00:07, 282.58it/s]2048it [00:08, 282.39it/s]2077it [00:08, 283.73it/s]2106it [00:08, 283.18it/s]2135it [00:08, 282.39it/s]2164it [00:08, 281.50it/s]2193it [00:08, 282.95it/s]2222it [00:08, 283.56it/s]2251it [00:08, 282.19it/s]2280it [00:08, 282.42it/s]2285it [00:08, 255.78it/s]
+/home/amckinney/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
