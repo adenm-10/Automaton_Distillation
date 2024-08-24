@@ -386,7 +386,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         reward += this_tile.reward
                         break
 
-                    if distance_to_tile > 1:
+                    if False:
+                    # if distance_to_tile > 1:
                         tile_reward = this_tile.reward
                         distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
                         persist_reward  = 0
