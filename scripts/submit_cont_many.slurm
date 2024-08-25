@@ -61,13 +61,13 @@ rm -rf ./checkpoints/*
 ###mpirun -np $SLURM_NTASKS python $file
 
 # baseline
-for dragon_r_i in 10 # 35 100
+for dragon_r_i in 10 100
 do
-    for bounding_persist_i in "True"
+    for seq_level_i in 2 3
     do
         for bounding_dist_i in 3 #6
         do
-            for index in 1 2 3 4
+            for index in 1 2
             do
                 dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_index_${index}"
                 mkdir "$dir_name"

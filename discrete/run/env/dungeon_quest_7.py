@@ -8,17 +8,15 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-sequence_level = 1 # 0-3
-
 terminal_reward = 10
-sequence_level = 1
+sequence_level = 2 # 0-3
 
 try:
     terminal_reward = int(os.environ.get("dragon_r"))
     sequence_level = int(os.environ.get("seq_level"))
 except:
     terminal_reward = 10
-    sequence_level = 1
+    sequence_level = 2
 
 print(f"Terminal Reward: {type(terminal_reward)}, {terminal_reward}")
 print(f"Sequence Level: {type(sequence_level)}, {sequence_level}")
@@ -52,9 +50,7 @@ elif sequence_level == 3:
     key_r, key_p, key_t = 1, 1, False
     shield_r, shield_p, shield_t = 1, 1, False
     sword_r, sword_p, sword_t = 1, 1, False
-    dragon_r_cont, dragon_p_cont, dragon_t_cont = 10, 1, True
-    dragon_r_disc, dragon_p_disc, dragon_t_disc = 100, 1, True
-  
+    dragon_r, dragon_p, dragon_t = 10, 1, True
 
 dungeon_quest_config_7 = MineWorldConfig(
     shape=(7, 7),
