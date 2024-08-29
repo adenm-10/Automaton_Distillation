@@ -1,0 +1,18 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+/home/amckinney/my-envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+XIO:  fatal IO error 2 (No such file or directory) on X server "172.17.0.242:16.0"
+      after 898 requests (898 known processed) with 2 events remaining.
+
+real	1m15.369s
+user	0m3.769s
+sys	0m4.014s

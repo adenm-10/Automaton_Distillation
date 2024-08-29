@@ -2,6 +2,7 @@ import functools
 from collections import Counter
 from random import Random
 from typing import Tuple, TypeVar, Union, List, Dict, Collection
+import os
 
 import numpy as np
 from gym import spaces
@@ -10,6 +11,20 @@ from math import sin, cos, sqrt, pi, exp
 from discrete.lib.env.gridenv import GridEnv
 from discrete.lib.env.saveloadenv import SaveLoadEnv
 from discrete.lib.env.util import element_add
+
+bounding_persist = False
+bounding_dist = 7
+
+try:
+    bounding_persist = os.environ.get("bounding_persist") == 'True'
+    bounding_dist = int(os.environ.get("bounding_dist"))
+except Exception as e:
+    print(f"Exception:\n\t{e}")
+    bounding_persist = False
+    bounding_dist = 7
+
+print(f"Bounding Persist: {type(bounding_persist)}, {bounding_persist}")
+print(f"Bounding Distance: {type(bounding_dist)}, {bounding_dist}")
 
 
 class MineWorldTileType:
@@ -157,37 +172,20 @@ def const_plane(shape, val):
     result = np.full(shape, val)
     return result
 
-def normal_distribution(x, mu=0, sigma=1):
-    coefficient = 1 / sqrt(2 * pi * sigma**2)
-    exponent = -((x - mu)**2) / (2 * sigma**2)
-    return coefficient * exp(exponent)
+# mu = b, sigma = a, x = distance from or time steps after
+def mod_normal_distribution(x, mu=1, height=1, width=1):
+    mod_sigma = (width - mu) / (2 * np.sqrt(2 * np.log(2)))
+    exponent = -0.5 * ((x - mu) / (mod_sigma))**2
+    return height * exp(exponent)
 
 
 @functools.lru_cache(16384)
 def obs_rewrite(shape, obs):
     position, tile_locs, inventories = obs
-
-    # print(f"position: {position}")
-    # print(f"tile locs: {tile_locs}")
-    # print(f"inventories: {inventories}")
-
-    # position = (int(position[0]), int(position[1]))
     # Convert to float?
-
-    # print(f"OBS REWRITE DEBUG")
-    # print(f"tuple expansion: {((position,), *tile_locs)}")
-    # print(f"tuple: {tuple(n_hot_grid(shape, layer) for layer in ((position,), *tile_locs))}")
-
     position_tile_layers = tuple(n_hot_grid(shape, layer) for layer in ((position,), *tile_locs))
     inventory_layers = tuple(np.full(shape, layer, dtype=np.int8) for layer in inventories)
-    
-    # print(f"position tile layers; {position_tile_layers}")
-    # print(f"inventory layers: {inventory_layers}")
-    
-    return_val = np.stack((*position_tile_layers, *inventory_layers), axis=0) 
-    # print(f"return val: {return_val}")
-    # assert False
-    return return_val
+    return np.stack((*position_tile_layers, *inventory_layers), axis=0)
 
 @functools.lru_cache(16384)
 def obs_rewrite_cont(obs):
@@ -201,14 +199,18 @@ def obs_rewrite_cont(obs):
         except:
             temp_tiles.append([0,0])
     # tile_locs = [list(list(tile)[0]) for tile in tile_locs if list(tile)]
-    tile_locs = temp_tiles
-    inventories = [[inv_num, 0] for inv_num in inventories]
+    tile_locs = [element for sublist in temp_tiles for element in sublist]
+    # tile_locs = [temp_tiles]
+    inventories = [inv_num for inv_num in inventories]
+    inventories_one_hot = [0, 0] * len(inventories)
+    for i in range(len(inventories)):
+        inventories_one_hot[2 * i + inventories[i]] = 1
 
     # print(f"position: {position}")
     # print(f"tile locs: {tile_locs}")
-    # print(f"inventories: {inventories}")
+    # print(f"inventories: {inventories_one_hot}")
 
-    return_val = np.stack((position, *tile_locs, *inventories), axis=0) 
+    return_val = np.concatenate((position, tile_locs, inventories_one_hot), axis=0) 
     # print(f"return val: {return_val}")
     # assert False
     return return_val
@@ -227,7 +229,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         # self.action_space = spaces.Discrete(6) # Input can only be 0, 1, 2, 3, 4, 5
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(self.num_actions,), dtype=np.float32)
         self.observation_space = spaces.Box(0, 1,
-                                            shape=(1 + len(config.placements) + len(config.inventory), 2),
+                                            shape=(2 + len(config.placements) * 2 + len(config.inventory) * 2, ),
                                             dtype=np.float32)
         self.config = config
         
@@ -244,6 +246,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         self.tile_position: Tuple[int, int]     = (0, 0) ### Truncated version of self.true_position
         self.special_tiles: Dict[Tuple[int, int], MineWorldTileType] = dict()
         self.inventory = Counter()
+
+        self.persist_dict = {}
 
     def step(self, action: float):
 
@@ -291,6 +295,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         if new_place[0] >= 0 and new_place[0] < self.config.tile_shape[0] and new_place[1] >= 0 and new_place[1] < self.config.tile_shape[1]:
             can_move = True
+        else:
+            reward -= 0.1
 
         # print(f"New Tile Position: {new_tile}, True Position: {new_place}")
         # print(f"Can Move: {can_move}")
@@ -356,7 +362,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         #     print(f"Inventory Name: {inv_config.name}")
                         #     print(f"Inventory State: {self.inventory[inv_config.name]}")
 
-                        # print(f"Full Reward!: {this_tile.reward}, Special Tile: {this_tile.action_name}, Special Tile Location: {special_tile}, Raw Distance: {distance_to_tile}")
+                        # print(f"Full Reward!: {this_tile.reward}, Special Tile: {this_tile.action_name}, Special Tile Location: {special_tile}, Raw Distance: {distance_to_tile}\n")
                         # print("Full Reward!\n")
 
                         new_inv = this_tile.apply_inventory(self.inventory)
@@ -369,6 +375,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                         self.inventory = new_inv
                         action_names.add(this_tile.action_name)
+                        self.persist_dict[self.special_tiles[special_tile]] = [1, this_tile.reward]
 
                         if this_tile.consumable:
                             del self.special_tiles[special_tile]
@@ -379,15 +386,27 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         reward += this_tile.reward
                         break
 
-                    if distance_to_tile > 1:
+                    # if False:
+                    if distance_to_tile > 1 and distance_to_tile <=2:
                         tile_reward = this_tile.reward
-                        distance_reward = 2.5 * normal_distribution(distance_to_tile, 1, 1)
-                        # print(f"This Tile: {special_tile}")
+                        # distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
+                        distance_reward = np.power(2, 2-distance)-1
+                        persist_reward  = 0
+
+                        for key in self.persist_dict.keys():
+                            persist_reward += mod_normal_distribution(self.persist_dict[key][0], mu=1, height=self.persist_dict[key][1], width=bounding_dist)
+                            if self.persist_dict[key][0] < bounding_dist + 1:
+                                self.persist_dict[key][0] += 1
+
+
+                        # distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
+                        # print(f"This Tile: {special_tile}, {this_tile.action_name}")
                         # print(f"Raw Distance: {distance_to_tile}")
                         # print(f"Tile Reward: {tile_reward}")
-                        # print(f"Distance Reward: {distance_reward}")
+                        # print(f"Distance Reward: {distance_reward}\n")
                         # Gradually work up to special tile reward as the agent moves closer to a distance of 1
-                        reward +=  tile_reward * distance_reward 
+                        # reward +=  distance_reward + persist_reward
+                        reward += distance_reward
                         # print()
 
                         # print(f"Total Reward: {reward}\n")

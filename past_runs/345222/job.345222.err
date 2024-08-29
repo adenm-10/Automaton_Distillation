@@ -1,0 +1,22 @@
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+Please run `conda env list` to see a list of all available environments. Use
+`source activate <env>` to activate the environment '<env>'. 
+
+Currently Loaded Modules:
+  1) anaconda/anaconda3   2) cuda/cuda-11.4
+
+ 
+
+Traceback (most recent call last):
+  File "./discrete/run/teacher/dungeon_quest_teacher_ddpg.py", line 4, in <module>
+    from discrete.lib.main import run_training
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/main.py", line 3, in <module>
+    from torch.utils.tensorboard import SummaryWriter
+  File "/apps/anaconda/anaconda3/lib/python3.8/site-packages/torch/utils/tensorboard/__init__.py", line 1, in <module>
+    import tensorboard
+ModuleNotFoundError: No module named 'tensorboard'
+
+real	0m2.228s
+user	0m1.842s
+sys	0m0.714s

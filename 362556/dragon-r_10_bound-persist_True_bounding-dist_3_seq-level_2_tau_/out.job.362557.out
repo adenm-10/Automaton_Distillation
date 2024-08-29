@@ -1,0 +1,296 @@
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic
+Bounding Persist: <class 'bool'>, True
+Bounding Distance: <class 'int'>, 3
+Terminal Reward: <class 'int'>, 10
+Sequence Level: <class 'int'>, 2
+Dungeon Quest LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+imported all dependencies, checking for cuda
+
+==============
+Cuda detected!
+==============
+
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x150e69e35a20>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x150e69e35a58>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x150e69e35a90>]
+
+
+============================================
+Training Teacher / Independent DDPG Agent
+Max Training Steps: 250000
+LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+Starting training at: 2024-08-17 10:06:52
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x150e69e35940>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(16,)
+Automaton Num States: 5
+Action Space: Box(1,)
+Agent Name: TD3 Agent
+NOT Loading from checkpoint
+Actor Learning Rate: 0.0003
+Critic Learning Rate: 0.0003
+Completed Steps:     1000 || Avg Steps: 1000 || Avg Rew: -192.308
+Completed Steps:     2000 || Avg Steps:  950 || Avg Rew: -181.979
+Completed Steps:     3000 || Avg Steps:  904 || Avg Rew: -171.519
+Completed Steps:     4000 || Avg Steps:  928 || Avg Rew: -176.821
+Completed Steps:     5000 || Avg Steps:  942 || Avg Rew: -176.214
+Completed Steps:     6000 || Avg Steps:  936 || Avg Rew: -176.086
+Completed Steps:     7000 || Avg Steps:  945 || Avg Rew: -177.861
+Completed Steps:     8000 || Avg Steps:  952 || Avg Rew: -179.742
+Completed Steps:     9000 || Avg Steps:  957 || Avg Rew: -181.305
+Completed Steps:    10000 || Avg Steps:  951 || Avg Rew: -180.504
+Completed Steps:    11000 || Avg Steps:  961 || Avg Rew: -182.440
+Completed Steps:    12000 || Avg Steps:  971 || Avg Rew: -184.959
+Completed Steps:    13000 || Avg Steps:  980 || Avg Rew: -187.147
+Completed Steps:    14000 || Avg Steps:  980 || Avg Rew: -187.364
+Completed Steps:    15000 || Avg Steps:  990 || Avg Rew: -191.577
+Completed Steps:    16000 || Avg Steps:  990 || Avg Rew: -191.951
+Completed Steps:    17000 || Avg Steps:  980 || Avg Rew: -190.284
+Completed Steps:    18000 || Avg Steps:  970 || Avg Rew: -188.296
+Completed Steps:    19000 || Avg Steps:  970 || Avg Rew: -187.700
+Completed Steps:    20000 || Avg Steps:  980 || Avg Rew: -189.811
+Completed Steps:    21000 || Avg Steps:  980 || Avg Rew: -190.152
+Completed Steps:    22000 || Avg Steps:  980 || Avg Rew: -190.246
+Completed Steps:    23000 || Avg Steps:  980 || Avg Rew: -190.506
+Completed Steps:    24000 || Avg Steps:  980 || Avg Rew: -190.331
+Completed Steps:    25000 || Avg Steps:  980 || Avg Rew: -190.493
+Completed Steps:    26000 || Avg Steps:  980 || Avg Rew: -190.393
+Completed Steps:    27000 || Avg Steps:  990 || Avg Rew: -192.421
+Completed Steps:    28000 || Avg Steps: 1000 || Avg Rew: -194.603
+Completed Steps:    29000 || Avg Steps: 1000 || Avg Rew: -195.258
+Completed Steps:    30000 || Avg Steps: 1000 || Avg Rew: -195.384
+Completed Steps:    31000 || Avg Steps: 1000 || Avg Rew: -195.235
+Completed Steps:    32000 || Avg Steps: 1000 || Avg Rew: -195.280
+Completed Steps:    33000 || Avg Steps: 1000 || Avg Rew: -194.857
+Completed Steps:    34000 || Avg Steps: 1000 || Avg Rew: -194.407
+Completed Steps:    35000 || Avg Steps: 1000 || Avg Rew: -194.217
+Completed Steps:    36000 || Avg Steps: 1000 || Avg Rew: -194.161
+Completed Steps:    37000 || Avg Steps: 1000 || Avg Rew: -194.313
+Completed Steps:    38000 || Avg Steps: 1000 || Avg Rew: -194.379
+Completed Steps:    39000 || Avg Steps: 1000 || Avg Rew: -194.428
+Completed Steps:    40000 || Avg Steps:  990 || Avg Rew: -192.182
+Completed Steps:    41000 || Avg Steps:  990 || Avg Rew: -192.303
+Completed Steps:    42000 || Avg Steps:  990 || Avg Rew: -192.289
+Completed Steps:    43000 || Avg Steps:  990 || Avg Rew: -192.613
+Completed Steps:    44000 || Avg Steps:  990 || Avg Rew: -192.469
+Completed Steps:    45000 || Avg Steps:  990 || Avg Rew: -192.332
+Completed Steps:    46000 || Avg Steps:  980 || Avg Rew: -189.042
+Completed Steps:    47000 || Avg Steps:  980 || Avg Rew: -187.779
+Completed Steps:    48000 || Avg Steps:  980 || Avg Rew: -187.667
+Completed Steps:    49000 || Avg Steps:  980 || Avg Rew: -186.483
+Completed Steps:    50000 || Avg Steps:  990 || Avg Rew: -188.441
+Completed Steps:    51000 || Avg Steps:  980 || Avg Rew: -186.039
+Completed Steps:    52000 || Avg Steps:  980 || Avg Rew: -185.911
+Completed Steps:    53000 || Avg Steps:  980 || Avg Rew: -185.824
+Completed Steps:    54000 || Avg Steps:  980 || Avg Rew: -186.658
+Completed Steps:    55000 || Avg Steps:  974 || Avg Rew: -184.857
+Completed Steps:    56000 || Avg Steps:  984 || Avg Rew: -187.997
+Completed Steps:    57000 || Avg Steps:  984 || Avg Rew: -189.159
+Completed Steps:    58000 || Avg Steps:  984 || Avg Rew: -189.256
+Completed Steps:    59000 || Avg Steps:  983 || Avg Rew: -189.764
+Completed Steps:    60000 || Avg Steps:  983 || Avg Rew: -189.004
+Completed Steps:    61000 || Avg Steps:  992 || Avg Rew: -191.154
+Completed Steps:    62000 || Avg Steps:  992 || Avg Rew: -191.322
+Completed Steps:    63000 || Avg Steps:  985 || Avg Rew: -189.822
+Completed Steps:    64000 || Avg Steps:  978 || Avg Rew: -188.001
+Completed Steps:    65000 || Avg Steps:  984 || Avg Rew: -189.557
+Completed Steps:    66000 || Avg Steps:  984 || Avg Rew: -189.723
+Completed Steps:    67000 || Avg Steps:  984 || Avg Rew: -189.325
+Completed Steps:    68000 || Avg Steps:  984 || Avg Rew: -189.226
+Completed Steps:    69000 || Avg Steps:  986 || Avg Rew: -189.990
+Completed Steps:    70000 || Avg Steps:  986 || Avg Rew: -190.036
+Completed Steps:    71000 || Avg Steps:  986 || Avg Rew: -190.111
+Completed Steps:    72000 || Avg Steps:  986 || Avg Rew: -190.002
+Completed Steps:    73000 || Avg Steps:  982 || Avg Rew: -189.069
+Completed Steps:    74000 || Avg Steps:  990 || Avg Rew: -190.679
+Completed Steps:    75000 || Avg Steps:  990 || Avg Rew: -191.126
+Completed Steps:    76000 || Avg Steps:  990 || Avg Rew: -190.954
+Completed Steps:    77000 || Avg Steps:  990 || Avg Rew: -191.499
+Completed Steps:    78000 || Avg Steps:  986 || Avg Rew: -190.620
+Completed Steps:    79000 || Avg Steps:  986 || Avg Rew: -190.445
+Completed Steps:    80000 || Avg Steps:  986 || Avg Rew: -191.267
+Completed Steps:    81000 || Avg Steps:  986 || Avg Rew: -191.391
+Completed Steps:    82000 || Avg Steps:  976 || Avg Rew: -189.316
+Completed Steps:    83000 || Avg Steps:  986 || Avg Rew: -191.658
+Completed Steps:    84000 || Avg Steps:  986 || Avg Rew: -191.512
+Completed Steps:    85000 || Avg Steps:  986 || Avg Rew: -190.637
+Completed Steps:    86000 || Avg Steps:  986 || Avg Rew: -190.321
+Completed Steps:    87000 || Avg Steps:  976 || Avg Rew: -188.137
+Completed Steps:    88000 || Avg Steps:  980 || Avg Rew: -188.586
+Completed Steps:    89000 || Avg Steps:  980 || Avg Rew: -188.696
+Completed Steps:    90000 || Avg Steps:  980 || Avg Rew: -188.342
+Completed Steps:    91000 || Avg Steps:  990 || Avg Rew: -190.589
+Completed Steps:    92000 || Avg Steps:  990 || Avg Rew: -190.512
+Completed Steps:    93000 || Avg Steps:  990 || Avg Rew: -190.734
+Completed Steps:    94000 || Avg Steps:  990 || Avg Rew: -190.628
+Completed Steps:    95000 || Avg Steps:  990 || Avg Rew: -191.367
+Completed Steps:    96000 || Avg Steps:  990 || Avg Rew: -191.189
+Completed Steps:    97000 || Avg Steps: 1000 || Avg Rew: -193.385
+Completed Steps:    98000 || Avg Steps: 1000 || Avg Rew: -193.827
+Completed Steps:    99000 || Avg Steps: 1000 || Avg Rew: -194.000
+Completed Steps:   100000 || Avg Steps: 1000 || Avg Rew: -194.234
+Completed Steps:   101000 || Avg Steps: 1000 || Avg Rew: -194.150
+Completed Steps:   102000 || Avg Steps: 1000 || Avg Rew: -194.219
+Completed Steps:   103000 || Avg Steps: 1000 || Avg Rew: -193.926
+Completed Steps:   104000 || Avg Steps: 1000 || Avg Rew: -194.182
+Completed Steps:   105000 || Avg Steps: 1000 || Avg Rew: -194.394
+Completed Steps:   106000 || Avg Steps: 1000 || Avg Rew: -194.688
+Completed Steps:   107000 || Avg Steps: 1000 || Avg Rew: -194.371
+Completed Steps:   108000 || Avg Steps: 1000 || Avg Rew: -194.137
+Completed Steps:   109000 || Avg Steps: 1000 || Avg Rew: -194.088
+Completed Steps:   110000 || Avg Steps: 1000 || Avg Rew: -193.906
+Completed Steps:   111000 || Avg Steps: 1000 || Avg Rew: -193.646
+Completed Steps:   112000 || Avg Steps: 1000 || Avg Rew: -193.898
+Completed Steps:   113000 || Avg Steps: 1000 || Avg Rew: -194.229
+Completed Steps:   114000 || Avg Steps: 1000 || Avg Rew: -193.454
+Completed Steps:   115000 || Avg Steps: 1000 || Avg Rew: -192.304
+Completed Steps:   116000 || Avg Steps: 1000 || Avg Rew: -192.717
+Completed Steps:   117000 || Avg Steps: 1000 || Avg Rew: -192.996
+Completed Steps:   118000 || Avg Steps: 1000 || Avg Rew: -193.014
+Completed Steps:   119000 || Avg Steps: 1000 || Avg Rew: -193.067
+Completed Steps:   120000 || Avg Steps:  991 || Avg Rew: -190.926
+Completed Steps:   121000 || Avg Steps:  991 || Avg Rew: -190.893
+Completed Steps:   122000 || Avg Steps:  991 || Avg Rew: -191.000
+Completed Steps:   123000 || Avg Steps:  991 || Avg Rew: -191.165
+Completed Steps:   124000 || Avg Steps:  991 || Avg Rew: -191.865
+Completed Steps:   125000 || Avg Steps:  981 || Avg Rew: -190.576
+Completed Steps:   126000 || Avg Steps:  981 || Avg Rew: -190.366
+Completed Steps:   127000 || Avg Steps:  981 || Avg Rew: -190.286
+Completed Steps:   128000 || Avg Steps:  981 || Avg Rew: -190.540
+Completed Steps:   129000 || Avg Steps:  981 || Avg Rew: -189.518
+Completed Steps:   130000 || Avg Steps:  990 || Avg Rew: -191.694
+Completed Steps:   131000 || Avg Steps:  990 || Avg Rew: -191.973
+Completed Steps:   132000 || Avg Steps:  990 || Avg Rew: -191.339
+Completed Steps:   133000 || Avg Steps:  990 || Avg Rew: -191.185
+Completed Steps:   134000 || Avg Steps:  990 || Avg Rew: -191.154
+Completed Steps:   135000 || Avg Steps: 1000 || Avg Rew: -193.361
+Completed Steps:   136000 || Avg Steps: 1000 || Avg Rew: -193.459
+Completed Steps:   137000 || Avg Steps: 1000 || Avg Rew: -193.404
+Completed Steps:   138000 || Avg Steps: 1000 || Avg Rew: -193.535
+Completed Steps:   139000 || Avg Steps:  980 || Avg Rew: -190.339
+Completed Steps:   140000 || Avg Steps:  980 || Avg Rew: -190.115
+Completed Steps:   141000 || Avg Steps:  980 || Avg Rew: -190.293
+Completed Steps:   142000 || Avg Steps:  971 || Avg Rew: -188.540
+Completed Steps:   143000 || Avg Steps:  971 || Avg Rew: -187.961
+Completed Steps:   144000 || Avg Steps:  971 || Avg Rew: -187.461
+Completed Steps:   145000 || Avg Steps:  971 || Avg Rew: -186.901
+Completed Steps:   146000 || Avg Steps:  971 || Avg Rew: -186.741
+Completed Steps:   147000 || Avg Steps:  961 || Avg Rew: -183.308
+Completed Steps:   148000 || Avg Steps:  961 || Avg Rew: -183.095
+Completed Steps:   149000 || Avg Steps:  981 || Avg Rew: -187.350
+Completed Steps:   150000 || Avg Steps:  981 || Avg Rew: -187.421
+Completed Steps:   151000 || Avg Steps:  981 || Avg Rew: -187.260
+Completed Steps:   152000 || Avg Steps:  990 || Avg Rew: -189.257
+Completed Steps:   153000 || Avg Steps:  989 || Avg Rew: -189.133
+Completed Steps:   154000 || Avg Steps:  989 || Avg Rew: -189.764
+Completed Steps:   155000 || Avg Steps:  989 || Avg Rew: -190.299
+Completed Steps:   156000 || Avg Steps:  989 || Avg Rew: -190.610
+Completed Steps:   157000 || Avg Steps:  999 || Avg Rew: -193.657
+Completed Steps:   158000 || Avg Steps:  999 || Avg Rew: -193.846
+Completed Steps:   159000 || Avg Steps:  999 || Avg Rew: -193.714
+Completed Steps:   160000 || Avg Steps:  999 || Avg Rew: -194.006
+Completed Steps:   161000 || Avg Steps:  999 || Avg Rew: -194.132
+Completed Steps:   162000 || Avg Steps:  989 || Avg Rew: -191.733
+Completed Steps:   163000 || Avg Steps:  977 || Avg Rew: -188.100
+Completed Steps:   164000 || Avg Steps:  960 || Avg Rew: -183.617
+Completed Steps:   165000 || Avg Steps:  960 || Avg Rew: -183.225
+Completed Steps:   166000 || Avg Steps:  960 || Avg Rew: -183.411
+Completed Steps:   167000 || Avg Steps:  960 || Avg Rew: -183.509
+Completed Steps:   168000 || Avg Steps:  960 || Avg Rew: -183.132
+Completed Steps:   169000 || Avg Steps:  960 || Avg Rew: -182.869
+Completed Steps:   170000 || Avg Steps:  960 || Avg Rew: -182.962
+Completed Steps:   171000 || Avg Steps:  960 || Avg Rew: -183.018
+Completed Steps:   172000 || Avg Steps:  979 || Avg Rew: -188.613
+Completed Steps:   173000 || Avg Steps:  982 || Avg Rew: -189.934
+Completed Steps:   174000 || Avg Steps: 1000 || Avg Rew: -194.099
+Completed Steps:   175000 || Avg Steps: 1000 || Avg Rew: -194.202
+Completed Steps:   176000 || Avg Steps: 1000 || Avg Rew: -194.111
+Completed Steps:   177000 || Avg Steps: 1000 || Avg Rew: -193.155
+Completed Steps:   178000 || Avg Steps:  990 || Avg Rew: -191.423
+Completed Steps:   179000 || Avg Steps:  990 || Avg Rew: -191.466
+Completed Steps:   180000 || Avg Steps:  990 || Avg Rew: -191.556
+Completed Steps:   181000 || Avg Steps:  990 || Avg Rew: -191.033
+Completed Steps:   182000 || Avg Steps:  990 || Avg Rew: -190.948
+Completed Steps:   183000 || Avg Steps:  990 || Avg Rew: -190.692
+Completed Steps:   184000 || Avg Steps:  990 || Avg Rew: -190.816
+Completed Steps:   185000 || Avg Steps:  990 || Avg Rew: -190.907
+Completed Steps:   186000 || Avg Steps:  990 || Avg Rew: -190.827
+Completed Steps:   187000 || Avg Steps:  990 || Avg Rew: -191.534
+Completed Steps:   188000 || Avg Steps: 1000 || Avg Rew: -193.577
+Completed Steps:   189000 || Avg Steps:  990 || Avg Rew: -191.625
+Completed Steps:   190000 || Avg Steps:  990 || Avg Rew: -191.462
+Completed Steps:   191000 || Avg Steps:  990 || Avg Rew: -191.895
+Completed Steps:   192000 || Avg Steps:  990 || Avg Rew: -192.061
+Completed Steps:   193000 || Avg Steps:  990 || Avg Rew: -192.174
+Completed Steps:   194000 || Avg Steps:  990 || Avg Rew: -192.284
+Completed Steps:   195000 || Avg Steps:  980 || Avg Rew: -189.840
+Completed Steps:   196000 || Avg Steps:  970 || Avg Rew: -187.425
+Completed Steps:   197000 || Avg Steps:  970 || Avg Rew: -186.887
+Completed Steps:   198000 || Avg Steps:  970 || Avg Rew: -186.893
+Completed Steps:   199000 || Avg Steps:  980 || Avg Rew: -188.726
+Completed Steps:   200000 || Avg Steps:  980 || Avg Rew: -188.719
+Completed Steps:   201000 || Avg Steps:  974 || Avg Rew: -187.084
+Completed Steps:   202000 || Avg Steps:  964 || Avg Rew: -184.418
+Completed Steps:   203000 || Avg Steps:  964 || Avg Rew: -184.228
+Completed Steps:   204000 || Avg Steps:  964 || Avg Rew: -184.015
+Completed Steps:   205000 || Avg Steps:  973 || Avg Rew: -186.469
+Completed Steps:   206000 || Avg Steps:  973 || Avg Rew: -186.571
+Completed Steps:   207000 || Avg Steps:  973 || Avg Rew: -187.117
+Completed Steps:   208000 || Avg Steps:  973 || Avg Rew: -187.203
+Completed Steps:   209000 || Avg Steps:  973 || Avg Rew: -187.694
+Completed Steps:   210000 || Avg Steps:  973 || Avg Rew: -188.012
+Completed Steps:   211000 || Avg Steps:  980 || Avg Rew: -188.966
+Completed Steps:   212000 || Avg Steps:  980 || Avg Rew: -189.203
+Completed Steps:   213000 || Avg Steps:  980 || Avg Rew: -189.247
+Completed Steps:   214000 || Avg Steps:  980 || Avg Rew: -189.662
+Completed Steps:   215000 || Avg Steps:  985 || Avg Rew: -189.149
+Completed Steps:   216000 || Avg Steps:  985 || Avg Rew: -189.220
+Completed Steps:   217000 || Avg Steps:  985 || Avg Rew: -188.856
+Completed Steps:   218000 || Avg Steps:  985 || Avg Rew: -188.665
+Completed Steps:   219000 || Avg Steps:  975 || Avg Rew: -186.666
+Completed Steps:   220000 || Avg Steps:  975 || Avg Rew: -186.360
+Completed Steps:   221000 || Avg Steps:  975 || Avg Rew: -186.847
+Completed Steps:   222000 || Avg Steps:  984 || Avg Rew: -189.078
+Completed Steps:   223000 || Avg Steps:  984 || Avg Rew: -188.956
+Completed Steps:   224000 || Avg Steps:  975 || Avg Rew: -187.664
+Completed Steps:   225000 || Avg Steps:  970 || Avg Rew: -186.877
+Completed Steps:   226000 || Avg Steps:  951 || Avg Rew: -182.509
+Completed Steps:   227000 || Avg Steps:  951 || Avg Rew: -182.505
+Completed Steps:   228000 || Avg Steps:  951 || Avg Rew: -182.663
+Completed Steps:   229000 || Avg Steps:  961 || Avg Rew: -184.568
+Completed Steps:   230000 || Avg Steps:  961 || Avg Rew: -184.469
+Completed Steps:   231000 || Avg Steps:  961 || Avg Rew: -184.459
+Completed Steps:   232000 || Avg Steps:  961 || Avg Rew: -184.576
+Completed Steps:   233000 || Avg Steps:  961 || Avg Rew: -184.583
+Completed Steps:   234000 || Avg Steps:  970 || Avg Rew: -186.623
+Completed Steps:   235000 || Avg Steps:  990 || Avg Rew: -191.548
+Completed Steps:   236000 || Avg Steps: 1000 || Avg Rew: -192.889
+Completed Steps:   237000 || Avg Steps: 1000 || Avg Rew: -193.101
+Completed Steps:   238000 || Avg Steps: 1000 || Avg Rew: -191.751
+Completed Steps:   239000 || Avg Steps: 1000 || Avg Rew: -192.255
+Completed Steps:   240000 || Avg Steps: 1000 || Avg Rew: -192.144
+Completed Steps:   241000 || Avg Steps:  990 || Avg Rew: -189.589
+Completed Steps:   242000 || Avg Steps:  990 || Avg Rew: -189.242
+Completed Steps:   243000 || Avg Steps:  980 || Avg Rew: -187.502
+Completed Steps:   244000 || Avg Steps:  980 || Avg Rew: -187.359
+Completed Steps:   245000 || Avg Steps:  980 || Avg Rew: -188.058
+Completed Steps:   246000 || Avg Steps:  980 || Avg Rew: -188.058
+Completed Steps:   247000 || Avg Steps:  980 || Avg Rew: -188.203
+Completed Steps:   248000 || Avg Steps:  980 || Avg Rew: -189.589
+Completed Steps:   249000 || Avg Steps:  980 || Avg Rew: -189.681
+Finished training at: 2024-08-17 11:12:18
+Total elapsed time: 3926.366754055023

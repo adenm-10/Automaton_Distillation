@@ -169,7 +169,12 @@ class CircularRolloutBuffer(RolloutBuffer):
         for dest_tensor, src_tensor in mapping:
             
             #DIEGO WAS HERE
-            src_tensor = torch.tensor(src_tensor, dtype=torch.float32, device=self.device)
+            if not isinstance(src_tensor, torch.Tensor):
+              src_tensor = torch.tensor(src_tensor, dtype=torch.float32, device=self.device)
+            #precious updated, creating a new tensor from an exisiting tensor would be better to create a copy esp when doing gradient computation
+            else:
+              src_tensor = src_tensor.clone().detach().float().to(self.device)
+
 
             # src_tensor = -0.234245
             # src_tensor = src_tensor.astype(np.int64)

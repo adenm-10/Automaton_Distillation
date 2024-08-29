@@ -1,7 +1,9 @@
 import copy
+import time
 from typing import Tuple, Dict, List
 from datetime import datetime
 import os
+import pickle
 
 import numpy as np
 import torch
@@ -25,8 +27,15 @@ from discrete.lib.rollout_buffer import VecRolloutBufferHelper, RolloutBuffer, C
 from discrete.lib.updater import Updater
 from discrete.lib.agent.DDPG_Agent import DDPG_Agent
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+
+curr_crit_loss = None 
+curr_act_loss = None
+
+top_loss = [(0, 0, 0, 0, 0, 0, 0)] * 10
 
 def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: TargetAgent,
           rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
@@ -47,16 +56,6 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
 
     importance = torch.pow(importance, 1 - config.epsilon)  # So that high-priority states aren't _too_ overrepresented
     
-    # print("indexes")
-    # print(indices)
-    # print(indices.shape)
-    
-    states = rollout_sample.states
-    # print("rollout states")
-    # print(states)
-    # print(states.shape)
-    
-    
     # Estimate best action in new states using main Q network
     q_max = agent.calc_q_values_batch(rollout_sample.next_states, rollout_sample.next_aut_states)
     arg_q_max = torch.argmax(q_max, dim=1)
@@ -72,25 +71,12 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
     # Calculate targets (bellman equation)
     target_q = rollout_sample.rewards + (config.gamma * double_q * (~rollout_sample.dones).float())
     target_q = target_q.detach()
-    
-    # print("aps")
-    # print(rollout_sample.aps)
-    
-    
-    # print("target q")
-    # print(target_q)
-    # print(target_q.shape)
 
     if isinstance(automaton, TargetAutomaton):
         # Q_teacher
         target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-
         # Beta
         target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-        
-        # print("target automaton q")
-        # print(target_automaton_q)
-        # print(target_automaton_q.shape)
         
         target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
 
@@ -105,19 +91,7 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
     action_q_values = q_values[range(config.agent_train_batch_size), (rollout_sample.actions).long()]
 
     # Sample q values that we get wrong more often
-    # print()
-    # print(q_values.shape)
-    # print(config.agent_train_batch_size)
-    # print(range(config.agent_train_batch_size))
-    # print((rollout_sample.actions).long().shape)
-    # print(action_q_values.shape)
-    # print(target_q.shape)
-    # print()
     error = action_q_values - target_q
-
-    # print("error")
-    # print(error)
-    # print(error.shape)
     rollout_buffer.set_priorities(indices=indices, errors=error.detach())
 
     # Actually train the neural network
@@ -131,7 +105,7 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
 
     return float(loss)
     
-def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
+def DDPG_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
           rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
     """
     Perform AC gradient descent on a batch of samples from the rollout buffer (from deepsynth)
@@ -220,7 +194,7 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     # print(f"Automaton: {automaton}\n\n")
 
     if isinstance(automaton, TargetAutomaton):
-        print("Automaton Distillation to Affecting Target Q Value\n\n\n")
+        # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
         # Q_teacher
         target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
 
@@ -239,10 +213,16 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
         # print(f"Target_Q: {target_q}")
 
         automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
+
+    # print(f"States: {states}")
+    # print(f"Actions: {actions}")
+
     
     agent.critic.train()
     critic_optim.zero_grad()
     critic_loss = F.mse_loss(target_q, critic_value)
+    # print(f"Critic Loss: {critic_loss}")
+    curr_crit_loss = critic_loss
     critic_loss.backward()
     critic_optim.step()
     
@@ -252,8 +232,14 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     agent.actor.train()
     actor_loss = -agent.critic.forward(states,mu)
     actor_loss = torch.mean(actor_loss)
+    # print(f"Actor Loss: {actor_loss}\n\n")
+    curr_act_loss = actor_loss
     actor_loss.backward()
     actor_optim.step()
+
+    # for i in range(len(top_loss)):
+    #     if critic_loss.item() + actor_loss.item() > top_loss[i][0]:
+    #         top_loss[i] = (curr_crit_loss.item() + curr_act_loss.item(), curr_crit_loss, curr_act_loss, states, actions, next_states, rewards)
 
     # What are the q-values that the current agent predicts for the actions it took
     # q_values = agent.calc_q_values_batch(rollout_sample.states, rollout_sample.aut_states)
@@ -279,6 +265,120 @@ def AC_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimi
     logger.add_scalar("training / critic loss", float(critic_loss), global_step=iter_num)
 
     # optim.step()
+
+    return float(critic_loss)
+
+def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optimizer, agent: AC_Agent, target_agent: AC_TargetAgent,
+          rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
+    """
+    Perform AC gradient descent on a batch of samples from the rollout buffer (from deepsynth)
+    """
+
+    cur_timestep = iter_num
+    
+    # print("AC learn")
+
+    target_agent.target.actor.eval()
+    target_agent.target.critic.eval()
+    agent.critic.eval()
+    
+    rollout_sample, indices, importance = rollout_buffer.sample(config.agent_train_batch_size,
+                                                                automaton.num_states,
+                                                                priority_scale=config.rollout_buffer_config.priority_scale,
+                                                                reward_machine=reward_machine)
+    
+    # importance = torch.pow(importance, 1 - config.epsilon)  # So that high-priority states aren't to overrepresented
+
+    states = rollout_sample.states
+    next_states = rollout_sample.next_states
+    rewards = rollout_sample.rewards
+    actions = rollout_sample.actions
+    dones = rollout_sample.dones
+
+    with torch.no_grad():
+        target_actions = target_agent.target.actor.forward(next_states)
+        
+        # Q'
+        target_critic_1_value, target_critic_2_value = target_agent.target.critic.forward(next_states, target_actions)
+        
+        # y = r + gamma * min(q1, q2)
+        target_q = []
+        for j in range(config.agent_train_batch_size):
+            target_q.append(rewards[j] + config.gamma * min(target_critic_1_value[j], target_critic_2_value[j]) * dones[j])
+            # target_q.append(rewards[j] + config.gamma*target_critic_value[j])
+        target_q = torch.tensor(target_q).to(config.device)
+        target_q = target_q.view(config.agent_train_batch_size, 1)
+        target_q = target_q.squeeze()
+
+        if isinstance(automaton, TargetAutomaton):
+            # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
+            # Q_teacher
+            target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+
+            # print(f"Aut States: {rollout_sample.aut_states}")
+            # print(f"APS': {rollout_sample.aps}")
+            # print(f"target q automaton: {target_automaton_q}")
+
+            # Beta
+            target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+            
+            # print('target_automaton_q')
+            # print(target_automaton_q.shape)
+            
+            target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
+
+            # print(f"Target_Q: {target_q}")
+
+            automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
+ 
+    # Q
+    critic_1_value, critic_2_value = agent.critic.forward(states, actions)
+
+    agent.critic.train()
+    critic_loss = F.mse_loss(target_q, critic_1_value) + F.mse_loss(target_q, critic_2_value)
+
+    critic_optim.zero_grad()
+    critic_loss.backward()
+    critic_optim.step()
+
+    agent.critic.eval()
+
+    # Delayed Target Update
+    # if t mod d:
+    #   Update Actor weights
+    #   Update Both Critic Target Weights
+    #   Update Actor Target Weights
+
+    actor_loss = 0
+
+    if (cur_timestep + 1) % agent.d == 0:
+
+        mu = agent.actor.forward(states)
+
+        # Only want Q1 prediction
+        actor_loss, _ = agent.critic.forward(states, mu)
+        actor_loss = torch.mean(-actor_loss)
+
+        agent.actor.train()
+        actor_optim.zero_grad()
+        actor_loss.backward()
+        actor_optim.step()
+        agent.actor.eval()
+
+        target_agent.update_weights()
+    
+    # Sample q values that we get wrong more often
+    # print(f"\n\ntarget q: {target_q}\n\n")
+    # print(f"\n\critic_value: {critic_value}\n\n")
+    # assert False
+
+    error = critic_1_value - target_q
+    rollout_buffer.set_priorities(indices=indices, errors=error.detach())
+
+    # print(f"Critic loss: {float(critic_loss)}")
+    # print(f"Actor  loss: {float(actor_loss)}")
+
+    logger.add_scalar("training / actor loss", float(actor_loss), global_step=iter_num)
 
     return float(critic_loss)
 
@@ -309,14 +409,12 @@ def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Ag
 
     optim.step()
 
-
 def take_eps_greedy_action_from_q_values(q_values: torch.Tensor, epsilon: float) -> np.ndarray:
     num_actions = q_values.shape[1]
     greedy_actions = torch.argmax(q_values, dim=1)
     modified_actions = torch.where(torch.rand_like(greedy_actions, dtype=torch.float32) > epsilon, greedy_actions,
                                    torch.randint_like(greedy_actions, num_actions))
     return modified_actions.detach().cpu().numpy()
-
 
 def vec_env_distinct_episodes(states: torch.Tensor, infos: List[Dict]) -> Tuple[torch.Tensor, torch.Tensor]:
     """
@@ -351,8 +449,10 @@ def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.
     # print(dones)
     # print(a)
     b = torch.tensor(aut_states_after_previous.cpu().numpy(), dtype=torch.int64, device="cpu")
+    
+    #precious reverted to the old code
 
-    return torch.where(dones, a, b)
+    return torch.where(dones, automaton.default_state, aut_states_after_previous)
 
 
 class TraceHelper:
@@ -552,28 +652,25 @@ def train_agent(config: Configuration,
 
     target_agent = agent.create_target_agent()
 
+    if isinstance(agent, AC_Agent):
+      target_agent = agent.create_target_agent(tau=config.tau)
+
     current_states = torch.as_tensor(env.reset(), device=config.device)
     current_aut_states = torch.tensor([automaton.default_state] * config.num_parallel_envs,
                                       device=config.device, dtype=torch.long)
     
     if isinstance(agent, AC_Agent):
-        #DIEGO WAS HERE
-        # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.001)
-        # actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
-        actor_lr = 0.0001
-        critic_lr = 0.001
+        actor_lr = config.actor_lr
+        critic_lr = config.critic_lr
 
         print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
 
-        actor_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
-        #Also try 0.000025 for lr
-    
-        critic_optimizer = torch.optim.Adam(agent.parameters(), lr = 0.001)
-        #Also try 0.00025 for lr
+        actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = actor_lr)
+        critic_optimizer = torch.optim.Adam(agent.critic.parameters(), lr = critic_lr)
+
     else:
         optimizer = torch.optim.Adam(agent.parameters())
-        # optimizer = torch.optim.Adam(agent.parameters(), lr = 0.0001)
-    
+
     trace_helper = TraceHelper(config.num_parallel_envs)
     batch_intrins_rew_calculator = IntrinsicRewardCalculatorBatchWrapper(config.intrinsic_reward_calculator,
                                                                          device=config.device)
@@ -592,26 +689,49 @@ def train_agent(config: Configuration,
 
     training_iterations = []
     losses = []
-    rewards_list = []
-    steps_to_terminal = [0]*config.num_parallel_envs
-    steps_to_terminal_total = []
+
+    rewards_per_step = []
+    rewards_per_ep_current = [0]*config.num_parallel_envs
+    rewards_per_episode = []
+
+    steps_to_term_per_step = []
+    steps_to_terminal_current = [0]*config.num_parallel_envs
+    steps_to_term_per_episode = []
+
+    ep_counter = 0
     
+    loss_mav = []
+    reward_mav = []
+    steps_mav = []
+
     rewards_iterations = []
 
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    dirname = os.path.dirname(__file__)
-    hard_path = f"./test_output/test_output_{now}"
+    start_time = time.time()
+    end_time = 0
 
-    if isinstance(agent, AC_Agent):
-        hard_path = hard_path + "_cont/"
+    path_to_out = ""
+    if config.path_to_out:
+        path_to_out = config.path_to_out
     else:
-        hard_path = hard_path + "_disc/"
+        now = datetime.now().strftime("%m-%d_%H-%M-%S")
+        dirname = os.path.dirname(__file__)
+        hard_path = f"./test_output/test_output_{now}"
 
-    path_to_out = os.path.join(hard_path)
-    os.mkdir(path_to_out)
+        if isinstance(agent, AC_Agent):
+            hard_path = hard_path + "_cont/"
+        else:
+            hard_path = hard_path + "_disc/"
+
+        path_to_out = os.path.join(hard_path)
+        
+        try:
+            os.mkdir(path_to_out)
+        except:
+            print("Output Directory Already Exists")
+    # print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
     for i in range(start_iter_num, config.max_training_steps):
-        # print(f"\n\n\nStep {i}\n\n\n")
+        # print(f"\nStep {i}")
     
         # (1) Choose action based off current state
         if isinstance(agent, AC_Agent):
@@ -620,21 +740,23 @@ def train_agent(config: Configuration,
         else:
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
-            # print(f"\nQ Values: {q_values}")
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
 
-        # (2) Return observation after making action in environment
-        # print(f"Actions: \n{actions}\n")
-        # assert False
 
         obs, rewards, dones, infos = env.step(actions)
 
         # Graphing operations
-        steps_to_terminal = [x+1 for x in steps_to_terminal]
+        steps_to_terminal_current = [x+1 for x in steps_to_terminal_current]
+        rewards_per_ep_current =    [x+r for x, r in zip(rewards_per_ep_current, rewards)]
         for index, done in enumerate(dones):
             if done:
-                steps_to_terminal_total.append(steps_to_terminal[index])
-                steps_to_terminal[index] = 0
+                steps_to_term_per_episode.append(steps_to_terminal_current[index])
+                steps_to_terminal_current[index] = 0
+
+                rewards_per_episode.append(rewards_per_ep_current[index])
+                rewards_per_ep_current[index] = 0
+
+                ep_counter = ep_counter + 1
 
         infos_discrete = copy.deepcopy(infos)
         for info in infos_discrete:
@@ -644,20 +766,23 @@ def train_agent(config: Configuration,
 
         obs = torch.as_tensor(obs, device=config.device)
         rewards = torch.as_tensor(rewards, device=config.device)
-        rewards_list.append(float(rewards.float().mean()))
-        logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
         dones = torch.as_tensor(dones, device=config.device)
+
+        rewards_per_step.append(float(rewards.float().mean()))
+        if len(steps_to_term_per_episode) > 0:
+            steps_to_term_per_step.append(steps_to_term_per_episode[-1])
+        else:
+            steps_to_term_per_step.append(0)
+
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
+        logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
 
-        # print(f"Infos Continuous: {infos}") 
-        # print(f"\nInfos Discrete: {infos_discrete}")
-        # print(f"Rewards: {rewards}")
-        # print(f"Rewards List: {rewards_list}")
-        # print(f"Dones: {dones}")
-        # print(f"States after current: {states_after_current}")
-        # print(f"next states: {next_states}")
 
-        aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos_discrete)
+        aps_after_current = []
+        if isinstance(agent, AC_Agent):
+            aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos_discrete)
+        else:
+            aps_after_current = ap_extractor.extract_aps_batch(states_after_current, infos)
 
         # If dfa_updater changes the automaton, we need to recalculate the current automaton state
         # Since aps_after_current shouldn't be included in this calculation, trace_helper is "two-phase"
@@ -671,10 +796,8 @@ def train_agent(config: Configuration,
         
         # Reward shaping
         if isinstance(automaton, TargetAutomaton):
-            print("Aut States affecting Rewards")
             rewards += automaton.target_reward_shaping(current_aut_states, aut_states_after_current)
 
-        
         trace_helper.finalize_step(dones)
 
         intr_rewards = batch_intrins_rew_calculator.calc_intr_rewards_batch(batch_intrins_reward_state,
@@ -719,8 +842,13 @@ def train_agent(config: Configuration,
             # print("entered training block")
             # Train off-policy
             if isinstance(agent, AC_Agent):
-                loss = AC_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
-                  automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                if agent.name == "DDPG Agent":
+                    loss = DDPG_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                else:
+                    loss = TD3_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
+                
                 # print(f"DDPG Critic Loss: {loss}")
                 losses.append(loss)
                 training_iterations.append(i)
@@ -731,66 +859,134 @@ def train_agent(config: Configuration,
                 losses.append(loss)
                 training_iterations.append(i)
             
-        target_agent_updater.update_every(config.target_agent_update_every_steps)
+            if agent.name != "TD3 Agent":
+                target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
-        if i % 1000 == 0:
-            print(f"Updating Graphs at Step: {i}")
-
-            # print(training_iterations)
-            # print(losses)
-            # print(rewards_list)
-
-            # moving average calculation
+        if i % 1000 == 0 and i != 0:
+        
             loss_mav = moving_average(losses)
-            reward_mav = moving_average(rewards_list)
-            steps_mav = moving_average(steps_to_terminal_total)
+            reward_mav = moving_average(rewards_per_step)
+            reward_ep_mav = moving_average(rewards_per_episode)
+            steps_mav = moving_average(steps_to_term_per_episode)
 
-            plt.plot(training_iterations, losses,   color='blue', label='Raw Losses')
-            plt.plot(training_iterations, loss_mav, color='red' , label='Moving Average Losses')
-            plt.xlabel('Iterations')
-            plt.ylabel('Loss')
-            plt.legend()
-            
-            # os.mkdir(path_to_out)
+            print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
 
-            # plt.ylim([0,2])
+    # print("Top Losses")
+    # for i in range(len(top_loss)):
+    #     print(f"Cumulative Loss: \n{top_loss[i][0]}\n")
+    #     print(f"Critic Loss: \n{top_loss[i][1]}\n")
+    #     print(f"Actor Loss: \n{top_loss[i][2]}\n")
+    #     print(f"States: \n{top_loss[i][3]}\n")
+    #     print(f"Actions: \n{top_loss[i][4]}\n")
+    #     print(f"Nest States: \n{top_loss[i][5]}\n")
+    #     print(f"Rewards: \n{top_loss[i][6]}\n")
+    #     print(f"=============================================================================")
 
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Losses.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Losses.png')
+    plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step,
+                 path_to_out, agent,
+                 displayed_steps=None, displayed_episodes=None)
 
-            plt.clf()
+    plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step,
+                 path_to_out, agent,
+                 displayed_steps=100000, displayed_episodes=10000)
 
-            # print(f"reward iters, list")
-            # print(rewards_iterations)
-            # print(rewards_list)
-            plt.plot(rewards_iterations, rewards_list, color='blue', label='Raw Rewards')
-            plt.plot(rewards_iterations, reward_mav,   color='red',  label='Moving Average Rewards')
-            plt.xlabel('Iterations')
-            plt.ylabel('Rewards')
-            plt.legend()
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Rewards.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Rewards.png')
-
-            plt.clf()
-
-            steps_iterations = [i+1 for i in range(len(steps_to_terminal_total))]
-
-            plt.plot(steps_iterations, steps_to_terminal_total, color='blue', label='Raw Steps to Terminal State')
-            plt.plot(steps_iterations, steps_mav, color='red', label = 'Moving Average Steps to Terminal State')
-            plt.xlabel('Episodes')
-            plt.ylabel('Steps to Terminal State')
-            plt.legend()
-            
-            if isinstance(agent, AC_Agent):
-                plt.savefig(f'{path_to_out}/Student_Steps.png')
-            else:
-                plt.savefig(f'{path_to_out}/Teacher_Steps.png')
+    export_results(rewards_per_episode, steps_to_term_per_episode,
+                   rewards_per_step, steps_to_term_per_step,
+                   path_to_out)
 
     return agent
+
+def export_results(rewards_per_episode, steps_to_term_per_episode,
+                   rewards_per_step, steps_to_term_per_step,
+                   path_to_out):
+
+    data_dict = {
+        'rewards_per_episode': rewards_per_episode, 
+        'steps_to_term_per_episode': steps_to_term_per_episode,
+        'rewards_per_step': rewards_per_step, 
+        'steps_to_term_per_step': steps_to_term_per_step
+        }
+
+    filepath = f"{path_to_out}/rew_and_steps_lists.pkl"
+    with open(filepath, 'wb') as file:
+        pickle.dump(data_dict, file)
+
+    return
+    
+
+def plot_results(rewards_per_episode, steps_to_term_per_episode,
+                 rewards_per_step, steps_to_term_per_step, 
+                 path_to_out, agent,
+                 displayed_steps=None, displayed_episodes=None):
+
+    def plot_details(iteration_list, raw_data, moving_average_data,  # Data specifics
+                     blue_label, red_label, x_label, y_label,        # Labels
+                     save_figure_name):                              # File save name
+
+        plt.plot(iteration_list, raw_data,            color='blue', label=blue_label)
+        plt.plot(iteration_list, moving_average_data, color='red',  label=red_label)
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.legend(loc="upper right")
+        
+        if isinstance(agent, AC_Agent):
+            plt.savefig(f'{path_to_out}/Student_{save_figure_name}.png')
+        else:
+            plt.savefig(f'{path_to_out}/Teacher_{save_figure_name}.png')
+
+        plt.clf()
+
+    reward_mav = moving_average(rewards_per_step)
+    reward_ep_mav = moving_average(rewards_per_episode)
+    steps_mav = moving_average(steps_to_term_per_step)
+    steps_ep_mav = moving_average(steps_to_term_per_episode)
+
+    ep_filename, step_filename = "Full", "Full"
+
+    if displayed_steps and displayed_steps < len(rewards_per_step) and displayed_steps < len(steps_to_term_per_step):
+        reward_mav =             reward_mav[0:displayed_steps]
+        steps_mav  =             steps_mav[0:displayed_steps]
+        rewards_per_step =       rewards_per_step[0:displayed_steps]
+        steps_to_term_per_step = steps_to_term_per_step[0:displayed_steps]
+
+        step_filename = f"{displayed_steps}_Steps"
+
+    if displayed_episodes and displayed_episodes < len(rewards_per_episode) and displayed_episodes < len(steps_to_term_per_episode):
+        reward_ep_mav =             reward_ep_mav[0:displayed_episodes]
+        steps_ep_mav  =             steps_ep_mav[0:displayed_episodes]
+        rewards_per_episode =       rewards_per_episode[0:displayed_episodes]
+        steps_to_term_per_episode = steps_to_term_per_episode[0:displayed_episodes]
+
+        ep_filename   = f"{displayed_episodes}_Episodes"
+
+    plt.clf()
+
+    episode_iterations = [i for i in range(len(reward_ep_mav))]
+    steps_iterations =   [i for i in range(len(reward_mav))]
+
+    # Rewards per Episode
+    plot_details(episode_iterations, rewards_per_episode, reward_ep_mav,
+                 'Raw Rewards', 'Moving Average Rewards', 'Episodes', 'Rewards per Episode',
+                 f"Reward_{ep_filename}")
+
+    # Rewards per Step
+    plot_details(steps_iterations, rewards_per_step, reward_mav,
+                 'Raw Rewards', 'Moving Average Rewards', 'Timesteps', 'Rewards per Step',
+                 f"Reward_{step_filename}")
+
+    # Steps to Reach Terminal State per Episode
+    plot_details(episode_iterations, steps_to_term_per_episode, steps_ep_mav,
+                 'Raw Steps', 'Moving Average Steps', 'Episodes', 'Steps To Terminal State per Episode',
+                 f"Steps_{ep_filename}")
+
+    # Steps to Reach Terminal State per Step
+    plot_details(steps_iterations, steps_to_term_per_step, steps_mav,
+                 'Raw Steps', 'Moving Average Steps', 'Timesteps', 'Steps To Terminal State per Step',
+                 f"Steps_{step_filename}")
+
+    return
+
 

@@ -1,0 +1,27 @@
+
+Currently Loaded Modules:
+  1) anaconda/anaconda-2023.09   2) cuda/cuda-12.2.2
+
+ 
+
+mkdir: cannot create directory ‘362858’: File exists
+/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Traceback (most recent call last):
+  File "./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py", line 63, in <module>
+    run_training(config)
+  File "/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic/discrete/lib/main.py", line 45, in run_training
+    train_agent(config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+  File "/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic/discrete/lib/training.py", line 999, in train_agent
+    filepath = f"{path_to_out}/{filename}"
+UnboundLocalError: local variable 'filename' referenced before assignment
+mv: cannot stat './test_output/test_output*': No such file or directory
+Traceback (most recent call last):
+  File "./discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_DDPG.py", line 66, in <module>
+    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, path_to_out=path_to_out
+  File "/lustre/fs1/home/amckinney/neuroSym/Local_Neuro_Symbolic/discrete/run/utils.py", line 91, in student_config_v1
+    with open(f"automaton_q/{teacher_run_name}.json", "r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'automaton_q/dungeon_quest_teacher_rew_per_step_7_productMDP.json'
+mv: cannot stat './test_output/test_output*': No such file or directory
+mv: cannot stat 'err.job.362858.err': No such file or directory
+mv: cannot stat 'out.job.362858.out': No such file or directory

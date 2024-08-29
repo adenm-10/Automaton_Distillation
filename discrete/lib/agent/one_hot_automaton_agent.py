@@ -38,6 +38,7 @@ class OneHotAutomatonAfterFeatureExtractorAgent(Agent):
         self.flattener = nn.Flatten()
         self.num_actions = num_actions
         self.num_aut_states = num_aut_states
+        self.name="OneHotAutomatonAfterFeatureExtractorAgent"
 
     @classmethod
     def create_agent(cls, input_shape: Tuple, num_automaton_states: int, num_actions: int) -> "Agent":

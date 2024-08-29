@@ -53,3 +53,7 @@ class Configuration(NamedTuple):
     ap_extractor: "ape.APExtractor"
     device: torch.device
     run_name: str
+    actor_lr: float
+    critic_lr: float
+    tau: float
+    path_to_out: str

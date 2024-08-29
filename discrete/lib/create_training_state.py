@@ -37,6 +37,7 @@ def create_training_state(config: Configuration) -> Tuple[Agent, RolloutBuffer, 
 
     agent = config.agent_cls.create_agent(sample_env.observation_space.shape, config.automaton.num_states,
                                             num_options).to(config.device)
+    agent.to(config.device)
 
     print(f"Agent Name: {agent.name}")
 
