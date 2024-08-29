@@ -8,49 +8,58 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-terminal_reward = 10
+dragon_r, key_r, shield_r, sword_r = 100, 1, 1, 1
 sequence_level = 2 # 0-3
 
 try:
-    terminal_reward = int(os.environ.get("dragon_r"))
+    dragon_r = int(os.environ.get("dragon_r"))
+    key_r = int(os.environ.get("key_r"))
+    shield_r = int(os.environ.get("shield_r"))
+    sword_r = int(os.environ.get("sword_r"))
     sequence_level = int(os.environ.get("seq_level"))
 except:
-    terminal_reward = 10
-    sequence_level = 2
-
-print(f"Terminal Reward: {type(terminal_reward)}, {terminal_reward}")
-print(f"Sequence Level: {type(sequence_level)}, {sequence_level}")
+    print("Shell variables not detected for environment descriptions, using defaults...")
 
 key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
 sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False
 
 # key
 if sequence_level == 0:
-    key_r, key_p, key_t = 10, 1, True
-    shield_r, shield_p, shield_t = 0, 0, False
-    sword_r, sword_p, sword_t = 0, 0, False
-    dragon_r, dragon_p, dragon_t = 0, 0, False
+    key_p, key_t =  1, True
+    shield_p, shield_t = 0, False
+    sword_p, sword_t = 0, False
+    dragon_p, dragon_t = 0, False
 
 # key -> sword
 elif sequence_level == 1:
-    key_r, key_p, key_t = 1, 1, False
-    shield_r, shield_p, shield_t = 0, 0, False
-    sword_r, sword_p, sword_t = 10, 1, True
-    dragon_r, dragon_p, dragon_t = 0, 0, False
+    key_p, key_t = 1, False
+    shield_p, shield_t = 0, False
+    sword_p, sword_t = 1, True
+    dragon_p, dragon_t = 0, False
 
 # key -> sword -> dragon
 elif sequence_level == 2:
-    key_r, key_p, key_t = 1, 1, False
-    shield_r, shield_p, shield_t = 1, 1, False
-    sword_r, sword_p, sword_t = 0, 0, False
-    dragon_r, dragon_p, dragon_t = 10, 1, True
+    key_p, key_t = 1, False
+    shield_p, shield_t = 1, False
+    sword_p, sword_t = 0, False
+    dragon_p, dragon_t = 1, True
 
 # key -> sword V shield -> dragon
 elif sequence_level == 3:
-    key_r, key_p, key_t = 1, 1, False
-    shield_r, shield_p, shield_t = 1, 1, False
-    sword_r, sword_p, sword_t = 1, 1, False
-    dragon_r, dragon_p, dragon_t = 10, 1, True
+    key_p, key_t = 1, False
+    shield_p, shield_t = 1, False
+    sword_p, sword_t = 1, False
+    dragon_p, dragon_t = 1, True
+
+
+print("\n====================================")
+print(f"Rewards for Automaton Steps (reward, placements)")
+print(f"\tKey: {key_r}, {key_p}")
+print(f"\tShield: {shield_r}, {shield_p}")
+print(f"\tSword: {sword_r}, {sword_p}")
+print(f"\tDragon: {dragon_r}, {dragon_p}")
+print(f"Sequence Level: {sequence_level}")
+print("====================================\n")
 
 dungeon_quest_config_7 = MineWorldConfig(
     shape=(7, 7),

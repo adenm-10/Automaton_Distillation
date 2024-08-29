@@ -386,10 +386,11 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         reward += this_tile.reward
                         break
 
-                    if False:
-                    # if distance_to_tile > 1:
+                    # if False:
+                    if distance_to_tile > 1 and distance_to_tile <=2:
                         tile_reward = this_tile.reward
-                        distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
+                        # distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
+                        distance_reward = np.power(2, 2-distance)-1
                         persist_reward  = 0
 
                         for key in self.persist_dict.keys():
@@ -404,7 +405,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         # print(f"Tile Reward: {tile_reward}")
                         # print(f"Distance Reward: {distance_reward}\n")
                         # Gradually work up to special tile reward as the agent moves closer to a distance of 1
-                        reward +=  distance_reward + persist_reward
+                        # reward +=  distance_reward + persist_reward
+                        reward += distance_reward
                         # print()
 
                         # print(f"Total Reward: {reward}\n")
