@@ -68,7 +68,7 @@ if __name__ == '__main__':
                                gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, path_to_out=path_to_out)
 
     print("\n\n============================================")
-    print(f"Training Teacher / Independent DDPG Agent")
+    print(f"Training Teacher / Independent TD3 Agent")
     print(f"Max Training Steps: {max_training_steps}")
     print(f"LTLF: {dungeon_quest_ltlf}")
     # print(f"Hyperparameters: {}")

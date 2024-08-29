@@ -61,19 +61,46 @@ rm -rf ./checkpoints/*
 ###mpirun -np $SLURM_NTASKS python $file
 
 # baseline
-for dragon_r_i in 10 100
+# for dragon_r_i in 10 100
+# do
+#     for key_r_i in 2 3
+#     do
+#         for bounding_dist_i in 3 #6
+#         do
+#             for index in 1 2
+#             do
+#                 dir_name="./dragon-r_${dragon_r_i}_key_r_${bounding_persist_i}_sword_i_${bounding_dist_i}_shield_i_${shield_}_seq-level_${seq_level_i}"
+#                 mkdir "$dir_name"
+#                 sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r_i $bounding_persist_i $bounding_dist_i $seq_level_i $tau_i
+#             done
+#         done
+#     done
+# done
+
+lists=(
+    "1 1 10"
+    "1 1 100"
+    "1 10 100"
+    "1 50 100"
+)
+
+# Iterate through each list in the list of lists
+for seq_level in 2 3
 do
-    for seq_level_i in 2 3
+    for list in "${lists[@]}"
     do
-        for bounding_dist_i in 3 #6
-        do
-            for index in 1 2
-            do
-                dir_name="./dragon-r_${dragon_r_i}_bound-persist_${bounding_persist_i}_bounding-dist_${bounding_dist_i}_seq-level_${seq_level_i}_index_${index}"
-                mkdir "$dir_name"
-                sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r_i $bounding_persist_i $bounding_dist_i $seq_level_i $tau_i
-            done
-        done
+        # Convert the list into an array
+        elements=($list)
+        
+        # Assign elements to variables
+        key_r=${elements[0]}
+        sword_n_shield_r=${elements[1]}
+        dragon_r=${elements[2]}
+
+        dir_name="./dragon-r_${dragon_r}_key_r_${key_r}_sword_i_${sword_n_shield_r}_shield_i_${sword_n_shield_r}_seq-level_${seq_level}"
+        mkdir "$dir_name"
+        sbatch ./scripts/submit_cont_single.slurm $dir_name $SLURM_JOB_ID $dragon_r $key_r $sword_n_shield_r $sword_n_shield_r $seq_level
+
     done
 done
 

@@ -390,7 +390,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                     if distance_to_tile > 1 and distance_to_tile <=2:
                         tile_reward = this_tile.reward
                         # distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
-                        distance_reward = np.power(2, 2-distance)-1
+                        distance_reward = np.power(2, 2-distance_to_tile)-1
                         persist_reward  = 0
 
                         for key in self.persist_dict.keys():

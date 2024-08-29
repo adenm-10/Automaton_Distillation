@@ -15,15 +15,16 @@
 dir_name=$1
 orig_job_id=$2
 
-export bounding_persist=$4
-export bounding_dist=$5
-export tau=$7
-
 export dragon_r=$3
-export key_r=0
-export shield_r=0
-export sword_r=0
-export seq_level=$6
+export key_r=$4
+export shield_r=$5
+export sword_r=$6
+export seq_level=$7
+
+export bounding_persist=$8
+export bounding_dist=$9
+export tau=$10
+
 
 out_file=out.job.${SLURM_JOB_ID}.out
 err_file=err.job.${SLURM_JOB_ID}.err

@@ -52,14 +52,12 @@ elif sequence_level == 3:
     dragon_p, dragon_t = 1, True
 
 
-print("\n====================================")
 print(f"Rewards for Automaton Steps (reward, placements)")
 print(f"\tKey: {key_r}, {key_p}")
 print(f"\tShield: {shield_r}, {shield_p}")
 print(f"\tSword: {sword_r}, {sword_p}")
 print(f"\tDragon: {dragon_r}, {dragon_p}")
 print(f"Sequence Level: {sequence_level}")
-print("====================================\n")
 
 dungeon_quest_config_7 = MineWorldConfig(
     shape=(7, 7),
