@@ -79,9 +79,9 @@ rm -rf ./checkpoints/*
 
 lists=(
     "1 1 10"
+    "10 10 10"
     "1 1 100"
     "1 10 100"
-    "1 50 100"
 )
 
 # Iterate through each list in the list of lists
