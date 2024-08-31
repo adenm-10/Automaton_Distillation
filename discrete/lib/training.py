@@ -870,7 +870,10 @@ def train_agent(config: Configuration,
             reward_ep_mav = moving_average(rewards_per_episode)
             steps_mav = moving_average(steps_to_term_per_episode)
 
-            print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
+            try:
+                print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
+            except:
+                print(f"Completed Steps: {i:8}")
 
     # print("Top Losses")
     # for i in range(len(top_loss)):
