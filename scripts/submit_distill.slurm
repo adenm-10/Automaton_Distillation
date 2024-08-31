@@ -65,7 +65,7 @@ alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=1500000
+total_steps=1000000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
@@ -73,6 +73,11 @@ export NOISE_STDDEV=0.2
 
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
+
+export dragon_r=10
+export key_r=1
+export shield_r=1
+export sword_r=1
 
 export seq_level=2
 python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
