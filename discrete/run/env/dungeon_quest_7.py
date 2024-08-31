@@ -20,8 +20,8 @@ try:
 except:
     print("Shell variables not detected for environment descriptions, using defaults...")
 
-key_r, key_p, shield_r, shield_p, key_t, shield_t = 0, 0, 0, 0, False, False
-sword_r, sword_p, dragon_r, dragon_p, sword_t, dragon_t = 0, 0, 0, 0, False, False
+key_p, shield_p, key_t, shield_t = 0, 0, False, False
+sword_p, dragon_p, sword_t, dragon_t = 0, 0, False, False
 
 # key
 if sequence_level == 0:
