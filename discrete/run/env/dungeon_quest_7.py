@@ -8,7 +8,7 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-dragon_r, key_r, shield_r, sword_r = 100, 1, 1, 1
+dragon_r, key_r, shield_r, sword_r = 10, 1, 1, 1
 sequence_level = 2 # 0-3
 
 try:
@@ -65,7 +65,7 @@ dungeon_quest_config_7 = MineWorldConfig(
     placements=[
         TilePlacement(
             tile=MineWorldTileType(
-                action_name="key", consumable=True, grid_letter="K", inventory_modifier=Counter(key=+1), reward=+key_r, terminal=key_t
+                action_name="key", consumable=True, grid_letter="K", inventory_modifier=Counter(key=+1), reward=+1, terminal=key_t
             ),
             fixed_placements=[],
             random_placements=key_p
@@ -73,7 +73,7 @@ dungeon_quest_config_7 = MineWorldConfig(
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="shield", consumable=True, grid_letter="S", inventory_modifier=Counter(shield=+1),
-                reward=+shield_r, terminal=shield_t
+                reward=+1, terminal=shield_t
             ),
             fixed_placements=[],
             random_placements=shield_p
@@ -81,7 +81,7 @@ dungeon_quest_config_7 = MineWorldConfig(
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="chest", consumable=False, grid_letter="C", inventory_modifier=Counter(key=-1, sword=+1),
-                inventory_requirements=Counter(key=1), reward=+sword_r, terminal=sword_t
+                inventory_requirements=Counter(key=1), reward=+1, terminal=sword_t
             ),
             fixed_placements=[],
             random_placements=sword_p
@@ -89,7 +89,7 @@ dungeon_quest_config_7 = MineWorldConfig(
         TilePlacement(
             tile=MineWorldTileType(
                 action_name="dragon", consumable=True, grid_letter="D", inventory_modifier=Counter(),
-                inventory_requirements=Counter(sword=sword_p, shield=shield_p), reward=+100, terminal=dragon_t
+                inventory_requirements=Counter(sword=sword_p, shield=shield_p), reward=+dragon_r, terminal=dragon_t
             ),
             fixed_placements=[],
             random_placements=dragon_p

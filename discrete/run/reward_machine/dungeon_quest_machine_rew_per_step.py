@@ -2,7 +2,7 @@ import torch
 
 from discrete.run.utils import construct_ap_extractor_automaton
 from discrete.lib.automaton.reward_machine import RewardMachine
-from discrete.run.env.dungeon_quest import dungeon_quest_aps, dungeon_quest_ltlf
+from discrete.run.env.dungeon_quest import dungeon_quest_aps, dungeon_quest_ltlf, dragon_r
 
 device = torch.device("cpu")
 
@@ -14,11 +14,12 @@ print(automaton.adj_mat)
 reward_adj_list = -0.1 * torch.ones_like(automaton.adj_mat)
 
 # success = +100
-reward_adj_list[automaton.adj_mat == 7] += 99
+# one less than terminal reward?
+reward_adj_list[automaton.adj_mat == 7] += 9
 
 # key/sword/shield/dragon = +1
 for i in range(automaton.num_states):
-    reward_adj_list[i, automaton.adj_mat[i] != i] += 1
+    reward_adj_list[i, automaton.adj_mat[i] != i] += dragon_r - 1
 
 # no reward in terminal states
 # reward_adj_list[1, :] = 0

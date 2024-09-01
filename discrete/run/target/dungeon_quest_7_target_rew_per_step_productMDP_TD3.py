@@ -53,7 +53,7 @@ if __name__ == '__main__':
     config = student_config_v1(
         env_config=dungeon_quest_rew_per_step_env_config_7_cont,
         teacher_run_name="dungeon_quest_teacher_rew_per_step_7_productMDP",
-        student_run_name="dungeon_quest_7_target_rew_per_step_productMDP_DDPG",
+        student_run_name="dungeon_quest_7_target_rew_per_step_productMDP_TD3",
         device=device,
         anneal_target_aut_class=ExponentialAnnealTargetAutomaton,
         anneal_target_aut_kwargs={
