@@ -1,0 +1,32 @@
+/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/gym/logger.py:30: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize('%s: %s'%('WARN', msg % args), 'yellow'))
+Traceback (most recent call last):
+  File "discrete/run/teacher/dungeon_quest_teacher_td3.py", line 77, in <module>
+    run_training(config)
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/main.py", line 45, in run_training
+    train_agent(config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/training.py", line 889, in train_agent
+    plot_results(rewards_per_episode, steps_to_term_per_episode,
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/training.py", line 973, in plot_results
+    # Rewards per Episode
+  File "/lustre/fs1/home/amckinney/Local_Neuro_Symbolic/discrete/lib/training.py", line 936, in plot_details
+    plt.legend(loc="upper right")
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/pyplot.py", line 977, in savefig
+    res = fig.savefig(*args, **kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/figure.py", line 3058, in savefig
+    self.canvas.print_figure(fname, **kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 2325, in print_figure
+    **kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 1648, in wrapper
+    return func(*args, **kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/_api/deprecation.py", line 415, in wrapper
+    return func(*inner_args, **inner_kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/backends/backend_agg.py", line 543, in print_png
+    dpi=self.figure.dpi, metadata=metadata, pil_kwargs=pil_kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/matplotlib/image.py", line 1675, in imsave
+    image.save(fname, **pil_kwargs)
+  File "/home/amckinney/.conda/envs/autd/lib/python3.7/site-packages/PIL/Image.py", line 2429, in save
+    fp = builtins.open(filename, "w+b")
+FileNotFoundError: [Errno 2] No such file or directory: './dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2/Student_Reward_Full.png'
+mv: target './dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2/' is not a directory
+mv: cannot stat './dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2': No such file or directory

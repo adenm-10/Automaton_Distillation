@@ -1,53 +1,13 @@
 #!/bin/bash
 
-#SBATCH --nodes=1 #try this (distributed - more than 1 computing node)
-#SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-#SBATCH --time=10:00:00
-#SBATCH --cpus-per-gpu=8
-#SBATCH --gpus=1
-#SBATCH --job-name=Automaton
-#SBATCH --account=cenyioha
-#SBATCH --output=out.job.%J.out
-#SBATCH --error=err.job.%J.err
-
-echo "checkpoint"
-
 username=$(whoami)
+SLURM_JOB_ID=2
 
 #Select File to run
 export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/${username}/Local_Neuro_Symbolic/
 
-#Select how logs get stored
-# SLURM_JOB_ID=1
-# mkdir $SLURM_JOB_ID
-# export debug_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
-# export benchmark_logs="$SLURM_JOB_ID/job_$SLURM_JOB_ID.log"
-
-## Enter Working Directory ##
-# cd $SLURM_SUBMIT_DIR
-
-## Create Log File ##
-echo $SLURM_SUBMIT_DIR
-echo "JobID: $SLURM_JOB_ID" >> $debug_logs
-##echo "Running on $SLURM_NODELIST" >> $debug_logs
-##echo "Running on $SLURM_NNODES nodes." >> $debug_logs
-##echo "Running on $SLURM_NPROCS processors." >> $debug_logs
-echo  "Current working directory is `pwd`" >> $debug_logs
-# mkdir "tmp"
-# mkdir "tmp/policy"
-# mkdir "learning_curves"
-
-## Module debugging ##
-# module list >> $debug_logs
-# nvidia-smi topo -m
-##which mpirun >> $debug_logs
-
-date >> $benchmark_logs
-echo "ulimit -l: " >> $benchmark_logs
-ulimit -l >> $benchmark_logs
-
-
 ## Run job ## 
+cd ~/ddpg_envs/Local_Neuro_Symbolic/Local_Neuro_Symbolic
 source ~/conda_init.sh
 source ~/ddpg_envs/Local_Neuro_Symbolic/env_act.sh
 
@@ -63,7 +23,7 @@ lists=(
 )
 
 # Iterate through each list in the list of lists
-for seq_level in 2 3
+for seq_level in 2 #3
 do
     for list in "${lists[@]}"
     do
@@ -75,9 +35,9 @@ do
         sword_n_shield_r=${elements[1]}
         dragon_r=${elements[2]}
 
-        dir_name="./dragon-r_${dragon_r}_key_r_${key_r}_sword_i_${sword_n_shield_r}_shield_i_${sword_n_shield_r}_seq-level_${seq_level}"
+        dir_name="./dragon-r_${dragon_r}_key_r_${key_r}_sword_i_${sword_n_shield_r}_shield_i_${sword_n_shield_r}_seq-level_${seq_level}_2"
         mkdir "$dir_name"
-        source ./scripts/local_disc_single.slurm $dir_name $SLURM_JOB_ID $dragon_r $key_r $sword_n_shield_r $sword_n_shield_r $seq_level
+        source ./scripts/local_disc_single.slurm $dir_name $SLURM_JOB_ID $dragon_r $key_r $sword_n_shield_r $sword_n_shield_r $seq_level #> ./"$dir_name"/out.txt
 
     done
 done
@@ -86,13 +46,3 @@ unset dragon_r
 unset bounding_persist
 unset bounding_dist
 unset seq_level
-
-date >> $benchmark_logs
-echo "ulimit -l" >> $benchmark_logs
-ulimit -l >> $benchmark_logs
-
-## Directory Cleanup ##
-# mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
-# mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
-# mv learning_curves $SLURM_JOB_ID/
-# mv tmp $SLURM_JOB_ID/

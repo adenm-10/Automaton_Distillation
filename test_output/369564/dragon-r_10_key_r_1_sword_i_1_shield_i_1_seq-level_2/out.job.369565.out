@@ -1,0 +1,53 @@
+entered training run...
+
+
+============================================
+Discrete Steps until Terminal State: 1000
+Continuous Steps until Terminal State: 1000
+3.7.2 | packaged by conda-forge | (default, Mar 20 2019, 01:46:52) 
+[GCC 7.3.0]
+/lustre/fs1/home/amckinney/Local_Neuro_Symbolic
+Exception:
+	invalid literal for int() with base 10: ''
+Bounding Persist: <class 'bool'>, False
+Bounding Distance: <class 'int'>, 7
+Rewards for Automaton Steps (reward, placements)
+	Key: 1, 1
+	Shield: 1, 1
+	Sword: 1, 0
+	Dragon: 10, 1
+Sequence Level: 2
+Dungeon Quest LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+imported all dependencies, checking for cuda
+
+==============
+Cuda detected!
+==============
+
+Done with DFA conversion
+[<discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x14fb162f0940>, <discrete.lib.automaton.mine_aps.MineInventoryAP object at 0x14fb162f0978>, <discrete.lib.automaton.mine_aps.MineInfoAutAP object at 0x14fb162f09b0>]
+
+
+============================================
+Training Teacher / Independent TD3 Agent
+Max Training Steps: 1000
+LTLF: F(dragon) & (!sword U key) & (!dragon U sword)
+============================================
+
+
+Starting training at: 2024-08-30 20:31:06
+Env Config: EnvConfig(env_name='MineWorldEnv-v1', kwargs={'config': <discrete.lib.env.mineworldenv.MineWorldConfig object at 0x14fb162f0860>}, wrapper_cls=<class 'discrete.lib.env.rew_every_step.RewEveryStep'>, wrapper_kwargs={'rew_per_step': -0.1})
+
+Env Name: MineWorldEnv-v1
+Observation Space: Box(16,)
+Automaton Num States: 5
+Action Space: Box(1,)
+Agent Name: TD3 Agent
+NOT Loading from checkpoint
+Actor Learning Rate: 0.0003
+Critic Learning Rate: 0.0003
+Finished training at: 2024-08-30 20:31:25
+Total elapsed time: 18.073869705200195
