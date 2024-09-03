@@ -85,7 +85,7 @@ lists=(
 )
 
 # Iterate through each list in the list of lists
-for seq_level in 2 3
+for seq_level in 3
 do
     for list in "${lists[@]}"
     do
