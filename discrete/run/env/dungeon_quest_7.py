@@ -8,8 +8,8 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-dragon_r, key_r, shield_r, sword_r = 10, 1, 1, 1
-sequence_level = 2 # 0-3
+dragon_r, key_r, shield_r, sword_r = 100, 1, 1, 1
+sequence_level = 3 # 0-3
 
 try:
     dragon_r = int(os.environ.get("dragon_r"))
@@ -103,8 +103,8 @@ dungeon_quest_config_7 = MineWorldConfig(
 )
 
 dungeon_quest_config_7_cont = MineWorldConfig(
-    shape=(2),
-    tile_shape=(7, 7),
+   
+    shape=(7, 7),
     initial_position=None,
     placements=[
         TilePlacement(

@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     # Distillation data dictionary read
     file_distill_name = "rew_and_steps_lists.pkl"
-    path_distill_to_out = "test_output/370105"
+    path_distill_to_out = "test_output/test_output_09-22_17-17-13_cont"
     file_distill_path = f"{path_distill_to_out}/{file_distill_name}"
     with open(file_distill_path, 'rb') as file_distill_:
         data = pickle.load(file_distill_)
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         
     # Independent agent data dictionary read
     file_independent_name = "rew_and_steps_lists.pkl"
-    path_independent_to_out = "test_output/369939/dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2"
+    path_independent_to_out = "test_output/test_output_09-22_12-17-39_cont"
     # path_independent_to_out = "test_output/369905/dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2"
     file_independent_path = f"{path_independent_to_out}/{file_independent_name}"
     with open(file_independent_path, 'rb') as file:

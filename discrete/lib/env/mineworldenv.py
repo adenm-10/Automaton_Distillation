@@ -3,6 +3,8 @@ from collections import Counter
 from random import Random
 from typing import Tuple, TypeVar, Union, List, Dict, Collection
 import os
+import copy
+from copy import deepcopy
 
 import numpy as np
 from gym import spaces
@@ -26,6 +28,11 @@ except Exception as e:
 print(f"Bounding Persist: {type(bounding_persist)}, {bounding_persist}")
 print(f"Bounding Distance: {type(bounding_dist)}, {bounding_dist}")
 
+Goal_reached_Dist = 0.4
+
+COLLISION_DIST = 0.35
+TIME_DELTA = 0.1
+hit_wall_reward = -0.1
 
 class MineWorldTileType:
     """A single special tile in the mine world"""
@@ -216,166 +223,119 @@ def obs_rewrite_cont(obs):
     return return_val
 
 class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
-    """A basic minecraft-like environment, with a global view of the state space"""
+
+
+    """
+    MineWorld: The continuous environment for the minecraft environment
+    """
+
     @staticmethod
     def from_dict(dict):
+        
         return MineWorldEnv(MineWorldConfig.from_dict(dict))
-
-    def __init__(self, config: MineWorldConfig, *args, **kwargs):
+    
+    def __init__(self,config:MineWorldConfig,*args,**kwargs):
         # super().__init__(shape=config.shape, *args, **kwargs)
 
-        self.num_actions = 1
+        self.action_space = spaces.Box(low=np.array([-1,-1], dtype=np.float32),
+                                           high=np.array([1,1],dtype=np.float32)) # positional change in the XY direction
+        self.observation_space = spaces.Box(low=0,
+                                                high=1, shape=(len(config.placements) + 2 + len(config.inventory),),dtype=np.float32) # gym.spaces.Box(0.0, 1.0, (self.lidar_num_bins,), dtype=np.float32)
+        self.metadata = {'render.modes': ['human']}
+        self.reward_range = (0, 100)
 
-        # self.action_space = spaces.Discrete(6) # Input can only be 0, 1, 2, 3, 4, 5
-        self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(self.num_actions,), dtype=np.float32)
-        self.observation_space = spaces.Box(0, 1,
-                                            shape=(2 + len(config.placements) * 2 + len(config.inventory) * 2, ),
-                                            dtype=np.float32)
         self.config = config
-        
 
         self.default_inventory = Counter(
             {inv_type.name: inv_type.default_quantity for inv_type in self.config.inventory})
         self.rand = Random()
 
-        # Position Update
-        # [0, 1):   Angle of step (map to degree values)
-
         self.done = True
-        self.true_position: Tuple[float, float] = (0.0, 0.0) ### x, y
-        self.tile_position: Tuple[int, int]     = (0, 0) ### Truncated version of self.true_position
-        self.special_tiles: Dict[Tuple[int, int], MineWorldTileType] = dict()
+        self.prev_position: Tuple [float,float] = (0.0,0.0)
+        self.new_position: Tuple [float,float] = (0.0,0.0)
+        self.special_tiles: Dict[Tuple[float,float], MineWorldTileType] = dict()
         self.inventory = Counter()
+        self.angle = 0
+        self.tile_type = []
 
-        self.persist_dict = {}
+        self.range = self.config.shape[1]
 
-    def step(self, action: float):
+        #variables
 
-        x = np.asarray([action], dtype=self.action_space.dtype)
+        self.dt = 0.05
+        self.vx = 0
+        self.vy = 0
+        self.g = -0.05
+  
+    
+    def step(self,action: np.ndarray):
 
-        # print(np.can_cast(x.dtype, self.action_space.dtype))
-        # print(x.shape == self.action_space.shape)
-        # print(np.all(x >= self.action_space.low))
-        # print(np.all(x <= self.action_space.high))
-        # print(self.action_space.contains(x))
+        action = np.array(action)
 
+        # print(f"action here {action}")
+
+        # print (f"this is the action {action}")
+       
+        assert action.shape == (2,)
         assert not self.done
 
         action_names = set()
+
+
+        self.prev_position = self.new_position
+
+        dx = action[0]
+        dy = action[1]
+        
+        # self.vx = self.vx + self.dt*dx
+        # self.vy = self.vy + self.dt*(dy + self.g)
+
+        new_posx = self.new_position[0] + 3.0*dx
+        new_posy = self.new_position[1] + 3.0*dy
+
+        self.new_position = (new_posx, new_posy)
+
+        # print(f"the new position is {self.new_position}")
+
+        # print (f"the old me {self.prev_position}")
+        # print (f"the new mw {self.new_position}")
+
         reward = 0
-        can_move = False
 
-        # print(f"\nAction: \n{action}\n")
-        # print(f"{self.action_space.low} {self.action_space.high}")
-        
-        # Dependent on DDPG Output function for regression
-        # Since this implementation uses tanh, scale from -1 - 1 to 0 - 6.28
+        if (self.new_position[0] >= 0 and self.new_position[0] < self.config.shape[0] and self.new_position[1] >= 0 and self.new_position[1] < self.config.shape[1]):
 
-        x, y = 0, 0
-
-        if self.num_actions == 1:
-            action = ((action + 1) / 2) * 6.28
-            x = cos(action)
-            y = sin(action)
+            self.forward = True
         else:
-            x = action[0]
-            y = action[1] 
+            self.forward = False
+            # print(f"the previous is {self.new_position}")
+            self.new_position = self.prev_position
+            # print(f"the new is {self.new_position}")
+            reward += hit_wall_reward
 
-        # print(action)
-        # print(type(action))
         
-        action_offsets = (x, y)
-        # action_offsets = (x, y)
-        # print(f"Action: {action}, Action Offsets: {action_offsets}")
-        # print(f"Current Tile Position: {self.tile_position}, True Position: {self.true_position}")
-
-        new_place = (float(self.true_position[0] + x), float(self.true_position[1] + y))
-        new_tile  = (int(new_place[0]), int(new_place[1]))
-
-
-        if new_place[0] >= 0 and new_place[0] < self.config.tile_shape[0] and new_place[1] >= 0 and new_place[1] < self.config.tile_shape[1]:
-            can_move = True
-        else:
-            reward -= 0.1
-
-        # print(f"New Tile Position: {new_tile}, True Position: {new_place}")
-        # print(f"Can Move: {can_move}")
-
-        # if new_tile in self.special_tiles:
-        #     tile = self.special_tiles[new_tile]
-        #     if tile.wall or not tile.move_requirements(self.inventory):
-        #         can_move = False
-
-
-        """ 
-        If Block for Boundary Box Reward
-        """
-        # if can_move:
-        #     # print("Updating position")
-        #     self.true_position = new_place
-        #     self.tile_position = new_tile
-
-        #     if self.tile_position in self.special_tiles:
-
-        #         this_tile: MineWorldTileType = self.special_tiles[self.tile_position]
-        #         if this_tile.meets_requirements(self.inventory):
-        #             new_inv = this_tile.apply_inventory(self.inventory)
-
-        #             for inv_config in self.config.inventory:
-        #                 if new_inv[inv_config.name] > inv_config.capacity:
-        #                     new_inv[inv_config.name] = inv_config.capacity
-
-        #             self.inventory = new_inv
-        #             action_names.add(this_tile.action_name)
-
-        #             if this_tile.consumable:
-        #                 del self.special_tiles[self.tile_position]
-
-        #             if this_tile.terminal:
-        #                 self.done = True
-
-        #             reward += this_tile.reward
-        #             print(f"Reward!: {reward}")
-
-        """
-        If Block for Distance Based Reward
-        """
-        if can_move:
-            # print("Updating position")
-            self.true_position = new_place
-            self.tile_position = new_tile
+        if self.forward:
 
             for special_tile in self.special_tiles:
 
-                # Take Euclidean Distance 
-                distance_to_tile = sqrt((self.true_position[0] - special_tile[0])**2 + (self.true_position[1] - special_tile[1])**2)
                 this_tile: MineWorldTileType = self.special_tiles[special_tile]
 
-                # print(f"Action: {action} / {action_offsets}")
-                # print(f"True Position: {self.true_position}")
-                # print(f"Distance to Tile: {distance_to_tile}")
-
                 if this_tile.meets_requirements(self.inventory):
-                    if distance_to_tile <= 1:
-                        
-                        # for inv_config in self.config.inventory:
-                        #     print(f"Inventory Name: {inv_config.name}")
-                        #     print(f"Inventory State: {self.inventory[inv_config.name]}")
 
-                        # print(f"Full Reward!: {this_tile.reward}, Special Tile: {this_tile.action_name}, Special Tile Location: {special_tile}, Raw Distance: {distance_to_tile}\n")
-                        # print("Full Reward!\n")
+                    distance = np.linalg.norm([self.new_position[0] - special_tile[0], self.new_position[1] - special_tile[1]])
+                            
+                    # dx = self.new_position[0] - special_tile[0]
+                    # dy = self.new_position[1] - special_tile[1]
+            
+                    if distance < Goal_reached_Dist:
 
                         new_inv = this_tile.apply_inventory(self.inventory)
 
                         for inv_config in self.config.inventory:
                             if new_inv[inv_config.name] > inv_config.capacity:
                                 new_inv[inv_config.name] = inv_config.capacity
-                            # print(f"Inventory Name: {inv_config.name}")
-                            # print(f"Inventory State: {new_inv[inv_config.name]}")
 
                         self.inventory = new_inv
                         action_names.add(this_tile.action_name)
-                        self.persist_dict[self.special_tiles[special_tile]] = [1, this_tile.reward]
 
                         if this_tile.consumable:
                             del self.special_tiles[special_tile]
@@ -384,90 +344,88 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                             self.done = True
 
                         reward += this_tile.reward
+
+                        print (f"here's the main reward {reward} for {action_names}")
+                        print(self.done)
                         break
 
-                    # if False:
-                    if distance_to_tile > 1 and distance_to_tile <=2:
-                        tile_reward = this_tile.reward
-                        # distance_reward = mod_normal_distribution(distance_to_tile, mu=1, height=tile_reward, width=bounding_dist)
-                        distance_reward = np.power(2, 2-distance_to_tile)-1
-                        persist_reward  = 0
 
-                        for key in self.persist_dict.keys():
-                            persist_reward += mod_normal_distribution(self.persist_dict[key][0], mu=1, height=self.persist_dict[key][1], width=bounding_dist)
-                            if self.persist_dict[key][0] < bounding_dist + 1:
-                                self.persist_dict[key][0] += 1
+        #reward-=0.01
 
-
-                        # distance_reward = max(0, 1 - (distance_to_tile - 1) / bounding_dist)
-                        # print(f"This Tile: {special_tile}, {this_tile.action_name}")
-                        # print(f"Raw Distance: {distance_to_tile}")
-                        # print(f"Tile Reward: {tile_reward}")
-                        # print(f"Distance Reward: {distance_reward}\n")
-                        # Gradually work up to special tile reward as the agent moves closer to a distance of 1
-                        # reward +=  distance_reward + persist_reward
-                        reward += distance_reward
-                        # print()
-
-                        # print(f"Total Reward: {reward}\n")
-
-                
-        """ """
-        debug_print = 0
-
-        if debug_print == 1:
-            # print(f"\nAction: {action} / {action_offsets}")
-            # print(f"True Position: {self.true_position}")
-            # print(f"Special Tiles:")
-            for special_tile in self.special_tiles: 
-                print(f"Special Tile: {special_tile}")
-
-            if can_move == 0:
-                print(f"Out of bounds")
-            print()
-
-
-        # print(f"After Tile Position: {self.tile_position}, True Position: {self.true_position}\n")
-        # assert False
-
+        # print (reward)
         info = {
             'tile_action_names': action_names,
             'inventory': self.inventory.copy(),
-            'position': self.true_position
+            'position': self.new_position
             # 'position': self.tile_position
         }
 
-        # return obs_rewrite(self.shape, self._get_observation()), reward, self.done, info
-        obs = obs_rewrite_cont(self._get_observation())
-        # print(f"Continuous Observation: {obs}")
-        return obs, reward, self.done, info
+        obs = self.obs()
+        # print(info)
+
+        # print (obs)
+
+        return obs, reward, self.done, info # because it needed truncated
+
+
+    def dist_xy(self,position):
+
+        ''' Return the distance from the robot to an XY position '''
+
+        dist_dict = {placement: (0.0) for placement in (self.tile_type)}
+
+
+        robot_pos = np.array([position[0], position[1]])
+
+        for special_tile in self.special_tiles:
+
+            if special_tile in self.tile_type:
+
+                dist = np.linalg.norm([special_tile[0] - robot_pos[0], special_tile[1] - robot_pos[1]])
+                ob = dist
+                dist_dict[special_tile] = ob
+
+        all_dists = np.array([dist for dist in dist_dict.values()])
+        # print(all_dists)
+
+        return all_dists
+
+
+
+    def obs(self):
+
+        ''' Return the observation of our agent '''
+
+        obz = np.array(([self.new_position[0], self.new_position[1]]))/self.range
+
+        obsy = self.dist_xy(self.new_position).flatten()
+        obsy = obsy/self.range
+        inventories = tuple(self.inventory[inv_config.name] for inv_config in self.config.inventory)
+        # assert self.observation_space.contains(obsy)
+        return np.concatenate((obz,obsy, inventories))
 
     def seed(self, seed=None):
         self.rand.seed(seed)
-
+        
     def reset(self):
+
         self.done = False
-        self.true_position = self.config.initial_position
-        if not self.true_position:
-            # self.true_position = self.rand.randrange(0, self.shape[0]), self.rand.randrange(0, self.shape[1])
-            self.true_position = (self.config.tile_shape[0] * self.rand.random(), self.config.tile_shape[1] * self.rand.random())
-        self.tile_position = tuple(int(x) for x in self.true_position)
+
+        self.prev_position = self.config.initial_position
+        if not self.prev_position:
+            position = (self.config.shape[0] * self.rand.random(), self.config.shape[1] * self.rand.random())
+
+            self.prev_position = position
+            self.new_position = position
+
         self.inventory = self.default_inventory.copy()
         self.special_tiles = self._get_tile_positioning()
+        self.tile_type = copy.deepcopy(self.special_tiles)
+    
+        return self.obs()
 
-        # print("\nReset!")
-        # print(f"Special Tiles:")
-        # for special_tile in self.special_tiles: 
-        #     print(f"Special Tile: {special_tile}")
-        # print(f"Starting Position: {self.true_position}")
 
-        # return obs_rewrite(self.shape, self._get_observation())
-        return obs_rewrite_cont(self._get_observation())
-
-    # Might not work
-    def _get_tile_positioning(self) -> Dict[Tuple[int, int], MineWorldTileType]:
-
-        # print(f"special tiles: {self.special_tiles}")
+    def _get_tile_positioning(self) -> Dict[Tuple[float, float], MineWorldTileType]:
 
         tiles = {}
 
@@ -475,48 +433,38 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
             for fixed in tile_type.fixed_placements:
                 tiles[fixed] = tile_type.tile
 
-        # print(tiles)
-        # print(self.config.placements)
-        # assert False
-
         # noinspection PyTypeChecker
-        all_spaces = set(np.ndindex(self.config.tile_shape)) # HARDCODED MAKE DYNAMIC
+        all_spaces = set(np.ndindex(self.config.shape))
         open_spaces = all_spaces.difference(tiles.keys())
-        # print(f"all spaces: {all_spaces}")
-        # print(f"open spaces: {open_spaces}")
+       
         if (0, 0) in open_spaces:
-            open_spaces.remove((0, 0))
+            open_spaces.remove((0, 0)) #remove some other points like (0,7) (7,0),(7,7)
 
         for tile_type in self.config.placements:
             tile, num_placements = tile_type.tile, tile_type.random_placements
-            # print(f"open_spaces: {open_spaces}")
-            # print(f"num_placements: {num_placements}")
-            spaces = self.rand.sample(open_spaces, num_placements)
+            
+            spaces = self.rand.sample(sorted(open_spaces), num_placements) #used sorted to handle sequence in the data
             open_spaces.difference_update(spaces)
+            # print (spaces)
 
             for space in spaces:
                 tiles[space] = tile
 
         return tiles
 
-    def _get_observation(self):
+    
+    def save_state(self):
+        return self.position, self.done, self.special_tiles.copy(), self.inventory.copy()
 
-        tiles = tuple(
-            frozenset(space for space, content in self.special_tiles.items() if content is placement.tile) for
-            placement in self.config.placements)
+    def load_state(self, state):
+        self.position, self.done, spec_tile, inv = state
+        self.special_tiles = spec_tile.copy()
+        self.inventory = inv.copy()
 
-        # print(f"Tiles: {tiles}")
-
-        inv = tuple(self.inventory[inv_config.name] for inv_config in self.config.inventory)
-
-        # print(f"Inventory: {inv}")
-
-        return (
-            self.true_position,
-            tiles,
-            inv
-        )
-
+    @property
+    def unwrapped(self):
+        return self
+        
     # Probably wont work, doesnt translate well to continuous
     def render(self, mode='human'):
         def render_func(x, y):
@@ -534,6 +482,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         self.true_position, self.done, spec_tile, inv = state
         self.special_tiles = spec_tile.copy()
         self.inventory = inv.copy()
+
 
 class MineWorldEnv(GridEnv, SaveLoadEnv):
     """A basic minecraft-like environment, with a global view of the state space"""

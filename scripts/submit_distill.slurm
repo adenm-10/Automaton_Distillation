@@ -10,12 +10,12 @@
 #SBATCH --output=out.job.%J.out
 #SBATCH --error=err.job.%J.err
 #SBATCH --mail-type=END
-#SBATCH --mail-user=aden.mckinney@ucf.edu
+#SBATCH --mail-user=pr556776@ucf.edu
 
 username=$(whoami)
 
 #Select File to run
-export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/${username}/Local_Neuro_Symbolic/
+export PYTHONPATH=${PYTHONPATH}:/lustre/fs1/home/${username}/Local_Neuro/
 
 #Select how logs get stored
 mkdir $SLURM_JOB_ID
@@ -74,7 +74,7 @@ export NOISE_STDDEV=0.2
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
 
-export dragon_r=10
+export dragon_r=100
 export key_r=1
 export shield_r=1
 export sword_r=1

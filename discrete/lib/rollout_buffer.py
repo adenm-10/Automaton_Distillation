@@ -11,7 +11,7 @@ class TraceStep(NamedTuple):
     state: np.ndarray
     action: np.ndarray
     ext_reward: float
-    done: bool
+    done: boolrain
     # Note that fields below this point are calculable from the fields above here, given the AP extractor, automaton, and trace history
     starting_aut_state: int
     ap: int
@@ -104,7 +104,7 @@ class CircularRolloutBuffer(RolloutBuffer):
                      device: torch.device, continuous: bool = False):
         return cls(capacity, input_shape,  num_actions, state_dtype, device)
 
-    def __init__(self, capacity=1000000, input_shape=(84, 84), num_actions=0,
+    def __init__(self, capacity=100000000, input_shape=(84, 84), num_actions=0,
                  state_dtype: torch.dtype = torch.uint8, device: torch.device = "cpu"):
         """
         Arguments:

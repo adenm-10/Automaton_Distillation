@@ -10,6 +10,7 @@ from typing import Tuple
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 import os
 
@@ -35,44 +36,44 @@ class CriticNetwork(nn.Module):
         ############
 
         self.fc1 = nn.Linear(self.input_dims, self.fc1_dims)
-        f1 = 1 / np.sqrt(self.fc1.weight.data.size()[0])
-        torch.nn.init.uniform_(self.fc1.weight.data, -f1, f1)
-        torch.nn.init.uniform_(self.fc1.bias.data, -f1, f1)
-        self.bn1 = nn.LayerNorm(self.fc1_dims)
+        #f1 = 1 / np.sqrt(self.fc1.weight.data.size()[0])
+        #torch.nn.init.uniform_(self.fc1.weight.data, -f1, f1)
+        #torch.nn.init.uniform_(self.fc1.bias.data, -f1, f1)
+        #self.bn1 = nn.LayerNorm(self.fc1_dims)
         
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
-        f2 = 1 / np.sqrt(self.fc2.weight.data.size()[0])
-        torch.nn.init.uniform_(self.fc2.weight.data, -f2, f2)
-        torch.nn.init.uniform_(self.fc2.bias.data, -f2, f2)
-        self.bn2 = nn.LayerNorm(self.fc2_dims)
+        #f2 = 1 / np.sqrt(self.fc2.weight.data.size()[0])
+        #torch.nn.init.uniform_(self.fc2.weight.data, -f2, f2)
+        #torch.nn.init.uniform_(self.fc2.bias.data, -f2, f2)
+        #self.bn2 = nn.LayerNorm(self.fc2_dims)
         self.action_1_value = nn.Linear(self.n_actions, self.fc2_dims)
 
         f3 = 0.003
         self.q1 = nn.Linear(fc2_dims, 1)
-        torch.nn.init.uniform_(self.q1.weight.data, -f3, f3)
-        torch.nn.init.uniform_(self.q1.bias.data, -f3, f3)
+        #torch.nn.init.uniform_(self.q1.weight.data, -f3, f3)
+        #torch.nn.init.uniform_(self.q1.bias.data, -f3, f3)
 
         ############
         # CRITIC 2 #
         ############
 
         self.fc3 = nn.Linear(self.input_dims, self.fc1_dims)
-        f4 = 1 / np.sqrt(self.fc3.weight.data.size()[0])
-        torch.nn.init.uniform_(self.fc3.weight.data, -f4, f4)
-        torch.nn.init.uniform_(self.fc3.bias.data, -f4, f4)
-        self.bn3 = nn.LayerNorm(self.fc1_dims)
+        #f4 = 1 / np.sqrt(self.fc3.weight.data.size()[0])
+        #torch.nn.init.uniform_(self.fc3.weight.data, -f4, f4)
+        #torch.nn.init.uniform_(self.fc3.bias.data, -f4, f4)
+        #self.bn3 = nn.LayerNorm(self.fc1_dims)
         
         self.fc4 = nn.Linear(self.fc1_dims, self.fc2_dims)
-        f5 = 1 / np.sqrt(self.fc4.weight.data.size()[0])
-        torch.nn.init.uniform_(self.fc4.weight.data, -f5, f5)
-        torch.nn.init.uniform_(self.fc4.bias.data, -f5, f5)
-        self.bn4 = nn.LayerNorm(self.fc2_dims)
+        #f5 = 1 / np.sqrt(self.fc4.weight.data.size()[0])
+        #torch.nn.init.uniform_(self.fc4.weight.data, -f5, f5)
+        #torch.nn.init.uniform_(self.fc4.bias.data, -f5, f5)
+        #self.bn4 = nn.LayerNorm(self.fc2_dims)
         self.action_2_value = nn.Linear(self.n_actions, self.fc2_dims)
 
-        f6 = 0.003
+        #f6 = 0.003
         self.q2 = nn.Linear(fc2_dims, 1)
-        torch.nn.init.uniform_(self.q2.weight.data, -f6, f6)
-        torch.nn.init.uniform_(self.q2.bias.data, -f6, f6)
+        #torch.nn.init.uniform_(self.q2.weight.data, -f6, f6)
+        #torch.nn.init.uniform_(self.q2.bias.data, -f6, f6)
         
         self.device = device
         
@@ -85,38 +86,45 @@ class CriticNetwork(nn.Module):
         ############
         # CRITIC 1 #
         ############
-        state_value = self.fc1(state)
-        state_value = self.bn1(state_value)
-        state_value = torch.nn.functional.relu(state_value)
-        state_value = self.fc2(state_value)
-        state_value = self.bn2(state_value)
+        state_value = F.relu(self.fc1(state))
+        #state_value = self.bn1(state_value)
+        #state_value = torch.nn.functional.relu(state_value)
+        state_value_s = self.fc2(state_value)
+        #state_value = self.bn2(state_value)
         
         action = action.view(-1, self.n_actions)
           
         action_value_flag = self.action_1_value(action)
-        action_value = torch.nn.functional.relu(action_value_flag)
-        state_action_value = torch.nn.functional.relu(torch.add(state_value, action_value))
+        s11 = torch.mm(state_value, self.fc2.weight.data.t())
+        s12 = torch.mm(action, self.action_1_value.weight.data.t())
+        #action_value = torch.nn.functional.relu(action_value_flag)
+        state_action_value = F.relu(s11 + s12 + self.action_1_value.bias.data)
         q1 = self.q1(state_action_value)
 
         ############
         # CRITIC 2 #
         ############
-        state_value = self.fc3(state)
-        state_value = self.bn3(state_value)
-        state_value = torch.nn.functional.relu(state_value)
-        state_value = self.fc4(state_value)
-        state_value = self.bn4(state_value)
+        state_value1 = F.relu(self.fc3(state))
+        #state_value = self.bn3(state_value)
+        #state_value = torch.nn.functional.relu(state_value)
+        state_value_s1 = self.fc4(state_value)
+        #state_value = self.bn4(state_value)
         
         action = action.view(-1, self.n_actions)
           
-        action_value_flag = self.action_2_value(action)
-        action_value = torch.nn.functional.relu(action_value_flag)
-        state_action_value = torch.nn.functional.relu(torch.add(state_value, action_value))
-        q2 = self.q2(state_action_value)
+        action_value_flag1 = self.action_2_value(action)
+        #action_value = torch.nn.functional.relu(action_value_flag)
+        s21 = torch.mm(state_value1, self.fc4.weight.data.t())
+        s22 = torch.mm(action, self.action_2_value.weight.data.t())
+        #state_action_value = torch.nn.functional.relu(torch.add(state_value, action_value))
+        s2 = F.relu(s21 + s22 + self.action_2_value.bias.data)
+        q2 = self.q2(s2)
         
         # print(f"\nState Value:\n{state_value}\n{state_value.shape}\n")
         # print(f"\nAction Value: \n{action_value}\n{action_value.shape}\n")
         # print(f"\nState Action Value:\n{state_action_value}\n{state_action_value.shape}\n")
+        
+        #q1.squeeze(), q2.squeeze()
         
         return q1.squeeze(), q2.squeeze()
     
@@ -129,7 +137,7 @@ class CriticNetwork(nn.Module):
         self.load_state_dict(torch.load(self.checkpoint_file))
         
 class ActorNetwork(nn.Module):
-    def __init__(self, alpha, input_dims, n_actions, name, fc1_dims = 400, fc2_dims = 300, 
+    def __init__(self, alpha, input_dims, n_actions, name, fc1_dims = 800, fc2_dims = 600, 
                 chkpt_dir='tmp/ddpg', device='cpu'):
         super(ActorNetwork, self).__init__()
 
@@ -144,28 +152,29 @@ class ActorNetwork(nn.Module):
         self.fc2_dims = fc2_dims
         self.fc1=nn.Linear(self.input_dims, self.fc1_dims)
         
-        f1 = 1 / np.sqrt(self.fc1.weight.data.size()[0])
+        #f1 = 1 / np.sqrt(self.fc1.weight.data.size()[0])
         # f1 = 0.003
-        torch.nn.init.uniform_(self.fc1.weight.data, -f1, f1)
-        torch.nn.init.uniform_(self.fc1.bias.data, -f1, f1)
-        self.bn1 = nn.LayerNorm(self.fc1_dims)
+        #torch.nn.init.uniform_(self.fc1.weight.data, -f1, f1)
+        #torch.nn.init.uniform_(self.fc1.bias.data, -f1, f1)
+        #self.bn1 = nn.LayerNorm(self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
 
-        f2 = 1 / np.sqrt(self.fc2.weight.data.size()[0])
+        #f2 = 1 / np.sqrt(self.fc2.weight.data.size()[0])
         # f2 = 0.003
-        torch.nn.init.uniform_(self.fc2.weight.data, -f2, f2)
-        torch.nn.init.uniform_(self.fc2.bias.data, -f2, f2)
-        self.bn2 = nn.LayerNorm(self.fc2_dims)
+        #torch.nn.init.uniform_(self.fc2.weight.data, -f2, f2)
+        #torch.nn.init.uniform_(self.fc2.bias.data, -f2, f2)
+        #self.bn2 = nn.LayerNorm(self.fc2_dims)
         
-        f3 = 0.003
+        #f3 = 0.003
         # print(f"\nfc2dims: {fc2_dims}, n_actions: {n_actions}\n")
 
         self.mu = nn.Linear(self.fc2_dims, self.n_actions)
-        torch.nn.init.uniform_(self.mu.weight.data, -f3, f3)
-        torch.nn.init.uniform_(self.mu.bias.data, -f3, f3)
+        #torch.nn.init.uniform_(self.mu.weight.data, -f3, f3)
+        #torch.nn.init.uniform_(self.mu.bias.data, -f3, f3)
         
         # self.optimizer = torch.optim.Adam(self.parameters(), lr =alpha)
         # self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.tanh = nn.Tanh()
         self.device = device
         self.to(self.device)
         
@@ -176,15 +185,15 @@ class ActorNetwork(nn.Module):
         x = self.flattener(state)
         # print(f"after flatten shape: {x.shape}")
         x = self.fc1(x)
-        x = self.bn1(x)
-        x = torch.nn.functional.relu(x)
+        #x = self.bn1(x)
+        x = F.relu(x)
         x = self.fc2(x)
-        x = self.bn2(x)
-        x = torch.nn.functional.relu(x)
-        x = torch.tanh(self.mu(x))
-        x = x.squeeze()
+        #x = self.bn2(x)
+        x = F.relu(x)
+        a = self.tanh(self.mu(x))
+        #x = x.squeeze()
 
-        return x
+        return a
     
     def save_checkpoint(self):
         print('... saving checkpoint ...')
@@ -207,6 +216,7 @@ class TD3_Agent(AC_Agent):
 
         self.noise_clip = 0.5
         self.policy_noise_stddev = 0.2
+        self.max_action = 1.0
         if os.getenv("NOISE_CLIP") is not None:
             self.noise_clip = float(os.getenv("NOISE_CLIP"))
             self.policy_noise_stddev = float(os.getenv("NOISE_STDDEV"))
@@ -222,10 +232,10 @@ class TD3_Agent(AC_Agent):
 
         self.flattener = nn.Flatten()
         
-        self.actor = ActorNetwork(alpha=0.00025, input_dims = np.prod(input_shape), n_actions=self.num_actions, name = 'Actor', device=self.device)
+        self.actor = ActorNetwork(alpha=0.005, input_dims = np.prod(input_shape), n_actions=self.num_actions, name = 'Actor', device=self.device)
         self.actor.to(self.device)
 
-        self.critic = CriticNetwork(beta=0.00025, input_dims = np.prod(input_shape), fc1_dims= 400,fc2_dims=300, n_actions=self.num_actions, name='Critic', device=self.device)
+        self.critic = CriticNetwork(beta=0.005, input_dims = np.prod(input_shape), fc1_dims= 800,fc2_dims=600, n_actions=self.num_actions, name='Critic', device=self.device)
         self.critic.to(self.device)
 
     def noise(self, action):
@@ -242,7 +252,7 @@ class TD3_Agent(AC_Agent):
 
         # noise = torch.tensor(self.noise(),dtype=torch.float).to(self.actor.device)
         noise = self.noise(mu)
-        mu_prime = mu + noise
+        mu_prime = (mu + noise).clamp(-self.max_action, self.max_action)
 
         self.actor.train()
         action = mu_prime.cpu().detach().numpy()

@@ -4,6 +4,7 @@ from typing import Tuple, Dict, List
 from datetime import datetime
 import os
 import pickle
+import logging
 
 import numpy as np
 import torch
@@ -79,6 +80,8 @@ def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: T
         target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
         
         target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
+
+        
 
         automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
 
@@ -295,25 +298,37 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
     actions = rollout_sample.actions
     dones = rollout_sample.dones
 
+    
     with torch.no_grad():
         target_actions = target_agent.target.actor.forward(next_states)
+
+        # Add noise to the actions for target smoothing
+        noise = agent.noise(target_actions)
         
+        target_actions = (target_actions + noise).clamp(-agent.max_action, agent.max_action)
+        
+            
         # Q'
         target_critic_1_value, target_critic_2_value = target_agent.target.critic.forward(next_states, target_actions)
         
         # y = r + gamma * min(q1, q2)
         target_q = []
         for j in range(config.agent_train_batch_size):
-            target_q.append(rewards[j] + config.gamma * min(target_critic_1_value[j], target_critic_2_value[j]) * dones[j])
+           
+            target_q.append(rewards[j] + config.gamma * min(target_critic_1_value[j], target_critic_2_value[j]) * (~dones[j]).float())
             # target_q.append(rewards[j] + config.gamma*target_critic_value[j])
         target_q = torch.tensor(target_q).to(config.device)
         target_q = target_q.view(config.agent_train_batch_size, 1)
         target_q = target_q.squeeze()
+        
+        
 
         if isinstance(automaton, TargetAutomaton):
             # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
             # Q_teacher
+            
             target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+            
 
             # print(f"Aut States: {rollout_sample.aut_states}")
             # print(f"APS': {rollout_sample.aps}")
@@ -321,11 +336,13 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
 
             # Beta
             target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
+            # print(target_automaton_q_weights)
             
             # print('target_automaton_q')
             # print(target_automaton_q.shape)
             
             target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
+            # print(target_q)
 
             # print(f"Target_Q: {target_q}")
 
@@ -336,6 +353,9 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
 
     agent.critic.train()
     critic_loss = F.mse_loss(target_q, critic_1_value) + F.mse_loss(target_q, critic_2_value)
+
+    logger.add_scalar("Target_Q", float(target_q.float().mean()), global_step=iter_num)
+
 
     critic_optim.zero_grad()
     critic_loss.backward()
@@ -640,6 +660,13 @@ def train_agent(config: Configuration,
     :param reward_machine: The reward machine used for CRM, if any
 	:return: The trained agent
 	"""
+    
+    # Setup logging
+    path_out = "./logger"  # You can customize this
+    logged = setup_logger(path_out)
+    
+    logged.info("Starting training process...")
+
     if run_name is not None:
         config = config._replace(run_name=run_name)
 
@@ -664,6 +691,7 @@ def train_agent(config: Configuration,
         critic_lr = config.critic_lr
 
         print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
+        logged.info(f"Actor Learning Rate: {actor_lr}, Critic Learning Rate: {critic_lr}")
 
         actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = actor_lr)
         critic_optimizer = torch.optim.Adam(agent.critic.parameters(), lr = critic_lr)
@@ -708,6 +736,12 @@ def train_agent(config: Configuration,
 
     start_time = time.time()
     end_time = 0
+    
+    expl_noise = 1
+    expl_min = 0.1
+    action_shape = env.action_space.shape
+    expl_decay_steps = 500000  # Number of steps over which the initial exploration noise will decay over)
+    max_action = 1.0
 
     path_to_out = ""
     if config.path_to_out:
@@ -741,10 +775,20 @@ def train_agent(config: Configuration,
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
-
+            
+            
+            
+        # added newly by Precious.
+        
+        # Exponential decay for exploration noise
+        if expl_noise > expl_min:
+            
+            expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
+        # # expl_noise = expl_min + (1 - expl_min) * np.exp(-i / expl_decay_steps)
+        # actions = (actions + np.random.normal(0, expl_noise, size=action_shape)).clip(-max_action, max_action)
 
         obs, rewards, dones, infos = env.step(actions)
-
+      
         # Graphing operations
         steps_to_terminal_current = [x+1 for x in steps_to_terminal_current]
         rewards_per_ep_current =    [x+r for x, r in zip(rewards_per_ep_current, rewards)]
@@ -776,6 +820,7 @@ def train_agent(config: Configuration,
 
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
         logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
+        #logged.info(f"Step {i}: Action taken, Reward: {rewards.mean():.3f}, Done: {dones}")
 
 
         aps_after_current = []
@@ -872,6 +917,7 @@ def train_agent(config: Configuration,
 
             try:
                 print(f"Completed Steps: {i:8} || Avg Steps: {int(steps_mav[-1]):4} || Avg Rew: {reward_ep_mav[-1]:.3f}")
+                logged.info(f"Step {i}: Avg Reward: {reward_mav[-1]:.3f}, Episode Reward: {rewards_per_ep_current}")
             except:
                 print(f"Completed Steps: {i:8}")
 
@@ -993,3 +1039,25 @@ def plot_results(rewards_per_episode, steps_to_term_per_episode,
     return
 
 
+def setup_logger(path_to_out):
+    logger = logging.getLogger('TrainingLogger')
+    logger.setLevel(logging.INFO)  # Set the logging level
+    
+    # Create formatter that matches the structure of the image output (timestamp, step, message)
+    formatter = logging.Formatter('%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    
+    # Ensure the directory exists
+    os.makedirs(path_to_out, exist_ok=True)
+
+    # Set up the logger
+    file_handler = logging.FileHandler(os.path.join(path_to_out, 'log.txt'))
+    logger = logging.getLogger()
+    logger.addHandler(file_handler)
+    
+    
+    # Optional: also log to the console
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    return logger

@@ -62,11 +62,11 @@ rm -rf ./automaton_q/*
 rm -rf ./logs/*
 rm -rf ./checkpoints/*
 
-alr=0.0001
+alr=0.001
 clr=0.001
 gamma=0.99
-tau=0.001
-dragon_r=10
+tau=0.005
+dragon_r=100
 
 ###mpirun -np $SLURM_NTASKS python $file
 echo

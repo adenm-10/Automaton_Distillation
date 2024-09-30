@@ -2,7 +2,7 @@ import torch
 
 from discrete.run.utils import construct_ap_extractor_automaton
 from discrete.lib.automaton.reward_machine import RewardMachine
-from discrete.run.env.dungeon_quest import dungeon_quest_aps, dungeon_quest_ltlf, dragon_r
+from discrete.run.env.dungeon_quest_7 import dungeon_quest_aps, dungeon_quest_ltlf, dragon_r
 
 device = torch.device("cpu")
 
