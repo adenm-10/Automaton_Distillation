@@ -60,6 +60,13 @@ blind_craftsman_rew_per_step_env_config = EnvConfig(
     wrapper_kwargs={"rew_per_step": -0.1}
 )
 
+blind_craftsman_rew_per_step_env_config_cont = EnvConfig(
+    env_name="MineWorldEnv-v1",
+    kwargs={"config": blind_craftsman_config},
+    wrapper_cls=RewEveryStep,
+    wrapper_kwargs={"rew_per_step": -0.1}
+)
+
 blind_craftsman_aps = [
     AP(name="at_home", func=MineLocationAP(location=(0, 0))),
     AP(name="tool_3", func=MineInventoryAP(inventory_item="tool", quantity=3)),

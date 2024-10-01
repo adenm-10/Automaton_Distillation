@@ -83,6 +83,13 @@ gold_mine_rew_per_step_env_config = EnvConfig(
     wrapper_kwargs={"rew_per_step": -0.1}
 )
 
+gold_mine_rew_per_step_env_config_cont = EnvConfig(
+    env_name="MineWorldEnv-v1",
+    kwargs={"config": gold_mine_config},
+    wrapper_cls=RewEveryStep,
+    wrapper_kwargs={"rew_per_step": -0.1}
+)
+
 gold_mine_aps = [
     AP(name="s1", func=MineInventoryAP(inventory_item="silver", quantity=1)),
     AP(name="s2", func=MineInventoryAP(inventory_item="silver", quantity=2)),
