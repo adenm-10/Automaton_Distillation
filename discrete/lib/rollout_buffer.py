@@ -11,7 +11,7 @@ class TraceStep(NamedTuple):
     state: np.ndarray
     action: np.ndarray
     ext_reward: float
-    done: boolrain
+    done: int
     # Note that fields below this point are calculable from the fields above here, given the AP extractor, automaton, and trace history
     starting_aut_state: int
     ap: int

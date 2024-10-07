@@ -81,3 +81,10 @@ gold_mine_rew_per_step_env_config_7 = EnvConfig(
     wrapper_kwargs={"rew_per_step": -0.1}
 )
 
+gold_mine_rew_per_step_env_config_7_cont = EnvConfig(
+    env_name="MineWorldEnv-v1",
+    kwargs={"config": gold_mine_config_7},
+    wrapper_cls=RewEveryStep,
+    wrapper_kwargs={"rew_per_step": -0.1}
+)
+

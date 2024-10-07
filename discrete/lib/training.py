@@ -402,6 +402,13 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
 
     return float(critic_loss)
 
+def TD3_Policy_Distillation_learn():
+    pass
+
+def DDQN_Policy_Distillation_learn():
+    pass
+
+
 def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Agent,
             rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int):
     """

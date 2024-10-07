@@ -74,7 +74,7 @@ export NOISE_STDDEV=0.2
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
 
-python -u ./discrete/run/teacher/dungeon_quest_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
+python -u ./discrete/run/teacher/gold_mine_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 python -u ./discrete/run/reward_machine/dungeon_quest_machine_rew_per_step.py
 export seq_level=3
