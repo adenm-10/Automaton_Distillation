@@ -12,7 +12,7 @@ from discrete.lib.main import run_training
 from discrete.run.utils import teacher_config_v1
 from discrete.lib.agent.TD3_Agent import TD3_Agent
 
-from discrete.run.env.gold_mine_7 import gold_mine_rew_per_step_env_config_7_cont
+from discrete.run.env.blind_craftsman_7 import blind_craftsman_rew_per_step_env_config_7_cont
 
 print("imported all dependencies, checking for cuda")
 
@@ -57,8 +57,8 @@ if __name__ == '__main__':
     path_to_out = args.path_to_out
     # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
-    config = teacher_config_v1(gold_mine_rew_per_step_env_config_7_cont, 
-                               "gold_mine_rew_per_step_env_config_7_cont",
+    config = teacher_config_v1(blind_craftsman_rew_per_step_env_config_7_cont, 
+                               "blind_craftsman_rew_per_step_env_config_7_cont",
                                device, 
                                agent_cls=TD3_Agent,
                             #    aps=dungeon_quest_aps, 

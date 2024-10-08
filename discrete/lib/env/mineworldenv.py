@@ -239,8 +239,14 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         self.action_space = spaces.Box(low=np.array([-1,-1], dtype=np.float32),
                                            high=np.array([1,1],dtype=np.float32)) # positional change in the XY direction
+
+        num_special_tiles = sum(tile_type.random_placements for tile_type in config.placements)
+        num_special_tiles += sum(len(tile_type.fixed_placements) for tile_type in config.placements)
+        # print(f"special tiles, position, len inv: {num_special_tiles}, 2, {len(config.inventory)}")
+
+        
         self.observation_space = spaces.Box(low=0,
-                                                high=1, shape=(len(config.placements) + 2 + len(config.inventory),),dtype=np.float32) # gym.spaces.Box(0.0, 1.0, (self.lidar_num_bins,), dtype=np.float32)
+                                                high=1, shape=(num_special_tiles + 2 + len(config.inventory),), dtype=np.float32) # gym.spaces.Box(0.0, 1.0, (self.lidar_num_bins,), dtype=np.float32)
         self.metadata = {'render.modes': ['human']}
         self.reward_range = (0, 100)
 
@@ -345,8 +351,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
                         reward += this_tile.reward
 
-                        print (f"here's the main reward {reward} for {action_names}")
-                        print(self.done)
+                        # print (f"here's the main reward {reward} for {action_names}")
+                        # print(self.done)
                         break
 
 
@@ -374,7 +380,6 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         dist_dict = {placement: (0.0) for placement in (self.tile_type)}
 
-
         robot_pos = np.array([position[0], position[1]])
 
         for special_tile in self.special_tiles:
@@ -390,8 +395,6 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         return all_dists
 
-
-
     def obs(self):
 
         ''' Return the observation of our agent '''
@@ -401,8 +404,12 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         obsy = self.dist_xy(self.new_position).flatten()
         obsy = obsy/self.range
         inventories = tuple(self.inventory[inv_config.name] for inv_config in self.config.inventory)
+        # print(f"special tiles, position, len inv: {len(obz)}, {len(obsy)}, {len(inventories)}")
+        # assert False
         # assert self.observation_space.contains(obsy)
-        return np.concatenate((obz,obsy, inventories))
+        ret = np.concatenate((obz,obsy, inventories))
+        # print(f"Observation: {ret}")
+        return ret
 
     def seed(self, seed=None):
         self.rand.seed(seed)

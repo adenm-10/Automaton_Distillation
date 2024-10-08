@@ -18,7 +18,7 @@ gold_mine_config_7 = MineWorldConfig(
                 action_name="at_home_done", consumable=False, grid_letter="H", inventory_modifier=Counter(),
                 inventory_requirements=Counter(silver=10), reward=+100, terminal=True
             ),
-            fixed_placements=[(0, 0)]
+            fixed_placements=[(0, 0)],
         ),
         TilePlacement(
             tile=MineWorldTileType(

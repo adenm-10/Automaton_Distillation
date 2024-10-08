@@ -74,10 +74,10 @@ export NOISE_STDDEV=0.2
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
 
-python -u ./discrete/run/teacher/gold_mine_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
+python -u ./discrete/run/teacher/blind_craftsman_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
 mv ./test_output/test_output* $SLURM_JOB_ID/
-python -u ./discrete/run/reward_machine/gold_mine_machine_rew_per_step.py
-python -u ./discrete/run/target/gold_mine_7_target_rew_per_step_productMDP_TD3.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps" --path-to-out="$dir_name"
+python -u ./discrete/run/reward_machine/blind_craftsman_machine_rew_per_step.py
+python -u ./discrete/run/target/blind_craftsman_7_target_rew_per_step_productMDP_TD3.py --alr="$alr" --clr="$clr" --gamma="$gamma" --tau="$tau" --total-steps="$total_steps" --path-to-out="$dir_name"
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 
