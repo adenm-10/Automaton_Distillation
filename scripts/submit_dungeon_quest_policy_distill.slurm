@@ -65,7 +65,7 @@ alr=0.0003
 clr=0.0003
 gamma=0.99
 tau=0.005
-total_steps=500000
+total_steps=2000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
@@ -74,10 +74,8 @@ export NOISE_STDDEV=0.2
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
 
-python -u ./discrete/run/teacher/blind_craftsman_teacher_rew_per_step_7_productMDP.py --total-steps="$total_steps" --path-to-out="$dir_name"
-mv ./test_output/test_output* $SLURM_JOB_ID/
-python -u ./discrete/run/reward_machine/blind_craftsman_machine_rew_per_step.py
-python -u discrete/run/target/blind_craftsman_obstacles_target_machine_rew_per_step_productMDP.py
+python -u discrete/run/distill/dungeon_quest_policy_distillation.py --total-steps="$total_steps" --path-to-out="$dir_name"
+
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 

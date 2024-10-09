@@ -417,7 +417,7 @@ def Policy_Distill_learn(student_config: Configuration, teacher_config: Configur
     # print(batch[0])
     # states = torch.stack([x[0] for x in batch]) # states
     states = torch.stack([x for x in rollout_sample.states])
-    print(f"states shape: {states.shape}")
+    # print(f"states shape: {states.shape}")
 
     # means_teacher = torch.stack([x[1] for x in batch]) # actions
     means_teacher = torch.stack([x for x in rollout_sample.actions])

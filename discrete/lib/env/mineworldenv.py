@@ -506,8 +506,8 @@ class MineWorldEnv(GridEnv, SaveLoadEnv):
         self.observation_space = spaces.Box(0, 1,
                                             shape=(1 + len(config.placements) + len(config.inventory), *config.shape),
                                             dtype=np.float32)
-        
-        if (os_space_len == 7):
+
+        if (any(placement.tile.action_name == "river" for placement in config.placements)):
             self.observation_space = spaces.Box(0, 1,
                                             shape=(len(config.placements) + len(config.inventory), *config.shape),
                                             dtype=np.float32)
