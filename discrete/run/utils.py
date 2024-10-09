@@ -2,6 +2,8 @@ import json
 from typing import List, Type
 
 import torch
+from torch.distributions import Normal
+from torch.distributions.kl import kl_divergence
 
 from discrete.lib.agent.normal_agent import DuelingQNetworkAgent
 from discrete.lib.agent.TD3_Agent import TD3_Agent
@@ -172,3 +174,14 @@ def teacher_config_productMDP(env_config: EnvConfig, run_name: str, device: torc
         device=device,
         run_name=run_name
     )
+
+def get_kl(teacher_dist_info, student_dist_info):
+    pi = Normal(loc=teacher_dist_info[0], scale=teacher_dist_info[1])
+    pi_new = Normal(student_dist_info[0], scale=student_dist_info[1])
+    kl = torch.mean(kl_divergence(pi, pi_new))
+    return kl
+
+def get_wasserstein(teacher_dist_info, student_dist_info):
+    means_t, stds_t = teacher_dist_info
+    means_s, stds_s = student_dist_info
+    return torch.sum((means_s - means_t) ** 2) + torch.sum((torch.sqrt(stds_s) - torch.sqrt(stds_t)) ** 2)

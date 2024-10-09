@@ -50,3 +50,23 @@ def run_training(config: Configuration,
                             device=config.device, run_name=run_name)
 
     print("Finished training at: {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+
+def run_policy_distillation(teacher_config: Configuration, 
+                            student_config: Configuration,
+                            run_name=None):
+    
+    if run_name is None:
+        run_name = teacher_config.run_name
+
+    print("Starting training at: {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+
+    agent, rollout_buffer, ap_extractor, automaton, start_iter = create_training_state(teacher_config)
+
+    logger = SummaryWriter(f"logs/{run_name}", purge_step=start_iter)
+
+    trained_teacher, teacher_rollout = train_agent(teacher_config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
+
+    agent, rollout_buffer, ap_extractor, automaton, start_iter = create_training_state(student_config)
+    train_agent(student_config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, teacher_rollout_buffer=teacher_rollout, policy_distill_teacher_config=teacher_config, run_name=run_name)
+
+    print("Finished training at: {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))

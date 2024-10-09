@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
 from typing import Union
+import math
 
 from discrete.lib.agent.agent import Agent, TargetAgent
 from discrete.lib.agent.AC_Agent import AC_Agent, AC_TargetAgent
@@ -27,11 +28,13 @@ from discrete.lib.intrinsic_reward import IntrinsicRewardCalculatorBatchWrapper
 from discrete.lib.rollout_buffer import VecRolloutBufferHelper, RolloutBuffer, CircularRolloutBuffer
 from discrete.lib.updater import Updater
 from discrete.lib.agent.DDPG_Agent import DDPG_Agent
+from discrete.run.utils import get_wasserstein, get_kl
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import OrderedDict
 
 curr_crit_loss = None 
 curr_act_loss = None
@@ -387,26 +390,107 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
 
         target_agent.update_weights()
     
-    # Sample q values that we get wrong more often
-    # print(f"\n\ntarget q: {target_q}\n\n")
-    # print(f"\n\critic_value: {critic_value}\n\n")
-    # assert False
 
     error = critic_1_value - target_q
     rollout_buffer.set_priorities(indices=indices, errors=error.detach())
-
-    # print(f"Critic loss: {float(critic_loss)}")
-    # print(f"Actor  loss: {float(actor_loss)}")
 
     logger.add_scalar("training / actor loss", float(actor_loss), global_step=iter_num)
 
     return float(critic_loss)
 
-def TD3_Policy_Distillation_learn():
-    pass
+def Policy_Distill_learn(student_config: Configuration, teacher_config: Configuration, optim: Optimizer, student_agent: Agent, teacher_rollout_buffer: Agent,
+                         logger: SummaryWriter, iter_num: int, current_aut_states,
+                         loss_metric='kl', reward_machine: RewardMachine = None):
+    
+    optim.zero_grad()
+    
+    ##################
+    # batch = random.sample(expert_data, self.training_batch_size)
+    # from the teacher ?
+    rollout_sample, indices, _ = teacher_rollout_buffer.sample(teacher_config.agent_train_batch_size,
+                                                                # automaton.num_states,
+                                                                priority_scale=teacher_config.rollout_buffer_config.priority_scale,
+                                                                reward_machine=reward_machine)
+    
+    
 
-def DDQN_Policy_Distillation_learn():
-    pass
+    # print(batch[0])
+    # states = torch.stack([x[0] for x in batch]) # states
+    states = torch.stack([x for x in rollout_sample.states])
+    print(f"states shape: {states.shape}")
+
+    # means_teacher = torch.stack([x[1] for x in batch]) # actions
+    means_teacher = torch.stack([x for x in rollout_sample.actions])
+
+    fake_std = torch.from_numpy(np.array([1e-6]*len(means_teacher))) # for deterministic
+    
+    # stds_teacher = torch.stack([fake_std for x in batch])
+    stds_teacher = torch.stack([fake_std for _ in rollout_sample.actions])
+    ####################
+
+    # means_student = self.policy.mean_action(states)
+    q_values = student_agent.calc_q_values_batch(torch.as_tensor(states, device=student_config.device, dtype=torch.float), rollout_sample.aut_states)
+    means_student = take_eps_greedy_action_from_q_values(q_values, student_config.epsilon)
+    means_student = torch.stack([torch.tensor(x) for x in means_student])
+
+    # stds_student = self.policy.get_std(states)
+    sigma = torch.tensor(0.5, requires_grad=True)  # Replace with your desired scalar value
+    scale = torch.exp(torch.clamp(sigma, min=math.log(1e-6)))
+    stds_student = torch.stack([scale for _ in rollout_sample.states])
+
+    if loss_metric == 'kl':
+        loss = torch.tensor((stds_teacher.log() - stds_student.log() + (stds_student.pow(2) + (means_teacher - means_student).pow(2)) / (2 * stds_student.pow(2)) - 0.5).mean(), requires_grad=True)
+    elif loss_metric == 'wasserstein':
+        loss = get_wasserstein([means_teacher, stds_teacher], [means_student, stds_student])
+
+    
+    loss.backward()
+    optim.step()
+
+    logger.add_scalar("training/loss", float(loss), global_step=iter_num)
+
+    return loss
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Agent,
@@ -656,7 +740,10 @@ def train_agent(config: Configuration,
                 logger: SummaryWriter,
                 start_iter_num: int,
                 reward_machine: RewardMachine = None,
-                run_name=None) -> Union[Agent,AC_Agent]:
+                run_name=None,
+                teacher_rollout_buffer: RolloutBuffer=None,
+                policy_distill_teacher_config: Configuration=None,
+                ) -> Union[Agent,AC_Agent]:
     """
 	Train the agent for an entire generation
 	:param agent: The agent to train
@@ -783,8 +870,6 @@ def train_agent(config: Configuration,
                                              current_aut_states)
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
             
-            
-            
         # added newly by Precious.
         
         # Exponential decay for exploration noise
@@ -893,7 +978,13 @@ def train_agent(config: Configuration,
         if rollout_buffer.num_filled_approx() >= config.rollout_buffer_config.min_size_before_training:
             # print("entered training block")
             # Train off-policy
-            if isinstance(agent, AC_Agent):
+            if teacher_rollout_buffer != None:
+                loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
+                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine)
+                losses.append(loss)
+                training_iterations.append(i)
+
+            elif isinstance(agent, AC_Agent):
                 if agent.name == "DDPG Agent":
                     loss = DDPG_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
                     automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
@@ -953,7 +1044,7 @@ def train_agent(config: Configuration,
                    rewards_per_step, steps_to_term_per_step,
                    path_to_out)
 
-    return agent
+    return agent, rollout_buffer
 
 def export_results(rewards_per_episode, steps_to_term_per_episode,
                    rewards_per_step, steps_to_term_per_step,

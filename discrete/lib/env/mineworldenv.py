@@ -500,10 +500,19 @@ class MineWorldEnv(GridEnv, SaveLoadEnv):
     def __init__(self, config: MineWorldConfig, *args, **kwargs):
         super().__init__(shape=config.shape, *args, **kwargs)
 
+        os_space_len = 1 + len(config.placements) + len(config.inventory)
+
         self.action_space = spaces.Discrete(6) # Input can only be 0, 1, 2, 3, 4, 5
         self.observation_space = spaces.Box(0, 1,
                                             shape=(1 + len(config.placements) + len(config.inventory), *config.shape),
                                             dtype=np.float32)
+        
+        if (os_space_len == 7):
+            self.observation_space = spaces.Box(0, 1,
+                                            shape=(len(config.placements) + len(config.inventory), *config.shape),
+                                            dtype=np.float32)
+
+
         self.config = config
         self.default_inventory = Counter(
             {inv_type.name: inv_type.default_quantity for inv_type in self.config.inventory})
@@ -615,9 +624,15 @@ class MineWorldEnv(GridEnv, SaveLoadEnv):
 
     def _get_observation(self):
 
+        # tiles = tuple(
+        #     frozenset(space for space, content in self.special_tiles.items() if (content is placement.tile and placement.tile.action_name != "river")) for
+        #     placement in self.config.placements)
+        
         tiles = tuple(
-            frozenset(space for space, content in self.special_tiles.items() if content is placement.tile) for
-            placement in self.config.placements)
+            frozenset(space for space, content in self.special_tiles.items() if (content is placement.tile)) for
+            placement in self.config.placements if (placement.tile.action_name != "river"))
+        
+        # remove river tiles from tiles list, convert tuo
 
         inv = tuple(self.inventory[inv_config.name] for inv_config in self.config.inventory)
 
