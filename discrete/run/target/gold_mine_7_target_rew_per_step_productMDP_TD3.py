@@ -66,6 +66,8 @@ if __name__ == '__main__':
         path_to_out=path_to_out
     )
 
+    config = config._replace(automaton=gold_mine_automaton, ap_extractor=gold_mine_ap_extractor)
+
     print("\n\n============================================")
     print(f"Training Teacher / Independent TD3 Agent")
     print("Environment: gold_mine_7_target_rew_per_step_productMDP_TD3")

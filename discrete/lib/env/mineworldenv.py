@@ -240,13 +240,15 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         self.action_space = spaces.Box(low=np.array([-1,-1], dtype=np.float32),
                                            high=np.array([1,1],dtype=np.float32)) # positional change in the XY direction
 
-        num_special_tiles = sum(tile_type.random_placements for tile_type in config.placements)
-        num_special_tiles += sum(len(tile_type.fixed_placements) for tile_type in config.placements)
+        num_special_tiles = sum(tile_type.random_placements for tile_type in config.placements if tile_type.tile.action_name != "river")
+        num_special_tiles += sum(len(tile_type.fixed_placements) for tile_type in config.placements if tile_type.tile.action_name != "river")
         # print(f"special tiles, position, len inv: {num_special_tiles}, 2, {len(config.inventory)}")
 
         
         self.observation_space = spaces.Box(low=0,
                                                 high=1, shape=(num_special_tiles + 2 + len(config.inventory),), dtype=np.float32) # gym.spaces.Box(0.0, 1.0, (self.lidar_num_bins,), dtype=np.float32)
+        
+        
         self.metadata = {'render.modes': ['human']}
         self.reward_range = (0, 100)
 
@@ -384,7 +386,7 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
 
         for special_tile in self.special_tiles:
 
-            if special_tile in self.tile_type:
+            if special_tile in self.tile_type and special_tile:
 
                 dist = np.linalg.norm([special_tile[0] - robot_pos[0], special_tile[1] - robot_pos[1]])
                 ob = dist
@@ -437,6 +439,8 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
         tiles = {}
 
         for tile_type in self.config.placements:
+            if tile_type.tile.action_name == "river":
+                continue
             for fixed in tile_type.fixed_placements:
                 tiles[fixed] = tile_type.tile
 
@@ -448,14 +452,17 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
             open_spaces.remove((0, 0)) #remove some other points like (0,7) (7,0),(7,7)
 
         for tile_type in self.config.placements:
-            tile, num_placements = tile_type.tile, tile_type.random_placements
-            
-            spaces = self.rand.sample(sorted(open_spaces), num_placements) #used sorted to handle sequence in the data
-            open_spaces.difference_update(spaces)
-            # print (spaces)
+            if tile_type.tile.action_name == "river":
+                continue
+            else:
+                tile, num_placements = tile_type.tile, tile_type.random_placements
+                
+                spaces = self.rand.sample(sorted(open_spaces), num_placements) #used sorted to handle sequence in the data
+                open_spaces.difference_update(spaces)
+                # print (spaces)
 
-            for space in spaces:
-                tiles[space] = tile
+                for space in spaces:
+                    tiles[space] = tile
 
         return tiles
 

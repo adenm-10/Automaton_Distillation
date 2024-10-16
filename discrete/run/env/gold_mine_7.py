@@ -50,8 +50,9 @@ gold_mine_config_7 = MineWorldConfig(
                 inventory_requirements=Counter(gold=1)
             ),
             fixed_placements=[],
-            random_placements=30
+            random_placements=25
         ),
+        
     ],
     inventory=[
         InventoryItemConfig(name="gold", default_quantity=0, capacity=2),

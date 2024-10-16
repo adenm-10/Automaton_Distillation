@@ -227,8 +227,8 @@ class TD3_Agent(AC_Agent):
             self.d = int(os.getenv("POLICY_FREQ"))
 
         self.device = "cpu"
-        if torch.cuda.is_available():
-            self.device = torch.device('cuda:0')
+        # if torch.cuda.is_available():
+        #     self.device = torch.device('cuda:0')
 
         self.flattener = nn.Flatten()
         

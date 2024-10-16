@@ -170,7 +170,7 @@ dungeon_quest_config_7_cont = MineWorldConfig(
     ]
 )
 
-dungeon_quest_rew_per_step_env_config_7_cont = EnvConfig(
+dungeon_quest_rew_per_step_env_config_7_obstacles_cont = EnvConfig(
     env_name="MineWorldEnv-v1",
     kwargs={"config": dungeon_quest_config_7_cont},
     wrapper_cls=RewEveryStep,

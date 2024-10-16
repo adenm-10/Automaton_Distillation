@@ -1,10 +1,10 @@
 import torch
 
 from discrete.lib.main import run_policy_distillation
-from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
+from discrete.lib.agent.TD3_Agent import TD3_Agent
 from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
-from discrete.run.env.dungeon_quest_7 import dungeon_quest_rew_per_step_env_config_7, dungeon_quest_aps, dungeon_quest_ltlf
-from discrete.run.env.dungeon_quest_7_obstacles import dungeon_quest_rew_per_step_env_config_7_obstacles, dungeon_quest_aps_obstacles, dungeon_quest_ltlf_obstacles
+from discrete.run.env.dungeon_quest_7 import dungeon_quest_rew_per_step_env_config_7_cont, dungeon_quest_aps, dungeon_quest_ltlf
+from discrete.run.env.dungeon_quest_7_obstacles import dungeon_quest_rew_per_step_env_config_7_obstacles_cont, dungeon_quest_aps_obstacles, dungeon_quest_ltlf_obstacles
 from discrete.run.utils import teacher_config_v1, student_config_v1
 import argparse
 import time
@@ -35,19 +35,19 @@ if __name__ == '__main__':
     path_to_out = args.path_to_out
     # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
-    teacher_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7, 
+    teacher_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_cont, 
                            "dungeon_quest_teacher_rew_per_step_7_productMDP",
                            device, 
-                           agent_cls=OneHotAutomatonAfterFeatureExtractorAgent, 
+                           agent_cls=TD3_Agent, 
                            aps=dungeon_quest_aps,
                            ltlf=dungeon_quest_ltlf, 
                            max_training_steps=max_training_steps,
                            path_to_out=path_to_out)
     
-    student_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_obstacles, 
-                               "dungeon_quest_rew_per_step_env_config_7_obstacles",
+    student_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_obstacles_cont, 
+                               "blind_craftsman_7_obstacles_target_rew_per_step_productMDP",
                                device, 
-                               agent_cls=OneHotAutomatonAfterFeatureExtractorAgent,
+                               agent_cls=TD3_Agent,
                                max_training_steps=max_training_steps, 
                             #    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
                                path_to_out=path_to_out,
