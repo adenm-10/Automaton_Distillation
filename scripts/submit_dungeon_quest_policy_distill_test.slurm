@@ -69,12 +69,12 @@ total_steps=2000000
 export POLICY_FREQ=2
 export NOISE_CLIP=0.5
 export NOISE_STDDEV=0.2
-
+# export seq_level=2
 
 dir_name=$SLURM_JOB_ID
 mkdir "$dir_name"
 
-python -u discrete/run/distill/blind_craftsmen_policy_distillation.py --total-steps="$total_steps" --path-to-out="$dir_name"
+python -u discrete/run/distill/dungeon_quest_policy_distillation_test.py --total-steps="$total_steps" --path-to-out="$dir_name"
 
 mv ./test_output/test_output* $SLURM_JOB_ID/
 echo

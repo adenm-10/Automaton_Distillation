@@ -452,47 +452,6 @@ def Policy_Distill_learn(student_config: Configuration, teacher_config: Configur
     return loss
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Agent,
             rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int):
     """
@@ -1056,13 +1015,14 @@ def export_results(rewards_per_episode, steps_to_term_per_episode,
         'rewards_per_step': rewards_per_step, 
         'steps_to_term_per_step': steps_to_term_per_step
         }
+    
+    current_time = datetime.now().strftime("%H:%M:%S")
 
-    filepath = f"{path_to_out}/rew_and_steps_lists.pkl"
+    filepath = f"{path_to_out}/rew_and_steps_lists{current_time}.pkl"
     with open(filepath, 'wb') as file:
         pickle.dump(data_dict, file)
 
     return
-    
 
 def plot_results(rewards_per_episode, steps_to_term_per_episode,
                  rewards_per_step, steps_to_term_per_step, 
@@ -1114,25 +1074,27 @@ def plot_results(rewards_per_episode, steps_to_term_per_episode,
     episode_iterations = [i for i in range(len(reward_ep_mav))]
     steps_iterations =   [i for i in range(len(reward_mav))]
 
+    current_time = datetime.now().strftime("%H:%M:%S")
+
     # Rewards per Episode
     plot_details(episode_iterations, rewards_per_episode, reward_ep_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Episodes', 'Rewards per Episode',
-                 f"Reward_{ep_filename}")
+                 f"Reward_{ep_filename}_{current_time}")
 
     # Rewards per Step
     plot_details(steps_iterations, rewards_per_step, reward_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Timesteps', 'Rewards per Step',
-                 f"Reward_{step_filename}")
+                 f"Reward_{step_filename}_{current_time}")
 
     # Steps to Reach Terminal State per Episode
     plot_details(episode_iterations, steps_to_term_per_episode, steps_ep_mav,
                  'Raw Steps', 'Moving Average Steps', 'Episodes', 'Steps To Terminal State per Episode',
-                 f"Steps_{ep_filename}")
+                 f"Steps_{ep_filename}_{current_time}")
 
     # Steps to Reach Terminal State per Step
     plot_details(steps_iterations, steps_to_term_per_step, steps_mav,
                  'Raw Steps', 'Moving Average Steps', 'Timesteps', 'Steps To Terminal State per Step',
-                 f"Steps_{step_filename}")
+                 f"Steps_{step_filename}_{current_time}")
 
     return
 
