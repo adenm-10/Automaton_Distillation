@@ -602,13 +602,13 @@ def distill_agent(config: Configuration,
                                                                          device=config.device)
     batch_intrins_reward_state = batch_intrins_rew_calculator.create_state(config.num_parallel_envs)
 
-    checkpoint_updater = Updater(lambda: save_checkpoint(config, Checkpoint(
-        iter_num=i,
-        ap_extractor_state=ap_extractor.state_dict(),
-        automaton_state=automaton.state_dict(),
-        rollout_buffer_state=student_buffer.state_dict(),
-        agent_state=student.state_dict()
-    )))
+    # checkpoint_updater = Updater(lambda: save_checkpoint(config, Checkpoint(
+    #     iter_num=i,
+    #     ap_extractor_state=ap_extractor.state_dict(),
+    #     automaton_state=automaton.state_dict(),
+    #     rollout_buffer_state=student_buffer.state_dict(),
+    #     agent_state=student.state_dict()
+    # )))
 
     for i in range(start_iter_num, config.max_training_steps):
         # Generate experience
@@ -673,7 +673,7 @@ def distill_agent(config: Configuration,
         distill(config=config, optim=optimizer, teacher=teacher, student=student, rollout_buffer=teacher_buffer,
                 automaton=automaton, logger=logger, iter_num=i)
 
-        checkpoint_updater.update_every(config.checkpoint_every_steps)
+        # checkpoint_updater.update_every(config.checkpoint_every_steps)
 
     return student
 
@@ -760,13 +760,13 @@ def train_agent(config: Configuration,
     # The next few functions keep the main training loop concise by moving out some counting tasks
     target_agent_updater = Updater(lambda: target_agent.update_weights())
 
-    checkpoint_updater = Updater(lambda: save_checkpoint(config, Checkpoint(
-        iter_num=i,
-        ap_extractor_state=ap_extractor.state_dict(),
-        automaton_state=automaton.state_dict(),
-        rollout_buffer_state=rollout_buffer.state_dict(),
-        agent_state=agent.state_dict()
-    )))
+    # checkpoint_updater = Updater(lambda: save_checkpoint(config, Checkpoint(
+    #     iter_num=i,
+    #     ap_extractor_state=ap_extractor.state_dict(),
+    #     automaton_state=automaton.state_dict(),
+    #     rollout_buffer_state=rollout_buffer.state_dict(),
+    #     agent_state=agent.state_dict()
+    # )))
 
     training_iterations = []
     losses = []
@@ -963,7 +963,7 @@ def train_agent(config: Configuration,
             
             if agent.name != "TD3 Agent":
                 target_agent_updater.update_every(config.target_agent_update_every_steps)
-        checkpoint_updater.update_every(config.checkpoint_every_steps)
+        # checkpoint_updater.update_every(config.checkpoint_every_steps)
 
         if i % 1000 == 0 and i != 0:
         

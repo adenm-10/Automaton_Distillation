@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1 #try this (distributed - more than 1 computing node)
 #SBATCH --constraint=v100 # try this again - if this does not work eliminate it
-#SBATCH --time=20:00:00
+#SBATCH --time=40:00:00
 #SBATCH --cpus-per-gpu=8
 #SBATCH --gpus=1
 #SBATCH --job-name=Automaton
