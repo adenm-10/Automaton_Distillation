@@ -61,7 +61,7 @@ if __name__ == '__main__':
     student_config = student_config._replace(automaton=gold_mine_automaton, ap_extractor=gold_mine_ap_extractor)
 
     print("\n\n============================================")
-    print("Training Teacher / Independent TD3 Agent")
+    print("Gold mine policy distillation run")
     print(f"Max Training Steps: {max_training_steps}")
     # print(f"LTLF: {dungeon_quest_ltlf}")
     # print(f"Hyperparameters: {}")

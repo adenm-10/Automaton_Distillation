@@ -57,7 +57,7 @@ if __name__ == '__main__':
                                ltlf=blind_craftsman_ltlf)
 
     print("\n\n============================================")
-    print("Training Teacher / Independent TD3 Agent")
+    print("Blind craftsmen policy distillation test")
     print(f"Max Training Steps: {max_training_steps}")
     # print(f"LTLF: {dungeon_quest_ltlf}")
     # print(f"Hyperparameters: {}")

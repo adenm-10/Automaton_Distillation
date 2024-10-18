@@ -55,7 +55,7 @@ if __name__ == '__main__':
                                ltlf=dungeon_quest_ltlf_obstacles)
 
     print("\n\n============================================")
-    print("Training Teacher / Independent TD3 Agent")
+    print("Dungeon Quest Policy Distillation Run")
     print(f"Max Training Steps: {max_training_steps}")
     # print(f"LTLF: {dungeon_quest_ltlf}")
     # print(f"Hyperparameters: {}")

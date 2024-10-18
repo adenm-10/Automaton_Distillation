@@ -54,7 +54,7 @@ if __name__ == '__main__':
                            path_to_out=path_to_out)
 
     print("\n\n============================================")
-    print("Training Teacher / Independent TD3 Agent")
+    print("Dungeon Quest policy distillation test")
     print(f"Max Training Steps: {max_training_steps}")
     # print(f"LTLF: {dungeon_quest_ltlf}")
     # print(f"Hyperparameters: {}")
