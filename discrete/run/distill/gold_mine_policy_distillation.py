@@ -1,7 +1,8 @@
 import torch
 
 from discrete.lib.main import run_policy_distillation
-from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
+from discrete.lib.agent.normal_agent import DuelingQNetworkAgent
+# from discrete.lib.agent.one_hot_automaton_agent import DuelingQNetworkAgent
 from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
 from discrete.run.env.gold_mine_7 import gold_mine_rew_per_step_env_config_7, gold_mine_automaton, gold_mine_ap_extractor
 from discrete.run.env.gold_mine_7_obstacles import gold_mine_rew_per_step_env_config_7_obstacles
@@ -39,7 +40,7 @@ if __name__ == '__main__':
     teacher_config = teacher_config_v1(gold_mine_rew_per_step_env_config_7, 
                            "gold_mine_rew_per_step_env_config_7",
                            device, 
-                           agent_cls=OneHotAutomatonAfterFeatureExtractorAgent, 
+                           agent_cls=DuelingQNetworkAgent, 
                         #    aps=dungeon_quest_aps,
                         #    ltlf=dungeon_quest_ltlf, 
                            max_training_steps=max_training_steps,
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     student_config = teacher_config_v1(gold_mine_rew_per_step_env_config_7_obstacles, 
                                "gold_mine_rew_per_step_env_config_7_obstacles",
                                device, 
-                               agent_cls=OneHotAutomatonAfterFeatureExtractorAgent,
+                               agent_cls=DuelingQNetworkAgent,
                                max_training_steps=max_training_steps, 
                             #    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
                                path_to_out=path_to_out,

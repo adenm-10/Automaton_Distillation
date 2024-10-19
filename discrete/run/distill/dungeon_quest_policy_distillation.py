@@ -1,7 +1,8 @@
 import torch
 
 from discrete.lib.main import run_policy_distillation
-from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
+from discrete.lib.agent.normal_agent import DuelingQNetworkAgent
+# from discrete.lib.agent.one_hot_automaton_agent import DuelingQNetworkAgent
 from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
 from discrete.run.env.dungeon_quest_7 import dungeon_quest_rew_per_step_env_config_7, dungeon_quest_aps, dungeon_quest_ltlf
 from discrete.run.env.dungeon_quest_7_obstacles import dungeon_quest_rew_per_step_env_config_7_obstacles, dungeon_quest_aps_obstacles, dungeon_quest_ltlf_obstacles
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     teacher_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7, 
                            "dungeon_quest_teacher_rew_per_step_7_productMDP",
                            device, 
-                           agent_cls=OneHotAutomatonAfterFeatureExtractorAgent, 
+                           agent_cls=DuelingQNetworkAgent, 
                            aps=dungeon_quest_aps,
                            ltlf=dungeon_quest_ltlf, 
                            max_training_steps=max_training_steps,
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     student_config = teacher_config_v1(dungeon_quest_rew_per_step_env_config_7_obstacles, 
                                "dungeon_quest_rew_per_step_env_config_7_obstacles",
                                device, 
-                               agent_cls=OneHotAutomatonAfterFeatureExtractorAgent,
+                               agent_cls=DuelingQNetworkAgent,
                                max_training_steps=max_training_steps, 
                             #    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
                                path_to_out=path_to_out,

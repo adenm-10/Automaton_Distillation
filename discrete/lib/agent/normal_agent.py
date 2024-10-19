@@ -46,14 +46,14 @@ class DuelingQNetworkAgent(Agent):
 
         q_vals = val + (adv - mean_adv.unsqueeze(1))  # Unsqueeze necessary so that it broadcasts correctly
 
-        print(f"Dueling Q Network Forward obs: {obs[0].size()}")
-        print(f"Dueling Q Network features: \n{features[0].size()}")
-        print(f"Val Stream: \n{val_stream[0].size()}")
-        print(f"Adv Stream: \n{adv_stream[0].size()}")
-        print(f"Val: \n{val[0]}")
-        print(f"adv: \n{adv[0]}")
-        print(f"Q_Vals: {q_vals[0]}")
-        assert False
+        # print(f"Dueling Q Network Forward obs: {obs[0].size()}")
+        # print(f"Dueling Q Network features: \n{features[0].size()}")
+        # print(f"Val Stream: \n{val_stream[0].size()}")
+        # print(f"Adv Stream: \n{adv_stream[0].size()}")
+        # print(f"Val: \n{val[0]}")
+        # print(f"adv: \n{adv[0]}")
+        # print(f"Q_Vals: {q_vals[0]}")
+        # assert False
 
 
         return q_vals

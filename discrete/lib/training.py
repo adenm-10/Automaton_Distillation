@@ -658,7 +658,7 @@ def distill_agent(config: Configuration,
                                         dones_after_current=dones,
                                         states_after_current=states_after_current,
                                         current_aut_states=current_aut_states,
-                                        aut_states_after_current=aut_states_after_current,
+                                        aut_staptes_after_current=aut_states_after_current,
                                         aps_after_current=aps_after_current,
                                         infos=infos,
                                         global_step=i)
@@ -817,6 +817,8 @@ def train_agent(config: Configuration,
             print("Output Directory Already Exists")
     # print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
+    print_once = True
+
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
     
@@ -938,6 +940,10 @@ def train_agent(config: Configuration,
             # print("entered training block")
             # Train off-policy
             if teacher_rollout_buffer != None:
+                if print_once:
+                    print("Learning via teacher Policy Distillation")
+                    print_once = False
+
                 loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
                                             teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine)
                 losses.append(loss)
@@ -1008,6 +1014,8 @@ def train_agent(config: Configuration,
 def export_results(rewards_per_episode, steps_to_term_per_episode,
                    rewards_per_step, steps_to_term_per_step,
                    path_to_out):
+    
+    print("Exporting Results!")
 
     data_dict = {
         'rewards_per_episode': rewards_per_episode, 
@@ -1028,6 +1036,8 @@ def plot_results(rewards_per_episode, steps_to_term_per_episode,
                  rewards_per_step, steps_to_term_per_step, 
                  path_to_out, agent,
                  displayed_steps=None, displayed_episodes=None):
+    
+    print("Plotting Results!")
 
     def plot_details(iteration_list, raw_data, moving_average_data,  # Data specifics
                      blue_label, red_label, x_label, y_label,        # Labels
@@ -1079,25 +1089,24 @@ def plot_results(rewards_per_episode, steps_to_term_per_episode,
     # Rewards per Episode
     plot_details(episode_iterations, rewards_per_episode, reward_ep_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Episodes', 'Rewards per Episode',
-                 f"Reward_{ep_filename}_{current_time}")
+                 f"Reward_per_ep_{ep_filename}_{current_time}")
 
     # Rewards per Step
     plot_details(steps_iterations, rewards_per_step, reward_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Timesteps', 'Rewards per Step',
-                 f"Reward_{step_filename}_{current_time}")
+                 f"Reward_per_step_{step_filename}_{current_time}")
 
     # Steps to Reach Terminal State per Episode
     plot_details(episode_iterations, steps_to_term_per_episode, steps_ep_mav,
                  'Raw Steps', 'Moving Average Steps', 'Episodes', 'Steps To Terminal State per Episode',
-                 f"Steps_{ep_filename}_{current_time}")
+                 f"Steps_per_ep_{ep_filename}_{current_time}")
 
     # Steps to Reach Terminal State per Step
     plot_details(steps_iterations, steps_to_term_per_step, steps_mav,
                  'Raw Steps', 'Moving Average Steps', 'Timesteps', 'Steps To Terminal State per Step',
-                 f"Steps_{step_filename}_{current_time}")
+                 f"Steps_per_step_{step_filename}_{current_time}")
 
     return
-
 
 def setup_logger(path_to_out):
     logger = logging.getLogger('TrainingLogger')

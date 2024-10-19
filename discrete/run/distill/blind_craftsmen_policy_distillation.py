@@ -1,7 +1,8 @@
 import torch
 
 from discrete.lib.main import run_policy_distillation
-from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
+from discrete.lib.agent.normal_agent import DuelingQNetworkAgent
+# from discrete.lib.agent.one_hot_automaton_agent import DuelingQNetworkAgent
 from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
 from discrete.run.env.blind_craftsman_7_obstacles import blind_craftsman_rew_per_step_env_config_7_obstacles
 from discrete.run.env.blind_craftsman_7 import blind_craftsman_rew_per_step_env_config_7
@@ -39,7 +40,7 @@ if __name__ == '__main__':
     teacher_config = teacher_config_v1(blind_craftsman_rew_per_step_env_config_7, 
                                "blind_craftsman_teacher_rew_per_step_7_productMDP",
                                device, 
-                               agent_cls=OneHotAutomatonAfterFeatureExtractorAgent,
+                               agent_cls=DuelingQNetworkAgent,
                                max_training_steps=max_training_steps, 
                             #    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
                                path_to_out=path_to_out,
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     student_config = teacher_config_v1(blind_craftsman_rew_per_step_env_config_7_obstacles, 
                                "blind_craftsman_7_obstacles_target_rew_per_step_productMDP",
                                device, 
-                               agent_cls=OneHotAutomatonAfterFeatureExtractorAgent,
+                               agent_cls=DuelingQNetworkAgent,
                                max_training_steps=max_training_steps, 
                             #    gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
                                path_to_out=path_to_out,

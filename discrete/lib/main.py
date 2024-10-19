@@ -66,7 +66,9 @@ def run_policy_distillation(teacher_config: Configuration,
 
     trained_teacher, teacher_rollout = train_agent(teacher_config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, run_name=run_name)
 
-    agent, rollout_buffer, ap_extractor, automaton, start_iter = create_training_state(student_config)
-    train_agent(student_config, agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, teacher_rollout_buffer=teacher_rollout, policy_distill_teacher_config=teacher_config, run_name=run_name)
+    print("Completed Teacher training for policy distillation, starting student training...")
+
+    new_agent, rollout_buffer, ap_extractor, automaton, start_iter = create_training_state(student_config)
+    _, _                             = train_agent(student_config, new_agent, automaton, ap_extractor, rollout_buffer, logger, start_iter, teacher_rollout_buffer=teacher_rollout, policy_distill_teacher_config=teacher_config, run_name=run_name)
 
     print("Finished training at: {}".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))

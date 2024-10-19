@@ -53,15 +53,15 @@ def create_training_state(config: Configuration) -> Tuple[Agent, RolloutBuffer, 
 
     start_iter = 0
 
-    if checkpoint_exists(config):
-        print("Loading from checkpoint")
-        checkpoint = load_checkpoint(config)
-        start_iter = checkpoint.iter_num + 1
-        ap_extractor.load_state_dict(checkpoint.ap_extractor_state)
-        automaton.load_state_dict(checkpoint.automaton_state)
-        rollout_buffer.load_state_dict(checkpoint.rollout_buffer_state)
-        agent.load_state_dict(checkpoint.agent_state)
-    else:
-        print("NOT Loading from checkpoint")
+    # if checkpoint_exists(config):
+    #     print("Loading from checkpoint")
+    #     checkpoint = load_checkpoint(config)
+    #     start_iter = checkpoint.iter_num + 1
+    #     ap_extractor.load_state_dict(checkpoint.ap_extractor_state)
+    #     automaton.load_state_dict(checkpoint.automaton_state)
+    #     rollout_buffer.load_state_dict(checkpoint.rollout_buffer_state)
+    #     agent.load_state_dict(checkpoint.agent_state)
+    # else:
+    #     print("NOT Loading from checkpoint")
 
     return agent, rollout_buffer, ap_extractor, automaton, start_iter
