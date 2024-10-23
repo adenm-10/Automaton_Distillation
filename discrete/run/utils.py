@@ -42,7 +42,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
         num_parallel_envs=10,
         rollout_buffer_config=RolloutBufferConfig(
             rollout_buffer_cls=CircularRolloutBuffer,
-            capacity=150000,
+            capacity=750000,
             priority_scale=0.7,
             min_size_before_training=1000
         ),

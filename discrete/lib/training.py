@@ -13,6 +13,7 @@ from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
 from typing import Union
 import math
+import random
 
 from discrete.lib.agent.agent import Agent, TargetAgent
 from discrete.lib.agent.AC_Agent import AC_Agent, AC_TargetAgent
@@ -399,20 +400,12 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
     return float(critic_loss)
 
 def Policy_Distill_learn(student_config: Configuration, teacher_config: Configuration, optim: Optimizer, student_agent: Agent, teacher_rollout_buffer: Agent,
-                         logger: SummaryWriter, iter_num: int, current_aut_states,
+                         logger: SummaryWriter, iter_num: int, expert_sample,
                          loss_metric='kl', reward_machine: RewardMachine = None):
-    
+
     optim.zero_grad()
-    
-    ##################
-    # batch = random.sample(expert_data, self.training_batch_size)
-    # from the teacher ?
-    rollout_sample, indices, _ = teacher_rollout_buffer.sample(teacher_config.agent_train_batch_size,
-                                                                # automaton.num_states,
-                                                                priority_scale=teacher_config.rollout_buffer_config.priority_scale,
-                                                                reward_machine=reward_machine)
-    
-    
+
+    rollout_sample = random(expert_sample, 2500)
 
     # print(batch[0])
     # states = torch.stack([x[0] for x in batch]) # states
@@ -818,6 +811,8 @@ def train_agent(config: Configuration,
     # print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
     print_once = True
+    policy_sample_interval = 2500
+
 
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
@@ -874,7 +869,6 @@ def train_agent(config: Configuration,
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
         logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
         #logged.info(f"Step {i}: Action taken, Reward: {rewards.mean():.3f}, Done: {dones}")
-
 
         aps_after_current = []
         if isinstance(agent, AC_Agent):
@@ -944,8 +938,14 @@ def train_agent(config: Configuration,
                     print("Learning via teacher Policy Distillation")
                     print_once = False
 
+                if i % policy_sample_interval == 0:
+                    expert_sample, indices, _ = teacher_rollout_buffer.sample(10000,
+                                                                # automaton.num_states,
+                                                                priority_scale=policy_distill_teacher_config.rollout_buffer_config.priority_scale,
+                                                                reward_machine=reward_machine)
+
                 loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
-                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine)
+                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine, expert_sample=expert_sample)
                 losses.append(loss)
                 training_iterations.append(i)
 
