@@ -405,31 +405,37 @@ def Policy_Distill_learn(student_config: Configuration, teacher_config: Configur
 
     optim.zero_grad()
 
-    rollout_sample = random(expert_sample, 2500)
+    sampled_indices = random.sample(range(len(expert_sample.actions)), 2500)
+
+    # Get the elements from list_a at those indices
+    rollout_sample_actions = [expert_sample.actions[i] for i in sampled_indices]
+    
+    # Get the elements from list_b at the same indices
+    rollout_sample_states = [expert_sample.states[i] for i in sampled_indices]
 
     # print(batch[0])
     # states = torch.stack([x[0] for x in batch]) # states
-    states = torch.stack([x for x in rollout_sample.states])
+    states = torch.stack([x for x in rollout_sample_states])
     # print(f"states shape: {states.shape}")
 
     # means_teacher = torch.stack([x[1] for x in batch]) # actions
-    means_teacher = torch.stack([x for x in rollout_sample.actions])
+    means_teacher = torch.stack([x for x in rollout_sample_actions])
 
     fake_std = torch.from_numpy(np.array([1e-6]*len(means_teacher))) # for deterministic
     
     # stds_teacher = torch.stack([fake_std for x in batch])
-    stds_teacher = torch.stack([fake_std for _ in rollout_sample.actions])
+    stds_teacher = torch.stack([fake_std for _ in rollout_sample_actions])
     ####################
 
     # means_student = self.policy.mean_action(states)
-    q_values = student_agent.calc_q_values_batch(torch.as_tensor(states, device=student_config.device, dtype=torch.float), rollout_sample.aut_states)
+    q_values = student_agent.calc_q_values_batch(torch.as_tensor(states, device=student_config.device, dtype=torch.float), expert_sample.aut_states)
     means_student = take_eps_greedy_action_from_q_values(q_values, student_config.epsilon)
     means_student = torch.stack([torch.tensor(x) for x in means_student])
 
     # stds_student = self.policy.get_std(states)
     sigma = torch.tensor(0.5, requires_grad=True)  # Replace with your desired scalar value
     scale = torch.exp(torch.clamp(sigma, min=math.log(1e-6)))
-    stds_student = torch.stack([scale for _ in rollout_sample.states])
+    stds_student = torch.stack([scale for _ in rollout_sample_states])
 
     if loss_metric == 'kl':
         loss = torch.tensor((stds_teacher.log() - stds_student.log() + (stds_student.pow(2) + (means_teacher - means_student).pow(2)) / (2 * stds_student.pow(2)) - 0.5).mean(), requires_grad=True)
@@ -812,7 +818,7 @@ def train_agent(config: Configuration,
 
     print_once = True
     policy_sample_interval = 2500
-
+    expert_sample = None
 
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
@@ -938,14 +944,14 @@ def train_agent(config: Configuration,
                     print("Learning via teacher Policy Distillation")
                     print_once = False
 
-                if i % policy_sample_interval == 0:
+                if i % policy_sample_interval == 0 or not expert_sample:
                     expert_sample, indices, _ = teacher_rollout_buffer.sample(10000,
                                                                 # automaton.num_states,
                                                                 priority_scale=policy_distill_teacher_config.rollout_buffer_config.priority_scale,
                                                                 reward_machine=reward_machine)
-
+                    
                 loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
-                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine, expert_sample=expert_sample)
+                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, loss_metric='kl', reward_machine=reward_machine, expert_sample=expert_sample)
                 losses.append(loss)
                 training_iterations.append(i)
 

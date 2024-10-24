@@ -31,7 +31,7 @@ module load anaconda
 module load cuda
 
 ## Enter Working Directory ##
-# cd $SLURM_SUBMIT_DIR
+# # cd $SLURM_SUBMIT_DIR
 
 ## Create Log File ##
 echo $SLURM_SUBMIT_DIR
@@ -76,10 +76,10 @@ mkdir "$dir_name"
 
 python -u discrete/run/distill/dungeon_quest_policy_distillation_test.py --total-steps="$total_steps" --path-to-out="$dir_name"
 
-# mv ./test_output/test_output* $SLURM_JOB_ID/
+# # mv ./test_output/test_output* $SLURM_JOB_ID/
 echo
 
-# mv $out_file $err_file $dir_name/
+# # mv $out_file $err_file $dir_name/
 
 unset dragon_r
 unset bounding_persist
@@ -91,7 +91,7 @@ echo "ulimit -l" >> $benchmark_logs
 ulimit -l >> $benchmark_logs
 
 ## Directory Cleanup ##
-# mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
-# mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
-# mv learning_curves $SLURM_JOB_ID/
-# mv tmp $SLURM_JOB_ID/
+# # mv err.job.$SLURM_JOB_ID.err $SLURM_JOB_ID/
+# # mv out.job.$SLURM_JOB_ID.out $SLURM_JOB_ID/
+# # mv learning_curves $SLURM_JOB_ID/
+# # mv tmp $SLURM_JOB_ID/
