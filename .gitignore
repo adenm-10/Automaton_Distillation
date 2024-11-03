@@ -3,3 +3,6 @@ test_output/*
 
 logs/*
 !logs/findings/
+
+automaton_q/*
+!automaton_q/
