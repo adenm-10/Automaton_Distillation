@@ -41,7 +41,7 @@ curr_act_loss = None
 
 top_loss = [(0, 0, 0, 0, 0, 0, 0)] * 10
 
-def learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: TargetAgent,
+def DQN_learn(config: Configuration, optim: Optimizer, agent: Agent, target_agent: TargetAgent,
           rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int, reward_machine: RewardMachine = None):
     """
 	Perform double Q-network gradient descent on a batch of samples from the rollout buffer (from deepsynth)
@@ -138,19 +138,6 @@ def DDPG_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Opti
     
     target_actions = target_agent.target.actor.forward(next_states)
     
-    # print("states")
-    # print(states)
-    # print(states.shape)
-    # print("actions")
-    # print(actions)
-    # print(actions.shape)
-    # print("target_actions")
-    # print(target_actions)
-    # print(target_actions.shape)
-    # print("next_states")
-    # print(next_states)
-    # print(next_states.shape)
-    
     # Q'
     target_critic_value = target_agent.target.critic.forward(next_states, target_actions)
     # print('target_critic_value')
@@ -172,32 +159,6 @@ def DDPG_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Opti
     target_q = torch.tensor(target_q).to(config.device)
     target_q = target_q.view(config.agent_train_batch_size, 1)
     target_q = target_q.squeeze()
-
-    
-    # print("target")
-    # print(target_q.shape)
-    
-    #update actor parameters
-    
-    # if isinstance(automaton, RewardMachine):
-    #     reward_machine = automaton
-    # else:
-    #     reward_machine = rm
-
-    # Estimate best action in new states using main Q network
-    # q_max = agent.calc_q_values_batch(rollout_sample.next_states, rollout_sample.next_aut_states)
-    # arg_q_max = torch.argmax(q_max, dim=1)
-    #
-    # # Target DQN estimates q-values
-    # future_q_values = target_agent.calc_q_values_batch(rollout_sample.next_states, rollout_sample.next_aut_states)
-    # double_q = future_q_values[range(config.agent_train_batch_size), arg_q_max]
-    #
-    # # Calculate targets (bellman equation)
-    # target_q = rollout_sample.rewards + (config.gamma * double_q * (~rollout_sample.dones).float())
-    # target_q = target_q.detach()
-
-    # print(f"Automaton type: {type(automaton)}\n\n")
-    # print(f"Automaton: {automaton}\n\n")
 
     if isinstance(automaton, TargetAutomaton):
         # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
@@ -327,27 +288,13 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
         
 
         if isinstance(automaton, TargetAutomaton):
-            # print("Automaton Distillation to Affecting Target Q Value\n\n\n")
             # Q_teacher
-            
             target_automaton_q = automaton.target_q_values(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-            
-
-            # print(f"Aut States: {rollout_sample.aut_states}")
-            # print(f"APS': {rollout_sample.aps}")
-            # print(f"target q automaton: {target_automaton_q}")
 
             # Beta
             target_automaton_q_weights = automaton.target_q_weights(rollout_sample.aut_states, rollout_sample.aps, iter_num)
-            # print(target_automaton_q_weights)
-            
-            # print('target_automaton_q')
-            # print(target_automaton_q.shape)
             
             target_q = (target_automaton_q * target_automaton_q_weights) + (target_q * (1 - target_automaton_q_weights))
-            # print(target_q)
-
-            # print(f"Target_Q: {target_q}")
 
             automaton.update_training_observed_count(rollout_sample.aut_states, rollout_sample.aps)
  
@@ -451,8 +398,6 @@ def Policy_Distill_learn(student_config: Configuration, teacher_config: Configur
 
     return loss
 
-
-
 def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Agent,
             rollout_buffer: RolloutBuffer, automaton: Automaton, logger: SummaryWriter, iter_num: int):
     """
@@ -501,7 +446,6 @@ def vec_env_distinct_episodes(states: torch.Tensor, infos: List[Dict]) -> Tuple[
 
     return states_after_current, states
 
-
 def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.Tensor,
                           automaton: Automaton) -> torch.tensor:
     """
@@ -524,7 +468,6 @@ def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.
     #precious reverted to the old code
 
     return torch.where(dones, automaton.default_state, aut_states_after_previous)
-
 
 class TraceHelper:
     """
@@ -718,7 +661,6 @@ def train_agent(config: Configuration,
     # Setup logging
     path_out = "./logger"  # You can customize this
     logged = setup_logger(path_out)
-    
     logged.info("Starting training process...")
 
     if run_name is not None:
@@ -731,25 +673,20 @@ def train_agent(config: Configuration,
     buff_helper = VecRolloutBufferHelper(config.num_parallel_envs, rollout_buffer, logger,
                                          no_done_on_out_of_time=config.no_done_on_out_of_time)
 
+    # Create the target agent for the AC Agent Architecture
     target_agent = agent.create_target_agent()
-
     if isinstance(agent, AC_Agent):
       target_agent = agent.create_target_agent(tau=config.tau)
 
+    # Initialize current environment and automaton states
     current_states = torch.as_tensor(env.reset(), device=config.device)
     current_aut_states = torch.tensor([automaton.default_state] * config.num_parallel_envs,
                                       device=config.device, dtype=torch.long)
-    
+
+    # Set optimizer(s) parameters
     if isinstance(agent, AC_Agent):
-        actor_lr = config.actor_lr
-        critic_lr = config.critic_lr
-
-        print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}\nBatch_Size:{config.agent_train_batch_size}")
-        logged.info(f"Actor Learning Rate: {actor_lr}, Critic Learning Rate: {critic_lr}")
-
-        actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = actor_lr)
-        critic_optimizer = torch.optim.Adam(agent.critic.parameters(), lr = critic_lr)
-
+        actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = config.actor_lr)
+        critic_optimizer = torch.optim.Adam(agent.critic.parameters(), lr = config.critic_lr)
     else:
         optimizer = torch.optim.Adam(agent.parameters())
 
@@ -769,32 +706,17 @@ def train_agent(config: Configuration,
         agent_state=agent.state_dict()
     )))
 
-    training_iterations = []
-    losses = []
-
-    rewards_per_step = []
-    rewards_per_ep_current = [0]*config.num_parallel_envs
-    rewards_per_episode = []
-
-    steps_to_term_per_step = []
-    steps_to_terminal_current = [0]*config.num_parallel_envs
-    steps_to_term_per_episode = []
-
     ep_counter = 0
-    
-    loss_mav = []
-    reward_mav = []
-    steps_mav = []
+    training_iterations = []
 
-    rewards_iterations = []
+    rewards_per_step,       rewards_per_episode,       rewards_per_ep_current    = [], [], [0]*config.num_parallel_envs
+    steps_to_term_per_step, steps_to_term_per_episode, steps_to_terminal_current = [], [], [0]*config.num_parallel_envs
 
-    start_time = time.time()
-    end_time = 0
+    reward_mav, steps_mav = [], []
     
+    # Decaying exploration noise parameters
     expl_noise = 0.3
-    # expl_min = 0.1
     action_shape = env.action_space.shape
-    expl_decay_steps = 2000000  # Number of steps over which the initial exploration noise will decay over)
     max_action = 1.0
 
     path_to_out = ""
@@ -829,17 +751,9 @@ def train_agent(config: Configuration,
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
-            
-        # added newly by Precious.
-        
-        # Exponential decay for exploration noise
-        # if expl_noise > expl_min:
-            
-        #     expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
-            #selete
-        # expl_noise = expl_min + (1 - expl_min) * np.exp(-i / expl_decay_steps)
         actions = (actions + np.random.normal(0, max_action * expl_noise, size=action_shape)).clip(-max_action, max_action)
-
+            
+        # (2) Take a step in the environment, process returned state, reward, and information
         obs, rewards, dones, infos = env.step(actions)
       
         # Graphing operations
@@ -858,8 +772,6 @@ def train_agent(config: Configuration,
         infos_discrete = copy.deepcopy(infos)
         for info in infos_discrete:
             info['position'] = (int(info['position'][0]), int(info['position'][1]))
-
-        rewards_iterations.append(i)
 
         obs = torch.as_tensor(obs, device=config.device)
         rewards = torch.as_tensor(rewards, device=config.device)
@@ -925,51 +837,29 @@ def train_agent(config: Configuration,
 
         current_states = next_states
         current_aut_states = next_aut_states
-
-        # logger.add_scalar("experience_generation/extrinsic_reward", float(rewards.float().mean()), global_step=i)
-        # logger.add_scalar("experience_generation/intrinsic_reward", float(intr_rewards.float().mean()), global_step=i)
-
-        # DONT KEEP THIS FOR DEBUG
-        # config.rollout_buffer_config.min_size_before_training = 1
-
-        # print(f"Steps before training: {config.rollout_buffer_config.min_size_before_training}")
-        # print(f"Filled rollout buffer entries: {rollout_buffer.num_filled_approx()}")
-        # assert False
         
+        # (3) Update the agents to learn based if rollout buffer has enough experiences
         if rollout_buffer.num_filled_approx() >= config.rollout_buffer_config.min_size_before_training:
             # print("entered training block")
             # Train off-policy
             if teacher_rollout_buffer != None:
                 loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
                                             teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine)
-                losses.append(loss)
-                training_iterations.append(i)
-
             elif isinstance(agent, AC_Agent):
-                if agent.name == "DDPG Agent":
-                    loss = DDPG_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
-                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
-                else:
-                    loss = TD3_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
-                    automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
-                
-                # print(f"DDPG Critic Loss: {loss}")
-                losses.append(loss)
-                training_iterations.append(i)
+                loss = TD3_learn(config=config, actor_optim=actor_optimizer, critic_optim=critic_optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
             else:
-                loss = learn(config=config, optim=optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
+                loss = DQN_learn(config=config, optim=optimizer, agent=agent, target_agent=target_agent, rollout_buffer=rollout_buffer,
                   automaton=automaton, logger=logger, iter_num=i, reward_machine=reward_machine)
-                # print(f"DQN Critic Loss: {loss}")
-                losses.append(loss)
-                training_iterations.append(i)
+            
+            training_iterations.append(i)
             
             if agent.name != "TD3 Agent":
                 target_agent_updater.update_every(config.target_agent_update_every_steps)
         checkpoint_updater.update_every(config.checkpoint_every_steps)
 
+        # (4) Process returned data for live logging and postprocessing for visualization
         if i % 1000 == 0 and i != 0:
-        
-            loss_mav = moving_average(losses)
             reward_mav = moving_average(rewards_per_step)
             reward_ep_mav = moving_average(rewards_per_episode)
             steps_mav = moving_average(steps_to_term_per_episode)
@@ -979,17 +869,6 @@ def train_agent(config: Configuration,
                 logged.info(f"Step {i}: Avg Reward: {reward_mav[-1]:.3f}, Episode Reward: {rewards_per_ep_current}")
             except:
                 print(f"Completed Steps: {i:8}")
-
-    # print("Top Losses")
-    # for i in range(len(top_loss)):
-    #     print(f"Cumulative Loss: \n{top_loss[i][0]}\n")
-    #     print(f"Critic Loss: \n{top_loss[i][1]}\n")
-    #     print(f"Actor Loss: \n{top_loss[i][2]}\n")
-    #     print(f"States: \n{top_loss[i][3]}\n")
-    #     print(f"Actions: \n{top_loss[i][4]}\n")
-    #     print(f"Nest States: \n{top_loss[i][5]}\n")
-    #     print(f"Rewards: \n{top_loss[i][6]}\n")
-    #     print(f"=============================================================================")
 
     plot_results(rewards_per_episode, steps_to_term_per_episode,
                  rewards_per_step, steps_to_term_per_step,
@@ -1022,8 +901,7 @@ def export_results(rewards_per_episode, steps_to_term_per_episode,
     with open(filepath, 'wb') as file:
         pickle.dump(data_dict, file)
 
-    return
-    
+    return   
 
 def plot_results(rewards_per_episode, steps_to_term_per_episode,
                  rewards_per_step, steps_to_term_per_step, 

@@ -106,9 +106,9 @@ To train the students and related algorithms run the training for each environme
         4) python discrete/run/teacher/gold_mine_teacher_rew_per_step.py
 
     6) Dynamic Automaton Distillation to Continuous environments
-        1) python discrete/run/teacher/dungeon_quest_7_target_rew_per_step_productMDP_TD3
-        2) python discrete/run/teacher/blind_craftsman_7_target_rew_per_step_productMDP_TD3
-        3) python discrete/run/teacher/gold_mine_7_target_rew_per_step_productMDP_TD3
+        1) python discrete/run/teacher/dungeon_quest_7_target_rew_per_step_productMDP_TD3.py
+        2) python discrete/run/teacher/blind_craftsman_7_target_rew_per_step_productMDP_TD3.py
+        3) python discrete/run/teacher/gold_mine_7_target_rew_per_step_productMDP_TD3.py
 
      Note: The helper script discrete/run/experiment/paperexperiments.py can be used to run multiple experiment trials including a run ID to make the checkpoints/logs unique to each trial.
 

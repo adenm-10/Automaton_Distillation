@@ -1,8 +1,10 @@
 test_output/*
-!test_output/.gitkeep
+!test_output/
 
 logs/*
 !logs/findings/
 
 automaton_q/*
 !automaton_q/
+
+*.pyc

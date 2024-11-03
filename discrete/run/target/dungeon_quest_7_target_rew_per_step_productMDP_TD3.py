@@ -48,7 +48,6 @@ if __name__ == '__main__':
     tau = args.tau
     max_training_steps = int(args.total_steps)
     path_to_out = args.path_to_out
-    # dungeon_quest_config_7.placements[-1].tile.reward = args.dragon_reward
 
     config = student_config_v1(
         env_config=dungeon_quest_rew_per_step_env_config_7_cont,

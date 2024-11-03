@@ -348,10 +348,9 @@ class MineWorldEnvContinuous(GridEnv, SaveLoadEnv):
                         if this_tile.terminal:
                             self.done = True
 
-                        reward += this_tile.reward
-
-                        print (f"here's the main reward {reward} for {action_names}")
-                        print(self.done)
+                        reward += this_tile.reward 
+                        # print (f"here's the main reward {reward} for {action_names}")
+                        # print(self.done)
                         break
 
 
