@@ -535,6 +535,8 @@ class MineWorldEnv(GridEnv, SaveLoadEnv):
         #assert self.action_space.contains(action)
         assert not self.done
 
+        action = int(action)
+
         action_names = set()
 
         reward = 0

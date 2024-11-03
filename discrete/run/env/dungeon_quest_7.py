@@ -8,48 +8,14 @@ from discrete.lib.env.mineworldenv import MineWorldConfig, TilePlacement, Invent
 from discrete.lib.env.rew_every_step import RewEveryStep
 from discrete.lib.env.time_limit import TimeLimit
 
-dragon_r, key_r, shield_r, sword_r = 100, 100, 1, 1
-sequence_level = 0 # 0-3
-
-try:
-    dragon_r = int(os.environ.get("dragon_r"))
-    key_r = int(os.environ.get("key_r"))
-    shield_r = int(os.environ.get("shield_r"))
-    sword_r = int(os.environ.get("sword_r"))
-    sequence_level = int(os.environ.get("seq_level"))
-except:
-    print("Shell variables not detected for environment descriptions, using defaults...")
-
-key_p, shield_p, key_t, shield_t = 0, 0, False, False
-sword_p, dragon_p, sword_t, dragon_t = 0, 0, False, False
-
-# key
-if sequence_level == 0:
-    key_p, key_t =  1, True
-    shield_p, shield_t = 0, False
-    sword_p, sword_t = 0, False
-    dragon_p, dragon_t = 0, False
-
-# key -> sword
-elif sequence_level == 1:
-    key_p, key_t = 1, False
-    shield_p, shield_t = 0, False
-    sword_p, sword_t = 1, True
-    dragon_p, dragon_t = 0, False
-
-# key -> sword -> dragon
-elif sequence_level == 2:
-    key_p, key_t = 1, False
-    shield_p, shield_t = 1, False
-    sword_p, sword_t = 0, False
-    dragon_p, dragon_t = 1, True
+dragon_r, key_r, shield_r, sword_r = 100, 1, 1, 1
+sequence_level = 3
 
 # key -> sword V shield -> dragon
-elif sequence_level == 3:
-    key_p, key_t = 1, False
-    shield_p, shield_t = 1, False
-    sword_p, sword_t = 1, False
-    dragon_p, dragon_t = 1, True
+key_p, key_t = 1, False
+shield_p, shield_t = 1, False
+sword_p, sword_t = 1, False
+dragon_p, dragon_t = 1, True
 
 
 print(f"Rewards for Automaton Steps (reward, placements)")

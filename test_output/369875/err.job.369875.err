@@ -1,9 +1,0 @@
-
-Currently Loaded Modules:
-  1) anaconda/anaconda-2023.09   2) cuda/cuda-12.2.2
-
- 
-
-rm: cannot remove './logs/dungeon_quest_rew_per_step_env_config_7_cont': Directory not empty
-mkdir: cannot create directory ‘./dragon-r_10_key_r_1_sword_i_1_shield_i_1_seq-level_2’: File exists
-mkdir: cannot create directory ‘./dragon-r_100_key_r_1_sword_i_1_shield_i_1_seq-level_2’: File exists

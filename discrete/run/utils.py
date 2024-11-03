@@ -72,7 +72,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
 def student_config_v1(env_config: EnvConfig, teacher_run_name: str, student_run_name: str,
                       device: torch.device, anneal_target_aut_class: Type[AnnealTargetAutomaton],
                       anneal_target_aut_kwargs, new_gamma: float = 0.99,
-                      agent_cls=TD3_Agent, max_training_steps=int(1e6),
+                      agent_cls=DuelingQNetworkAgent, max_training_steps=int(1e6),
                       no_done_on_out_of_time=False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
                       reward_machine: bool = False,
                       gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.0001, batch_size: int = 64, tau: float = 0.005, path_to_out: str = None):
