@@ -13,7 +13,6 @@ from torch.optim import Optimizer
 from torch.utils.tensorboard import SummaryWriter
 from typing import Union
 import math
-import random
 
 from discrete.lib.agent.agent import Agent, TargetAgent
 from discrete.lib.agent.AC_Agent import AC_Agent, AC_TargetAgent
@@ -400,42 +399,44 @@ def TD3_learn(config: Configuration, actor_optim: Optimizer, critic_optim: Optim
     return float(critic_loss)
 
 def Policy_Distill_learn(student_config: Configuration, teacher_config: Configuration, optim: Optimizer, student_agent: Agent, teacher_rollout_buffer: Agent,
-                         logger: SummaryWriter, iter_num: int, expert_sample,
+                         logger: SummaryWriter, iter_num: int, current_aut_states,
                          loss_metric='kl', reward_machine: RewardMachine = None):
-
-    optim.zero_grad()
-
-    sampled_indices = random.sample(range(len(expert_sample.actions)), 2500)
-
-    # Get the elements from list_a at those indices
-    rollout_sample_actions = [expert_sample.actions[i] for i in sampled_indices]
     
-    # Get the elements from list_b at the same indices
-    rollout_sample_states = [expert_sample.states[i] for i in sampled_indices]
+    optim.zero_grad()
+    
+    ##################
+    # batch = random.sample(expert_data, self.training_batch_size)
+    # from the teacher ?
+    rollout_sample, indices, _ = teacher_rollout_buffer.sample(teacher_config.agent_train_batch_size,
+                                                                # automaton.num_states,
+                                                                priority_scale=teacher_config.rollout_buffer_config.priority_scale,
+                                                                reward_machine=reward_machine)
+    
+    
 
     # print(batch[0])
     # states = torch.stack([x[0] for x in batch]) # states
-    states = torch.stack([x for x in rollout_sample_states])
+    states = torch.stack([x for x in rollout_sample.states])
     # print(f"states shape: {states.shape}")
 
     # means_teacher = torch.stack([x[1] for x in batch]) # actions
-    means_teacher = torch.stack([x for x in rollout_sample_actions])
+    means_teacher = torch.stack([x for x in rollout_sample.actions])
 
     fake_std = torch.from_numpy(np.array([1e-6]*len(means_teacher))) # for deterministic
     
     # stds_teacher = torch.stack([fake_std for x in batch])
-    stds_teacher = torch.stack([fake_std for _ in rollout_sample_actions])
+    stds_teacher = torch.stack([fake_std for _ in rollout_sample.actions])
     ####################
 
     # means_student = self.policy.mean_action(states)
-    q_values = student_agent.calc_q_values_batch(torch.as_tensor(states, device=student_config.device, dtype=torch.float), expert_sample.aut_states)
+    q_values = student_agent.calc_q_values_batch(torch.as_tensor(states, device=student_config.device, dtype=torch.float), rollout_sample.aut_states)
     means_student = take_eps_greedy_action_from_q_values(q_values, student_config.epsilon)
     means_student = torch.stack([torch.tensor(x) for x in means_student])
 
     # stds_student = self.policy.get_std(states)
     sigma = torch.tensor(0.5, requires_grad=True)  # Replace with your desired scalar value
     scale = torch.exp(torch.clamp(sigma, min=math.log(1e-6)))
-    stds_student = torch.stack([scale for _ in rollout_sample_states])
+    stds_student = torch.stack([scale for _ in rollout_sample.states])
 
     if loss_metric == 'kl':
         loss = torch.tensor((stds_teacher.log() - stds_student.log() + (stds_student.pow(2) + (means_teacher - means_student).pow(2)) / (2 * stds_student.pow(2)) - 0.5).mean(), requires_grad=True)
@@ -449,6 +450,7 @@ def Policy_Distill_learn(student_config: Configuration, teacher_config: Configur
     logger.add_scalar("training/loss", float(loss), global_step=iter_num)
 
     return loss
+
 
 
 def distill(config: Configuration, optim: Optimizer, teacher: Agent, student: Agent,
@@ -657,7 +659,7 @@ def distill_agent(config: Configuration,
                                         dones_after_current=dones,
                                         states_after_current=states_after_current,
                                         current_aut_states=current_aut_states,
-                                        aut_staptes_after_current=aut_states_after_current,
+                                        aut_states_after_current=aut_states_after_current,
                                         aps_after_current=aps_after_current,
                                         infos=infos,
                                         global_step=i)
@@ -742,7 +744,7 @@ def train_agent(config: Configuration,
         actor_lr = config.actor_lr
         critic_lr = config.critic_lr
 
-        print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}")
+        print(f"Actor Learning Rate: {actor_lr}\nCritic Learning Rate: {critic_lr}\nBatch_Size:{config.agent_train_batch_size}")
         logged.info(f"Actor Learning Rate: {actor_lr}, Critic Learning Rate: {critic_lr}")
 
         actor_optimizer = torch.optim.Adam(agent.actor.parameters(), lr = actor_lr)
@@ -789,10 +791,10 @@ def train_agent(config: Configuration,
     start_time = time.time()
     end_time = 0
     
-    expl_noise = 1
-    expl_min = 0.1
+    expl_noise = 0.3
+    # expl_min = 0.1
     action_shape = env.action_space.shape
-    expl_decay_steps = 500000  # Number of steps over which the initial exploration noise will decay over)
+    expl_decay_steps = 2000000  # Number of steps over which the initial exploration noise will decay over)
     max_action = 1.0
 
     path_to_out = ""
@@ -816,10 +818,6 @@ def train_agent(config: Configuration,
             print("Output Directory Already Exists")
     # print(f"\n\nExporting Plots to:\n{path_to_out}\n\n")
 
-    print_once = True
-    policy_sample_interval = 2500
-    expert_sample = None
-
     for i in range(start_iter_num, config.max_training_steps):
         # print(f"\nStep {i}")
     
@@ -835,11 +833,12 @@ def train_agent(config: Configuration,
         # added newly by Precious.
         
         # Exponential decay for exploration noise
-        if expl_noise > expl_min:
+        # if expl_noise > expl_min:
             
-            expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
-        # # expl_noise = expl_min + (1 - expl_min) * np.exp(-i / expl_decay_steps)
-        # actions = (actions + np.random.normal(0, expl_noise, size=action_shape)).clip(-max_action, max_action)
+        #     expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
+            #selete
+        # expl_noise = expl_min + (1 - expl_min) * np.exp(-i / expl_decay_steps)
+        actions = (actions + np.random.normal(0, max_action * expl_noise, size=action_shape)).clip(-max_action, max_action)
 
         obs, rewards, dones, infos = env.step(actions)
       
@@ -875,6 +874,7 @@ def train_agent(config: Configuration,
         states_after_current, next_states = vec_env_distinct_episodes(obs, infos)
         logger.add_scalar("reward", float(rewards.float().mean()), global_step=i)
         #logged.info(f"Step {i}: Action taken, Reward: {rewards.mean():.3f}, Done: {dones}")
+
 
         aps_after_current = []
         if isinstance(agent, AC_Agent):
@@ -940,18 +940,8 @@ def train_agent(config: Configuration,
             # print("entered training block")
             # Train off-policy
             if teacher_rollout_buffer != None:
-                if print_once:
-                    print("Learning via teacher Policy Distillation")
-                    print_once = False
-
-                if i % policy_sample_interval == 0 or not expert_sample:
-                    expert_sample, indices, _ = teacher_rollout_buffer.sample(10000,
-                                                                # automaton.num_states,
-                                                                priority_scale=policy_distill_teacher_config.rollout_buffer_config.priority_scale,
-                                                                reward_machine=reward_machine)
-                    
                 loss = Policy_Distill_learn(student_config=config, teacher_config=policy_distill_teacher_config, optim=optimizer, student_agent=agent, 
-                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, loss_metric='kl', reward_machine=reward_machine, expert_sample=expert_sample)
+                                            teacher_rollout_buffer=teacher_rollout_buffer, logger=logger, iter_num=i, current_aut_states=current_aut_states, loss_metric='kl', reward_machine=reward_machine)
                 losses.append(loss)
                 training_iterations.append(i)
 
@@ -1020,8 +1010,6 @@ def train_agent(config: Configuration,
 def export_results(rewards_per_episode, steps_to_term_per_episode,
                    rewards_per_step, steps_to_term_per_step,
                    path_to_out):
-    
-    print("Exporting Results!")
 
     data_dict = {
         'rewards_per_episode': rewards_per_episode, 
@@ -1029,21 +1017,18 @@ def export_results(rewards_per_episode, steps_to_term_per_episode,
         'rewards_per_step': rewards_per_step, 
         'steps_to_term_per_step': steps_to_term_per_step
         }
-    
-    current_time = datetime.now().strftime("%H:%M:%S")
 
-    filepath = f"{path_to_out}/rew_and_steps_lists{current_time}.pkl"
+    filepath = f"{path_to_out}/rew_and_steps_lists.pkl"
     with open(filepath, 'wb') as file:
         pickle.dump(data_dict, file)
 
     return
+    
 
 def plot_results(rewards_per_episode, steps_to_term_per_episode,
                  rewards_per_step, steps_to_term_per_step, 
                  path_to_out, agent,
                  displayed_steps=None, displayed_episodes=None):
-    
-    print("Plotting Results!")
 
     def plot_details(iteration_list, raw_data, moving_average_data,  # Data specifics
                      blue_label, red_label, x_label, y_label,        # Labels
@@ -1090,29 +1075,28 @@ def plot_results(rewards_per_episode, steps_to_term_per_episode,
     episode_iterations = [i for i in range(len(reward_ep_mav))]
     steps_iterations =   [i for i in range(len(reward_mav))]
 
-    current_time = datetime.now().strftime("%H:%M:%S")
-
     # Rewards per Episode
     plot_details(episode_iterations, rewards_per_episode, reward_ep_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Episodes', 'Rewards per Episode',
-                 f"Reward_per_ep_{ep_filename}_{current_time}")
+                 f"Reward_{ep_filename}")
 
     # Rewards per Step
     plot_details(steps_iterations, rewards_per_step, reward_mav,
                  'Raw Rewards', 'Moving Average Rewards', 'Timesteps', 'Rewards per Step',
-                 f"Reward_per_step_{step_filename}_{current_time}")
+                 f"Reward_{step_filename}")
 
     # Steps to Reach Terminal State per Episode
     plot_details(episode_iterations, steps_to_term_per_episode, steps_ep_mav,
                  'Raw Steps', 'Moving Average Steps', 'Episodes', 'Steps To Terminal State per Episode',
-                 f"Steps_per_ep_{ep_filename}_{current_time}")
+                 f"Steps_{ep_filename}")
 
     # Steps to Reach Terminal State per Step
     plot_details(steps_iterations, steps_to_term_per_step, steps_mav,
                  'Raw Steps', 'Moving Average Steps', 'Timesteps', 'Steps To Terminal State per Step',
-                 f"Steps_per_step_{step_filename}_{current_time}")
+                 f"Steps_{step_filename}")
 
     return
+
 
 def setup_logger(path_to_out):
     logger = logging.getLogger('TrainingLogger')

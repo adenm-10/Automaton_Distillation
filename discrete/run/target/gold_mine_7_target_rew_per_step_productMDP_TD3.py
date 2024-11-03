@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--gamma', type=float, default=0.99, help='Discount Factor (Gamma)')
     parser.add_argument('--batch-size', type=int, default=64, help='Buffer Batch Size')
     parser.add_argument('--tau', type=float, default=0.005, help='Target Transfer Tau')
-    parser.add_argument('--total-steps', type=int, default=int(5e5), help='Buffer Batch Size')
+    parser.add_argument('--total-steps', type=int, default=int(2e6), help='Buffer Batch Size')
     parser.add_argument('--path-to-out', type=str, default="", help='Path to place plots')
 
     
@@ -65,8 +65,6 @@ if __name__ == '__main__':
         # gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
         path_to_out=path_to_out
     )
-
-    config = config._replace(automaton=gold_mine_automaton, ap_extractor=gold_mine_ap_extractor)
 
     print("\n\n============================================")
     print(f"Training Teacher / Independent TD3 Agent")

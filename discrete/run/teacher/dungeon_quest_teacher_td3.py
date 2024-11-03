@@ -36,12 +36,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script to handle command line arguments for ALR, CLR, and Gamma.")
     
     # Add arguments
-    parser.add_argument('--alr', type=float, default=0.001, help='Actor Learning Rate')
-    parser.add_argument('--clr', type=float, default=0.001, help='Critic Learning Rate')
+    parser.add_argument('--alr', type=float, default=0.0001, help='Actor Learning Rate')
+    parser.add_argument('--clr', type=float, default=0.0001, help='Critic Learning Rate')
     parser.add_argument('--gamma', type=float, default=0.99, help='Discount Factor (Gamma)')
     parser.add_argument('--batch-size', type=int, default=128, help='Buffer Batch Size')
     parser.add_argument('--tau', type=float, default=0.005, help='Target Transfer Tau')
-    parser.add_argument('--total-steps', type=int, default=int(5e5), help='Buffer Batch Size')
+    parser.add_argument('--total-steps', type=int, default=int(1e6), help='Buffer Batch Size')
     parser.add_argument('--path-to-out', type=str, default=None, help='Path to place plots')
 
     

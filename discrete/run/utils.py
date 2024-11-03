@@ -33,7 +33,7 @@ dummy_ltlf = "True"
 def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device, agent_cls=DuelingQNetworkAgent,
                       no_done_on_out_of_time: bool = False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
                       max_training_steps=int(1e6), online_distill: bool = False, 
-                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.001, batch_size: int = 32, tau: float = 1.0, path_to_out: str = None):
+                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.0001, batch_size: int = 64, tau: float = 1, path_to_out: str = None):
     automaton, ap_extractor = construct_ap_extractor_automaton(aps, ltlf, device)
 
 
@@ -42,7 +42,7 @@ def teacher_config_v1(env_config: EnvConfig, run_name: str, device: torch.device
         num_parallel_envs=10,
         rollout_buffer_config=RolloutBufferConfig(
             rollout_buffer_cls=CircularRolloutBuffer,
-            capacity=750000,
+            capacity=150000,
             priority_scale=0.7,
             min_size_before_training=1000
         ),
@@ -75,7 +75,7 @@ def student_config_v1(env_config: EnvConfig, teacher_run_name: str, student_run_
                       agent_cls=TD3_Agent, max_training_steps=int(1e6),
                       no_done_on_out_of_time=False, aps: List = dummy_aps, ltlf: str = dummy_ltlf,
                       reward_machine: bool = False,
-                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.001, batch_size: int = 32, tau: float = 1.0, path_to_out: str = None):
+                      gamma: float = 0.99, alr: float = 0.0001, clr: float = 0.0001, batch_size: int = 64, tau: float = 0.005, path_to_out: str = None):
 
     teacher_config = None
     if agent_cls == TD3_Agent:

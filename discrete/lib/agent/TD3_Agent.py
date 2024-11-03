@@ -227,8 +227,8 @@ class TD3_Agent(AC_Agent):
             self.d = int(os.getenv("POLICY_FREQ"))
 
         self.device = "cpu"
-        # if torch.cuda.is_available():
-        #     self.device = torch.device('cuda:0')
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda:0')
 
         self.flattener = nn.Flatten()
         
@@ -245,17 +245,25 @@ class TD3_Agent(AC_Agent):
     def create_agent(cls, input_shape: Tuple, num_automaton_states: int, num_actions: int) -> "AC_Agent":
         return cls(input_shape, num_actions)
     
+    # def choose_action(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> torch.tensor:
+
+    #     self.actor.eval()
+    #     mu = self.actor.forward(observation).to(self.actor.device)
+
+    #     # noise = torch.tensor(self.noise(),dtype=torch.float).to(self.actor.device)
+    #     noise = self.noise(mu)
+    #     mu_prime = (mu + noise).clamp(-self.max_action, self.max_action)
+
+    #     self.actor.train()
+    #     action = mu_prime.cpu().detach().numpy()
+
+    #     return action
+    
     def choose_action(self, observation: torch.Tensor, automaton_states: torch.Tensor) -> torch.tensor:
 
-        self.actor.eval()
+        
         mu = self.actor.forward(observation).to(self.actor.device)
-
-        # noise = torch.tensor(self.noise(),dtype=torch.float).to(self.actor.device)
-        noise = self.noise(mu)
-        mu_prime = (mu + noise).clamp(-self.max_action, self.max_action)
-
-        self.actor.train()
-        action = mu_prime.cpu().detach().numpy()
+        action = mu.cpu().detach().numpy()
 
         return action
 
