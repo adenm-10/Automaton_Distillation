@@ -446,8 +446,7 @@ def vec_env_distinct_episodes(states: torch.Tensor, infos: List[Dict]) -> Tuple[
 
     return states_after_current, states
 
-def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.Tensor,
-                          automaton: Automaton) -> torch.tensor:
+def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.Tensor, automaton: Automaton, device: str) -> torch.tensor:
     """
 	Reset the automaton state for resetted environments
 	:param aut_states_after_previous: The automaton state of the environment, possibly of the terminal state
@@ -459,15 +458,13 @@ def reset_done_aut_states(aut_states_after_previous: torch.Tensor, dones: torch.
 	return torch.where(dones, automaton.default_state, aut_states_after_previous)
 	"""
 
+
+
     a = automaton.default_state
     a = np.int64(a)
-    # print(dones)
-    # print(a)
-    b = torch.tensor(aut_states_after_previous.cpu().numpy(), dtype=torch.int64, device="cpu")
-    
-    #precious reverted to the old code
+    b = torch.tensor(aut_states_after_previous.cpu().numpy(), dtype=torch.int64, device=device)
 
-    return torch.where(dones, automaton.default_state, aut_states_after_previous)
+    return torch.where(dones, a, b)
 
 class TraceHelper:
     """
@@ -592,7 +589,7 @@ def distill_agent(config: Configuration,
                                                                             aps_after_current,
                                                                             aut_states_after_current)
 
-        next_aut_states = reset_done_aut_states(aut_states_after_current, dones, automaton)
+        next_aut_states = reset_done_aut_states(aut_states_after_current, dones, automaton, device=config.device)
         
         # All of these are part of the same episode. next_states and next_aut_states may be part of a different episode
         buff_helper.add_vec_experiences(current_states=current_states,
@@ -820,7 +817,7 @@ def train_agent(config: Configuration,
                                                                             aps_after_current,
                                                                             aut_states_after_current)
 
-        next_aut_states = reset_done_aut_states(aut_states_after_current, dones, automaton)
+        next_aut_states = reset_done_aut_states(aut_states_after_current, dones, automaton, device=config.device)
 
         # All of these are part of the same episode. next_states and next_aut_states may be part of a different episode
         buff_helper.add_vec_experiences(current_states=current_states,

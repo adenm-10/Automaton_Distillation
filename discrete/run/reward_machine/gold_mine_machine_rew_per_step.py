@@ -1,7 +1,6 @@
 import torch
 
 from discrete.run.utils import construct_ap_extractor_automaton
-assert False
 from discrete.lib.automaton.reward_machine import RewardMachine
 from discrete.run.env.gold_mine import gold_mine_automaton, n
 

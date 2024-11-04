@@ -58,7 +58,7 @@ The overall organization:
 
 ## Experiment 
 
-To train the teachers:
+### To train the teachers:
     
     1) Delete contents of automaton_q folder
         Linux: `rm -rf ./automaton_q/*`
@@ -73,7 +73,7 @@ To train the teachers:
        2) python discrete/run/reward_machine/blind_craftsman_machine_rew_per_step.py
        3) python discrete/run/reward_machine/gold_mine_machine_rew_per_step.py
 
-To train the students and related algorithms run the training for each environment/student:
+### To train the students and related algorithms run the training for each environment/student:
     
     1) Dynamic Automaton Distillation:
         1) python discrete/run/target/dungeon_quest_7_10_target_rew_per_step_productMDP.py
@@ -81,40 +81,50 @@ To train the students and related algorithms run the training for each environme
         3) python discrete/run/target/blind_craftsman_7_obstacles_target_rew_per_step_productMDP.py
         4) python discrete/run/target/gold_mine_7_10_target_rew_per_step_productMDP.py
 
-    2) Static Automaton Distillation:
+    2) Dynamic Automaton Distillation to Continuous environments
+        1) python discrete/run/target/dungeon_quest_7_target_rew_per_step_productMDP_TD3.py
+        2) python discrete/run/target/blind_craftsman_7_target_rew_per_step_productMDP_TD3.py
+        3) python discrete/run/target/gold_mine_7_target_rew_per_step_productMDP_TD3.py
+
+    3) Static Automaton Distillation:
         1) python discrete/run/target/dungeon_quest_target_machine_q_rew_per_step_productMDP.py
         2) python discrete/run/target/blind_craftsman_target_machine_rew_per_step_productMDP.py
         3) python discrete/run/target/blind_craftsman_obstacles_target_machine_rew_per_step_productMDP.py
         4) python discrete/run/target/gold_mine_target_machine_q_rew_per_step_productMDP.py
 
-    3) CRM:
+    4) CRM:
         1)  python discrete/run/target/dungeon_quest_target_machine_rew_per_step_CRM.py
         2) python discrete/run/target/blind_craftsman_target_machine_rew_per_step_CRM.py
         3) python discrete/run/target/blind_craftsman_obstacles_target_machine_rew_per_step_CRM.py
         4) python discrete/run/target/gold_mine_target_machine_rew_per_step_CRM.py
 
-    4) Product MDP Q-Learning:
+    5) Product MDP Q-Learning:
         1) python discrete/run/teacher/dungeon_quest_teacher_rew_per_step_productMDP.py
         2) python discrete/run/teacher/blind_craftsman_teacher_rew_per_step_productMDP.py
         3) python discrete/run/teacher/blind_craftsman_obstacles_teacher_rew_per_step_productMDP.py
         4) python discrete/run/teacher/gold_mine_teacher_rew_per_step_productMDP.py
 
-    5) Vanilla Q-Learning:
+    6) Vanilla Q-Learning:
         1) python discrete/run/teacher/dungeon_quest_teacher_rew_per_step.py
         2) python discrete/run/teacher/blind_craftsman_teacher_rew_per_step.py
         3) python discrete/run/teacher/blind_craftsman_obstacles_teacher_rew_per_step.py
         4) python discrete/run/teacher/gold_mine_teacher_rew_per_step.py
 
-    6) Dynamic Automaton Distillation to Continuous environments
-        1) python discrete/run/teacher/dungeon_quest_7_target_rew_per_step_productMDP_TD3.py
-        2) python discrete/run/teacher/blind_craftsman_7_target_rew_per_step_productMDP_TD3.py
-        3) python discrete/run/teacher/gold_mine_7_target_rew_per_step_productMDP_TD3.py
+    7) Vanilla TD3-Learning:
+       1) python discrete/run/teacher/dungeon_quest_teacher_td3.py
+       2) python discrete/run/teacher/blind_craftsman_teacher_td3.py.py
+       3) python discrete/run/teacher/gold_mine_teacher_td3.py
+
 
      Note: The helper script discrete/run/experiment/paperexperiments.py can be used to run multiple experiment trials including a run ID to make the checkpoints/logs unique to each trial.
 
-To extract CSV results from logs for plotting:
-  python discrete/run/experiment/extract_events_to_csv.py LOGFOLDER
+### To extract CSV results from logs for plotting:
+  `python discrete/run/experiment/extract_events_to_csv.py LOGFOLDER`
 
+### To view plots:
+
+    1) View immediately generated plots in test_output/
+    2) Change file paths to generated csv in `logs/plot.py` and run `logs/plot.py` to generate new plots
 
 NOTES:
 When running for the first time, training should print "NOT loading from the checkpoint"; otherwise, it will automatically load from the last checkpoint.

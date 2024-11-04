@@ -16,7 +16,7 @@ def create_training_state(config: Configuration) -> Tuple[Agent, RolloutBuffer, 
     """
     Loads training state from a checkpoint, or creates a default training state if no checkpoint exists
     """
-    print(f"Env Config: {config.env_config}")
+    # print(f"Env Config: {config.env_config}")
     sample_env = make_env(config.env_config)
     print(f"Env Name: {config.env_config.env_name}")
     print(f"Observation Space: {sample_env.observation_space}")

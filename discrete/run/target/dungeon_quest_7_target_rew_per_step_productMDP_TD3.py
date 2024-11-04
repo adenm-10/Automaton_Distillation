@@ -4,16 +4,11 @@ import torch
 import time
 import argparse
 
-from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
-from discrete.run.env.dungeon_quest_7 import dungeon_quest_rew_per_step_env_config_7_cont, dungeon_quest_aps, dungeon_quest_ltlf
-from discrete.lib.agent.one_hot_automaton_agent import OneHotAutomatonAfterFeatureExtractorAgent
 from discrete.lib.main import run_training
-# from discrete.run.env.dungeon_quest import dungeon_quest_aps, dungeon_quest_ltlf
 from discrete.run.utils import student_config_v1
 from discrete.lib.agent.TD3_Agent import TD3_Agent
-
-from discrete.lib.agent.AC_Agent import AC_Agent
-from discrete.run.env.dungeon_quest_7 import dungeon_quest_config_7, dungeon_quest_rew_per_step_env_config_7, dungeon_quest_rew_per_step_env_config_7_cont, dungeon_quest_aps, dungeon_quest_ltlf
+from discrete.lib.automaton.target_automaton import ExponentialAnnealTargetAutomaton
+from discrete.run.env.dungeon_quest_7 import dungeon_quest_rew_per_step_env_config_7_cont, dungeon_quest_aps, dungeon_quest_ltlf
 
 print("imported all dependencies, checking for cuda")
 
@@ -62,14 +57,15 @@ if __name__ == '__main__':
         aps=dungeon_quest_aps,
         ltlf=dungeon_quest_ltlf,
         max_training_steps=max_training_steps,
-        gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, path_to_out=path_to_out
+        gamma=gamma, alr=alr, clr=clr, batch_size=batch_size, tau=tau, 
+        path_to_out=path_to_out
     )
 
     print("\n\n============================================")
-    print(f"Training Teacher / Independent DDPG Agent")
+    print(f"Training Student / Dependent TD3 Agent")
     print(f"Max Training Steps: {max_training_steps}")
     print(f"LTLF: {dungeon_quest_ltlf}")
-    # print(f"Hyperparameters: {}")
+    print(f"Environment: Continuous Dungeon Quest 7x7")
     print("============================================\n\n")
     start_time = time.time()
     run_training(config)

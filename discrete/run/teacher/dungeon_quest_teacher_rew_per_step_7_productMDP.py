@@ -58,6 +58,7 @@ if __name__ == '__main__':
     print(f"Training Teacher / Independent Dueling-DQN Agent")
     print(f"Max Training Steps: {max_training_steps}")
     print(f"LTLF: {dungeon_quest_ltlf}")
+    print("Environment: Discrete Dungeon Quest 7x7")
     print("============================================\n\n")
 
     run_training(config)
