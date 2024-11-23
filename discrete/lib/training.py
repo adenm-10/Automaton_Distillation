@@ -744,11 +744,12 @@ def train_agent(config: Configuration,
         if isinstance(agent, AC_Agent):
             actions = agent.choose_action(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states) # DDPG doesnt use current aut states in action selection
+	    actions = (actions + np.random.normal(0, max_action * expl_noise, size=action_shape)).clip(-max_action, max_action)
         else:
             q_values = agent.calc_q_values_batch(torch.as_tensor(current_states, device=config.device, dtype=torch.float),
                                              current_aut_states)
             actions = take_eps_greedy_action_from_q_values(q_values, config.epsilon)
-        actions = (actions + np.random.normal(0, max_action * expl_noise, size=action_shape)).clip(-max_action, max_action)
+        
             
         # (2) Take a step in the environment, process returned state, reward, and information
         obs, rewards, dones, infos = env.step(actions)
